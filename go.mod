@@ -1,4 +1,4 @@
-module tutorial/api
+module DebTour
 
 go 1.21.6
 

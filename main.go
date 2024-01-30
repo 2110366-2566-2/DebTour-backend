@@ -1,19 +1,21 @@
 package main
 
 import (
-	"net/http"
+	"DebTour/controllers"
 
 	"github.com/gin-gonic/gin"
 )
 
-func getHello(c *gin.Context) {
-	c.String(http.StatusOK, "Hello World")
+func SetupRouter() *gin.Engine {
+	router := gin.Default()
+
+	return router
 }
 
 func main() {
-	router := gin.Default()
+	router := SetupRouter()
 
-	router.GET("/", getHello)
+	router.GET("/", controllers.HelloWorld)
 
 	router.Run("localhost:9000")
 }
