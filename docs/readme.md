@@ -3,4 +3,6 @@ To access Swagger, go to [/swagger/index.html](http://localhost:9000/swagger/ind
 ```
 
 ## To Generate docs
-run 'swag init' in the root directory of the project. This will generate the docs folder with the swagger documentation.
+First, run 'go install github.com/swaggo/swag/cmd/swag@latest'
+
+Second, run 'swag init' in the root directory of the project. This will generate the docs folder with the swagger documentation.
