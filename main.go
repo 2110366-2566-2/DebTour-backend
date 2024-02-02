@@ -37,5 +37,5 @@ func main() {
 		v1.GET("/hello", controllers.HelloWorld)
 	}
 
-	router.Run("localhost:9000")
+	router.Run(":9000")
 }
