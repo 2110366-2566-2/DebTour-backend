@@ -1,0 +1,16 @@
+info:
+  contact: {}
+paths:
+  /hello:
+    get:
+      description: Just reply Hello World!
+      operationId: HelloWorld
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Hello World!
+          schema:
+            type: string
+      summary: Hello World
+swagger: "2.0"
