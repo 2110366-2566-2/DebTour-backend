@@ -1,6 +1,6 @@
 package models
 
 type IssueImage struct {
-	IssueId uint   `json:"issueId"`
-	Image   string `json:"image"`
+	IssueId uint   `gorm:"primaryKey" json:"issue_id"`
+	Image   string `gorm:"primaryKey" json:"image"`
 }

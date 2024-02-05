@@ -1,7 +1,7 @@
 package models
 
 type ActivityLocation struct {
-	TourId     uint `json:"tourId"`
-	ActivityId uint `json:"activityId"`
-	LocationId uint `json:"locationId"`
+	TourId     uint `gorm:"primaryKey" json:"tourId"`
+	ActivityId uint `gorm:"primaryKey" json:"activityId"`
+	LocationId uint `gorm:"primaryKey" json:"locationId"`
 }

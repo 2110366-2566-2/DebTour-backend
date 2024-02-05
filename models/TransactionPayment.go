@@ -3,8 +3,8 @@ package models
 import "time"
 
 type TransactionPayment struct {
-	TransactionId   uint   `json:"transactionId"`
-	TourId          uint   `json:"tourId"`
-	TouristUsername string `json:"touristUsername"`
-	Timestamp       time.Time
+	TransactionId   uint      `gorm:"primaryKey" json:"transactionId"`
+	TourId          uint      `gorm:"primaryKey" json:"tourId"`
+	TouristUsername string    `gorm:"primaryKey" json:"touristUsername"`
+	Timestamp       time.Time `gorm:"autoCreateTime" json:"timestamp"`
 }

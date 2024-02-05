@@ -3,8 +3,8 @@ package models
 import "time"
 
 type CommentReview struct {
-	ReviewId        uint      `json:"reviewId"`
-	TourId          uint      `json:"tourId"`
-	TouristUsername string    `json:"touristUsername"`
-	Timestamp       time.Time `json:"timestamp"`
+	ReviewId        uint      `gorm:"primaryKey" json:"reviewId"`
+	TourId          uint      `gorm:"primaryKey" json:"tourId"`
+	TouristUsername string    `gorm:"primaryKey" json:"touristUsername"`
+	Timestamp       time.Time `gorm:"autoCreateTime" json:"timestamp"`
 }

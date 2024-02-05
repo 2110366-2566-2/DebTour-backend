@@ -5,9 +5,9 @@ import (
 )
 
 type Notification struct {
-	NotificationId uint   `json:"notificationId"`
-	Message        string `json:"message"`
-	URL            string `json:"url"`
-	Username       string `json:"username"`
-	Timestamp      time.Time
+	NotificationId uint      `gorm:"primaryKey" json:"notification_id"`
+	Message        string    `json:"message"`
+	URL            string    `json:"url"`
+	Username       string    `json:"username"`
+	Timestamp      time.Time `gorm:"autoCreateTime"`
 }

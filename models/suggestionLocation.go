@@ -1,6 +1,6 @@
 package models
 
 type SuggestionLocation struct {
-	SuggestionId uint `json:"suggestionId"`
-	LocationId   uint `json:"locationId"`
+	SuggestionId uint `gorm:"primaryKey" json:"suggestionId"`
+	LocationId   uint `gorm:"primaryKey" json:"locationId"`
 }
