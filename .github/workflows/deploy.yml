@@ -15,3 +15,9 @@ jobs:
         
       - name: Build docker compose
         run: docker-compose up -d --build
+
+      - name: Build Go
+        run: go build -o main .
+
+      - name: Run Go
+        run: ./main
