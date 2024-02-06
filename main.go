@@ -2,6 +2,7 @@ package main
 
 import (
 	"DebTour/controllers"
+	"DebTour/models"
 
 	"github.com/gin-gonic/gin"
 
@@ -27,6 +28,9 @@ func SetupRouter() *gin.Engine {
 }
 
 func main() {
+
+	models.InitDB()
+
 	router := SetupRouter()
 
 	SetUpSwagger()
