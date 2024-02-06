@@ -39,6 +39,9 @@ func main() {
 	v1 := router.Group("/api/v1")
 	{
 		v1.GET("/hello", controllers.HelloWorld)
+		v1.GET("/users", controllers.GetAllUsers)
+		v1.GET("/users/:username", controllers.GetUserByUsername)
+		v1.POST("/users", controllers.CreateUser)
 	}
 
 	router.Run(":9000")
