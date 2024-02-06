@@ -9,6 +9,7 @@ type User struct {
 	Password    string    `json:"password"`
 	Phone       string    `json:"phone"`
 	Email       string    `json:"email"`
+	Image       string    `json:"image"`
 	CreatedTime time.Time `gorm:"autoCreateTime"`
 }
 
@@ -18,12 +19,13 @@ func GetUserByUsername(username string) (User, error) {
 	return user, result.Error
 }
 
-func CreateUser(username, password, phone, email string) error {
+func CreateUser(username, password, phone, email, image string) error {
 	user := User{
 		Username: username,
 		Password: password,
 		Phone:    phone,
 		Email:    email,
+		Image:    image,
 	}
 	result := db.Create(&user)
 	return result.Error

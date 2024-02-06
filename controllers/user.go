@@ -56,7 +56,7 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := models.CreateUser(user.Username, user.Password, user.Phone, user.Email)
+	err := models.CreateUser(user.Username, user.Password, user.Phone, user.Email, user.Image)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
