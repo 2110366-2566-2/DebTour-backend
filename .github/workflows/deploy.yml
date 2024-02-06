@@ -9,6 +9,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
+      - name: Stop existing containers
+        run: docker-compose down
+        
       - name: Build docker compose
         run: docker-compose up -d --build
