@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Tour struct {
-	TourId           uint      `gorm:"primaryKey;type:SERIAL" json:"tourId"`
+	TourId           uint      `gorm:"primaryKey;autoIncrement" json:"tourId"`
 	Name             string    `json:"name"`
 	StartDate        string    `json:"startDate"`
 	EndDate          string    `json:"endDate"`
