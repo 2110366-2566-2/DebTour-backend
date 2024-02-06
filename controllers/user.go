@@ -63,3 +63,46 @@ func CreateUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
+
+// DeleteUser godoc
+// @summary Delete a user
+// @description Delete a user
+// @id DeleteUser
+// @param username path string true "Username"
+// @produce json
+// @response 200 {string} string "User deleted"
+// @router /users/{username} [delete]
+func DeleteUser(c *gin.Context) {
+	username := c.Param("username")
+	err := models.DeleteUser(username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, "User deleted")
+}
+
+// UpdateUser godoc
+// @summary Update a user
+// @description Update a user
+// @id UpdateUser
+// @accept json
+// @produce json
+// @param username path string true "Username"
+// @param user body User true "User"
+// @response 200 {string} string "User updated"
+// @router /users/{username} [put]
+func UpdateUser(c *gin.Context) {
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	username := user.Username
+	err := models.UpdateUser(username, user.Password, user.Phone, user.Email, user.Image)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, "User updated")
+}
