@@ -42,6 +42,8 @@ func main() {
 		v1.GET("/users", controllers.GetAllUsers)
 		v1.GET("/users/:username", controllers.GetUserByUsername)
 		v1.POST("/users", controllers.CreateUser)
+		v1.DELETE("/users/:username", controllers.DeleteUser)
+		v1.PUT("/users", controllers.UpdateUser)
 	}
 
 	router.Run(":9000")
