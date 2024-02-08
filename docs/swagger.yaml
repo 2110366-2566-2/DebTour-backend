@@ -1,4 +1,33 @@
 definitions:
+  models.Tour:
+    properties:
+      agencyUsername:
+        type: string
+      createdTimestamp:
+        type: string
+      description:
+        type: string
+      endDate:
+        type: string
+      maxMemberCount:
+        type: integer
+      memberCount:
+        type: integer
+      name:
+        type: string
+      overviewLocation:
+        type: string
+      price:
+        type: number
+      refundDueDate:
+        type: string
+      startDate:
+        type: string
+      status:
+        type: string
+      tourId:
+        type: integer
+    type: object
   models.User:
     properties:
       createdTime:
@@ -29,6 +58,64 @@ paths:
           schema:
             type: string
       summary: Hello World
+  /tours:
+    get:
+      description: Get all tours
+      operationId: GetAllTours
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Tour'
+            type: array
+      summary: Get all tours
+    post:
+      consumes:
+      - application/json
+      description: Create a tour with the input JSON data
+      operationId: CreateTour
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tour'
+      summary: Create a tour
+  /tours/{tourId}:
+    delete:
+      description: Delete a tour
+      operationId: DeleteTour
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete a tour
+    put:
+      consumes:
+      - application/json
+      description: Update a tour with the input JSON data
+      operationId: UpdateTour
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tour'
+      summary: Update a tour
   /users:
     get:
       description: Get all users

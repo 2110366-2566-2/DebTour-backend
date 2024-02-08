@@ -33,6 +33,92 @@ const docTemplate = `{
                 }
             }
         },
+        "/tours": {
+            "get": {
+                "description": "Get all tours",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all tours",
+                "operationId": "GetAllTours",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Tour"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a tour with the input JSON data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create a tour",
+                "operationId": "CreateTour",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tour"
+                        }
+                    }
+                }
+            }
+        },
+        "/tours/{tourId}": {
+            "put": {
+                "description": "Update a tour with the input JSON data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update a tour",
+                "operationId": "UpdateTour",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tour"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a tour",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete a tour",
+                "operationId": "DeleteTour",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tour ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Get all users",
@@ -175,6 +261,50 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Tour": {
+            "type": "object",
+            "properties": {
+                "agencyUsername": {
+                    "type": "string"
+                },
+                "createdTimestamp": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "maxMemberCount": {
+                    "type": "integer"
+                },
+                "memberCount": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "overviewLocation": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "refundDueDate": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tourId": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.User": {
             "type": "object",
             "properties": {
