@@ -17,3 +17,28 @@ type Tour struct {
 	AgencyUsername   string    `json:"agencyUsername"`
 	CreatedTimestamp time.Time `gorm:"autoCreateTime" json:"createdTimestamp"`
 }
+
+func GetAllTours() (tours []Tour, err error) {
+	result := db.Find(&tours)
+
+	return tours, result.Error
+}
+
+func CreateTour(tour *Tour) (err error) {
+	result := db.Model(&Tour{}).Create(tour)
+
+	return result.Error
+}
+
+func UpdateTour(tour *Tour) (err error) {
+	result := db.Model(&Tour{}).Where("tour_id = ?", tour.TourId).Updates(tour)
+
+	return result.Error
+}
+
+func DeleteTour(tourId uint) (err error) {
+
+	result := db.Model(&Tour{}).Where("tour_id = ?", tourId).Delete(&Tour{})
+
+	return result.Error
+}
