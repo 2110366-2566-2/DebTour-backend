@@ -37,8 +37,24 @@ func UpdateTour(tour *Tour) (err error) {
 }
 
 func DeleteTour(tourId uint) (err error) {
+	// Transaction begins
+	tx := db.Begin()
 
-	result := db.Model(&Tour{}).Where("tour_id = ?", tourId).Delete(&Tour{})
+	// Delete all joinings of the tour by calling the function from joining.go
+	err = DeleteJoiningByTourId(tourId, tx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
-	return result.Error
+	// Delete the tour
+	result := tx.Model(&Tour{}).Where("tour_id = ?", tourId).Delete(&Tour{})
+	if result.Error != nil {
+		tx.Rollback()
+		return result.Error
+	}
+
+	// Transaction ends
+	tx.Commit()
+	return nil
 }
