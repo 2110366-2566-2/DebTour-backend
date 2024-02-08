@@ -24,6 +24,12 @@ func GetAllTours() (tours []Tour, err error) {
 	return tours, result.Error
 }
 
+func GetTour(tourId uint) (tour Tour, err error) {
+	result := db.First(&tour, tourId)
+
+	return tour, result.Error
+}
+
 func CreateTour(tour *Tour) (err error) {
 	result := db.Model(&Tour{}).Create(tour)
 

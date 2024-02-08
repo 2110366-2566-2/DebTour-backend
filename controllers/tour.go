@@ -27,6 +27,34 @@ func GetAllTours(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": tours})
 }
 
+// GetTouristByTourId godoc
+// @summary Get a tourist by tourId
+// @description Get a tourist by tourId
+// @id GetTouristByTourId
+// @produce json
+// @param id path int true "Tour ID"
+// @success 200 {array} models.
+// @router /tours/{tourId}/tourists [get]
+func GetTouristByTourId(c *gin.Context) {
+
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	id := uint(id64)
+	joining, err := models.GetJoiningByTourId(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": joining})
+}
+
 // CreateTour godoc
 // @summary Create a tour
 // @description Create a tour with the input JSON data
@@ -60,16 +88,32 @@ func CreateTour(c *gin.Context) {
 // @accept json
 // @produce json
 // @success 200 {object} models.Tour
-// @router /tours [put]
+// @router /tours/{tourId} [put]
 func UpdateTour(c *gin.Context) {
 
+	tourId64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	tourId := uint(tourId64)
 	var tour models.Tour
+
+	tour, err = models.GetTour(tourId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&tour); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	err := models.UpdateTour(&tour)
+	err = models.UpdateTour(&tour)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})

@@ -47,7 +47,7 @@ func main() {
 
 		v1.GET("/tours", controllers.GetAllTours)
 		v1.POST("/tours", controllers.CreateTour)
-		v1.PUT("/tours", controllers.UpdateTour)
+		v1.PUT("/tours/:id", controllers.UpdateTour)
 		v1.DELETE("/tours/:id", controllers.DeleteTour)
 	}
 
