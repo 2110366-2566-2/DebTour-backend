@@ -12,7 +12,7 @@ import (
 // @description Get all users
 // @id GetAllUsers
 // @produce json
-// @response 200 {array} User
+// @response 200 {array} models.User
 // @router /users [get]
 func GetAllUsers(c *gin.Context) {
 	users, err := models.GetAllUsers()
@@ -29,7 +29,7 @@ func GetAllUsers(c *gin.Context) {
 // @id GetUserByUsername
 // @produce json
 // @param username path string true "Username"
-// @response 200 {object} User
+// @response 200 {object} models.User
 // @router /users/{username} [get]
 func GetUserByUsername(c *gin.Context) {
 	username := c.Param("username")
@@ -47,8 +47,8 @@ func GetUserByUsername(c *gin.Context) {
 // @id CreateUser
 // @accept json
 // @produce json
-// @param user body User true "User"
-// @success 200 {object} User
+// @param user body models.User true "User"
+// @success 200 {object} models.User
 // @router /users [post]
 func CreateUser(c *gin.Context) {
 	var user models.User
@@ -89,7 +89,7 @@ func DeleteUser(c *gin.Context) {
 // @accept json
 // @produce json
 // @param username path string true "Username"
-// @param user body User true "User"
+// @param user body models.User true "User"
 // @response 200 {string} string "User updated"
 // @router /users/{username} [put]
 func UpdateUser(c *gin.Context) {
