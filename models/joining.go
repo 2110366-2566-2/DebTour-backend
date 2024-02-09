@@ -3,10 +3,17 @@ package models
 import "gorm.io/gorm"
 
 type Joining struct {
-	TourId          uint   `gorm:"primaryKey" json:"tourId"`
-	TouristUsername string `gorm:"primaryKey" json:"touristUsername"`
-	MemberName      string `gorm:"primaryKey" json:"memberName"`
-	Age             uint   `json:"age"`
+	TourId          uint   `gorm:"foreignKey" json:"tourId"`
+	TouristUsername string `gorm:"foreignKey" json:"touristUsername"`
+	MemberFirstName string `json:"memberFirstName"`
+	MemberLastName  string `json:"memberLastName"`
+	MemberAge       uint   `json:"memberAge"`
+}
+
+func GetALlJoinings() ([]Joining, error) {
+	var joining []Joining
+	result := db.Model(&Joining{}).Find(&joining)
+	return joining, result.Error
 }
 
 func GetJoiningByTourId(tourId uint) (joinings []Joining, err error) {

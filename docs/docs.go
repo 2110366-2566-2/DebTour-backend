@@ -33,6 +33,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/joinings": {
+            "get": {
+                "description": "Get all joinings",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all joinings",
+                "operationId": "GetAllJoinings",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Joining"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Join tour",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Join tour",
+                "operationId": "JoinTour",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Joining"
+                        }
+                    }
+                }
+            }
+        },
         "/tours": {
             "get": {
                 "description": "Get all tours",
@@ -63,6 +103,116 @@ const docTemplate = `{
                 ],
                 "summary": "Create a tour",
                 "operationId": "CreateTour",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tour"
+                        }
+                    }
+                }
+            }
+        },
+        "/tours/filter": {
+            "get": {
+                "description": "Filter tours",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Filter tours",
+                "operationId": "FilterTours",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date",
+                        "name": "startDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date",
+                        "name": "endDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Overview location",
+                        "name": "overviewLocation",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Member count from",
+                        "name": "memberCountFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Member count to",
+                        "name": "memberCountTo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Price from",
+                        "name": "priceFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Price to",
+                        "name": "priceTo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Tour"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tours/{id}": {
+            "get": {
+                "description": "Get tour by id",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get tour by id",
+                "operationId": "GetTourByID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tour ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -261,6 +411,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Joining": {
+            "type": "object",
+            "properties": {
+                "memberAge": {
+                    "type": "integer"
+                },
+                "memberFirstName": {
+                    "type": "string"
+                },
+                "memberLastName": {
+                    "type": "string"
+                },
+                "tourId": {
+                    "type": "integer"
+                },
+                "touristUsername": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Tour": {
             "type": "object",
             "properties": {
