@@ -10,14 +10,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Kill existing execution
+        run: pskill -f './main'
+
       - name: Stop existing containers
         run: docker-compose down
-        
-      - name: Build docker compose
-        run: docker-compose up -d --build
+
+      - name: Download Go dependencies
+        run: go mod download
 
       - name: Build Go
         run: go build -o main .
+
+      - name: Build docker compose
+        run: docker-compose up -d
 
       - name: Run Go
         run: ./main
