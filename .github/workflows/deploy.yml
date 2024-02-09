@@ -10,7 +10,7 @@ jobs:
       working-directory: ...../DebTour/DebTour-backend
     steps:
       - name: Pull code
-        uses: git pull
+        run: git pull
         working-directory: ${{ env.working-directory }}
 
       - name: Download Go dependencies
