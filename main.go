@@ -48,6 +48,9 @@ func main() {
 		v1.GET("/tours/:id", controllers.GetTourByID)
 		v1.GET("/tours/filter", controllers.FilterTours)
 
+		v1.POST("/joinings/join-tour", controllers.JoinTour)
+		v1.GET("/joinings", controllers.GetAllJoinings)
+
 	}
 
 	router.Run(":9000")
