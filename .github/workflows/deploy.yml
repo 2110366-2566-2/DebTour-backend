@@ -22,11 +22,9 @@ jobs:
       - name: Init swagger
         run: swag init
 
-      - name: Build docker compose
-        run: docker-compose up -d
   deploy:
-    - runs-on: self-hosted
-    - needs: build
-    - steps:
-        - name: Run Go
-          run: ./main
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Docker compose up
+        run: docker-compose up -d --build
