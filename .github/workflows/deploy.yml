@@ -41,6 +41,6 @@ jobs:
       - name: Run Go
         run: |
           kill -9 `cat save_pid.txt`
-          nohup ./main  > my.log 2>&1 &
+          RUNNER_TRACKING_ID="" && (nohup ./main  > my.log 2>&1 &)
           echo $! > save_pid.txt
         working-directory: ${{ env.working-directory }}
