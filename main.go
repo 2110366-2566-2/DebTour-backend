@@ -44,6 +44,13 @@ func main() {
 		v1.POST("/users", controllers.CreateUser)
 		v1.DELETE("/users/:username", controllers.DeleteUser)
 		v1.PUT("/users", controllers.UpdateUser)
+
+		v1.GET("/tours/:id", controllers.GetTourByID)
+		v1.GET("/tours/filter", controllers.FilterTours)
+
+		v1.POST("/joinings/join-tour", controllers.JoinTour)
+		v1.GET("/joinings", controllers.GetAllJoinings)
+
 	}
 
 	router.Run(":9000")
