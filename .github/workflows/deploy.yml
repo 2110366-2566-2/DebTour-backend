@@ -4,14 +4,11 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Stop existing containers
-        run: docker-compose down
 
       - name: Download Go dependencies
         run: go mod download
@@ -19,8 +16,14 @@ jobs:
       - name: Build Go
         run: go build -o main .
 
+      - name: Init swagger
+        run: swag init
+
       - name: Build docker compose
         run: docker-compose up -d
-
+  deploy:
+    - runs-on: self-hosted
+    - needs: build
+    - steps:
       - name: Run Go
         run: ./main
