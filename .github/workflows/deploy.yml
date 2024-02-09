@@ -10,6 +10,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Stop existing containters
+        run: docker-compose down
+
       - name: Download Go dependencies
         run: go mod download
 
@@ -25,5 +28,5 @@ jobs:
     - runs-on: self-hosted
     - needs: build
     - steps:
-      - name: Run Go
-        run: ./main
+        - name: Run Go
+          run: ./main
