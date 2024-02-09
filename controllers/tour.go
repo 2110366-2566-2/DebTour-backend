@@ -3,11 +3,31 @@ package controllers
 import (
 	"DebTour/models"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"math"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
+
+// GetAllTours godoc
+// @summary Get all tours
+// @description Get all tours
+// @id GetAllTours
+// @produce json
+// @success 200 {array} models.Tour
+// @router /tours [get]
+func GetAllTours(c *gin.Context) {
+
+	tours, err := models.GetAllTours()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tours})
+}
 
 // GetTourByID godoc
 // @Summary Get tour by id
@@ -21,15 +41,136 @@ func GetTourByID(c *gin.Context) {
 	id := c.Param("id")
 	_id, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tour id"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
 	tour, err := models.GetTourById(_id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"tour": tour})
+	c.JSON(http.StatusOK, gin.H{"success": false, "data": tour})
+}
+
+// // GetTouristByTourId godoc
+// // @summary Get a tourist by tourId
+// // @description Get a tourist by tourId
+// // @id GetTouristByTourId
+// // @produce json
+// // @param id path int true "Tour ID"
+// // @success 200 {array} models.Joining
+// // @router /tours/{tourId}/tourists [get]
+func GetTouristByTourId(c *gin.Context) {
+
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	id := uint(id64)
+	joining, err := models.GetJoiningByTourId(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": joining})
+}
+
+// CreateTour godoc
+// @summary Create a tour
+// @description Create a tour with the input JSON data
+// @id CreateTour
+// @accept json
+// @produce json
+// @success 200 {object} models.Tour
+// @router /tours [post]
+func CreateTour(c *gin.Context) {
+
+	var tour models.Tour
+	if err := c.ShouldBindJSON(&tour); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	err := models.CreateTour(&tour)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tour})
+}
+
+// UpdateTour godoc
+// @summary Update a tour
+// @description Update a tour with the input JSON data
+// @id UpdateTour
+// @accept json
+// @produce json
+// @success 200 {object} models.Tour
+// @router /tours/{tourId} [put]
+func UpdateTour(c *gin.Context) {
+
+	tourId, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	tour, err := models.GetTourById(tourId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&tour); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	err = models.UpdateTour(&tour)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tour})
+}
+
+// DeleteTour godoc
+// @summary Delete a tour
+// @description Delete a tour
+// @id DeleteTour
+// @produce json
+// @param id path int true "Tour ID"
+// @success 200 {string} string
+// @router /tours/{tourId} [delete]
+func DeleteTour(c *gin.Context) {
+
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	id := uint(id64)
+	err = models.DeleteTour(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Tour deleted successfully"})
 }
 
 // FilterTours godoc
@@ -98,7 +239,7 @@ func FilterTours(c *gin.Context) {
 	} else {
 		limitInt, err = strconv.Atoi(limit)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit"})
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid limit"})
 			return
 		}
 	}
@@ -108,7 +249,7 @@ func FilterTours(c *gin.Context) {
 	} else {
 		offsetInt, err = strconv.Atoi(offset)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset"})
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid offset"})
 			return
 		}
 	}
@@ -142,9 +283,9 @@ func FilterTours(c *gin.Context) {
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"tours": filteredToursResponse})
+	c.JSON(http.StatusOK, gin.H{"success": false, "data": filteredToursResponse})
 }
