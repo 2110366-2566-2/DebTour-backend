@@ -19,15 +19,8 @@ func GetUserByUsername(username string) (User, error) {
 	return user, result.Error
 }
 
-func CreateUser(username, password, phone, email, image string) error {
-	user := User{
-		Username: username,
-		Password: password,
-		Phone:    phone,
-		Email:    email,
-		Image:    image,
-	}
-	result := db.Model(&User{}).Create(&user)
+func CreateUser(user *User) error {
+	result := db.Model(&User{}).Create(user)
 	return result.Error
 }
 
@@ -37,12 +30,16 @@ func GetAllUsers() ([]User, error) {
 	return users, result.Error
 }
 
-func DeleteUser(username string) error {
-	result := db.Model(&User{}).Where("username = ?", username).Delete(&User{})
+func DeleteUser(user *User) error {
+	result := db.Model(&User{}).Where("username = ?", user.Username).Delete(user)
 	return result.Error
 }
 
-func UpdateUser(username, password, phone, email, image string) error {
-	result := db.Model(&User{}).Where("username = ?", username).Updates(User{Password: password, Phone: phone, Email: email, Image: image})
-	return result.Error
+func UpdateUser(user *User) error {
+	_, err := GetUserByUsername(user.Username)
+	if err != nil {
+		return err
+	}
+	result := db.Model(&User{}).Where("username = ?", user.Username).Updates(user)
+	return result.Error	
 }

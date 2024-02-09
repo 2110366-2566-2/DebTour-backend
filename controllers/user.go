@@ -17,10 +17,10 @@ import (
 func GetAllUsers(c *gin.Context) {
 	users, err := models.GetAllUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"users": users})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": users})
 }
 
 // GetUserByUsername godoc
@@ -35,10 +35,10 @@ func GetUserByUsername(c *gin.Context) {
 	username := c.Param("username")
 	user, err := models.GetUserByUsername(username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"user": user})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 }
 
 // CreateUser godoc
@@ -53,15 +53,15 @@ func GetUserByUsername(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err := models.CreateUser(user.Username, user.Password, user.Phone, user.Email, user.Image)
+	err := models.CreateUser(&user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"user": user})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 }
 
 // DeleteUser godoc
@@ -73,13 +73,17 @@ func CreateUser(c *gin.Context) {
 // @response 200 {string} string "User deleted"
 // @router /users/{username} [delete]
 func DeleteUser(c *gin.Context) {
-	username := c.Param("username")
-	err := models.DeleteUser(username)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, "User deleted")
+	err := models.DeleteUser(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Delete user successfully"})
 }
 
 // UpdateUser godoc
@@ -95,14 +99,13 @@ func DeleteUser(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	username := user.Username
-	err := models.UpdateUser(username, user.Password, user.Phone, user.Email, user.Image)
+	err := models.UpdateUser(&user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, "User updated")
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 }
