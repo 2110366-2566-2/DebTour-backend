@@ -117,7 +117,7 @@ func FilterTours(c *gin.Context) {
 
 	tours, err := models.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, offsetInt, limitInt)
 
-	type FilterToursDto struct {
+	type FilteredToursResponse struct {
 		TourId           int     `json:"tourId"`
 		TourName         string  `json:"tourName"`
 		StartDate        string  `json:"startDate"`
@@ -127,9 +127,9 @@ func FilterTours(c *gin.Context) {
 		MaxMemberCount   uint    `json:"maxMemberCount"`
 		Price            float64 `json:"price"`
 	}
-	var toursDto []FilterToursDto
+	var filteredToursResponse []FilteredToursResponse
 	for _, tour := range tours {
-		toursDto = append(toursDto, FilterToursDto{
+		filteredToursResponse = append(filteredToursResponse, FilteredToursResponse{
 			TourId:           int(tour.TourId),
 			TourName:         tour.Name,
 			StartDate:        tour.StartDate,
@@ -146,5 +146,5 @@ func FilterTours(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"tours": toursDto})
+	c.JSON(http.StatusOK, gin.H{"tours": filteredToursResponse})
 }
