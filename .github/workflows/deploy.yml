@@ -10,8 +10,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Stop existing containters
-        run: docker-compose down
+      - name: Download Go dependencies
+        run: go mod download
 
-      - name: Docker compose up
-        run: docker-compose up -d --build
+      - name: Build Go
+        run: go build -o main .
+
+      - name: Init swagger
+        run: swag init
+
+      - name: Build docker compose
+        run: docker-compose up -d
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Run Go
+        run: |
+          kill -9 `cat save_pid.txt`
+          nohup ./main  > my.log 2>&1 &
+          echo $! > save_pid.txt
