@@ -13,7 +13,7 @@ func InitDB() {
 	// Connect to the postgres db
 	var err error
 
-	db, err = gorm.Open(postgres.Open("host=localhost user=admin password=admin dbname=DebTour port=5432 TimeZone=Asia/Bangkok"), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open("host=postgres user=admin password=admin dbname=DebTour port=5432 TimeZone=Asia/Bangkok"), &gorm.Config{})
 
 	if err != nil {
 		log.Fatalln("Unable to connect to database: ", err)
@@ -49,4 +49,3 @@ func MigrateDB() {
 
 	db.AutoMigrate(Models...)
 }
-

@@ -13,18 +13,5 @@ jobs:
       - name: Stop existing containters
         run: docker-compose down
 
-      - name: Download Go dependencies
-        run: go mod download
-
-      - name: Build Go
-        run: go build -o main .
-
-      - name: Init swagger
-        run: swag init
-
-  deploy:
-    runs-on: self-hosted
-    needs: build
-    steps:
       - name: Docker compose up
         run: docker-compose up -d --build
