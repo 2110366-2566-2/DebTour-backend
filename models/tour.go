@@ -37,6 +37,12 @@ func CreateTour(tour *Tour) (err error) {
 }
 
 func UpdateTour(tour *Tour) (err error) {
+	_, err = GetTour(tour.TourId)
+
+	if err != nil {
+		return err
+	}
+
 	result := db.Model(&Tour{}).Where("tour_id = ?", tour.TourId).Updates(tour)
 
 	return result.Error
