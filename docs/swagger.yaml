@@ -85,7 +85,6 @@ paths:
               $ref: '#/definitions/models.Joining'
             type: array
       summary: Get all joinings
-  /joinings/join-tour:
     post:
       consumes:
       - application/json
@@ -99,6 +98,33 @@ paths:
           schema:
             $ref: '#/definitions/models.Joining'
       summary: Join tour
+  /tours:
+    get:
+      description: Get all tours
+      operationId: GetAllTours
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Tour'
+            type: array
+      summary: Get all tours
+    post:
+      consumes:
+      - application/json
+      description: Create a tour with the input JSON data
+      operationId: CreateTour
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tour'
+      summary: Create a tour
   /tours/{id}:
     get:
       description: Get tour by id
@@ -117,6 +143,37 @@ paths:
           schema:
             $ref: '#/definitions/models.Tour'
       summary: Get tour by id
+  /tours/{tourId}:
+    delete:
+      description: Delete a tour
+      operationId: DeleteTour
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete a tour
+    put:
+      consumes:
+      - application/json
+      description: Update a tour with the input JSON data
+      operationId: UpdateTour
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tour'
+      summary: Update a tour
   /tours/filter:
     get:
       description: Filter tours

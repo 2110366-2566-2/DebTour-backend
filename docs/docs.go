@@ -52,9 +52,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/joinings/join-tour": {
+            },
             "post": {
                 "description": "Join tour",
                 "consumes": [
@@ -70,6 +68,46 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Joining"
+                        }
+                    }
+                }
+            }
+        },
+        "/tours": {
+            "get": {
+                "description": "Get all tours",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all tours",
+                "operationId": "GetAllTours",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Tour"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a tour with the input JSON data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create a tour",
+                "operationId": "CreateTour",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tour"
                         }
                     }
                 }
@@ -180,6 +218,52 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Tour"
+                        }
+                    }
+                }
+            }
+        },
+        "/tours/{tourId}": {
+            "put": {
+                "description": "Update a tour with the input JSON data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update a tour",
+                "operationId": "UpdateTour",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tour"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a tour",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete a tour",
+                "operationId": "DeleteTour",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tour ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
