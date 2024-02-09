@@ -6,27 +6,37 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    env:
+      working-directory: ...../DebTour/DebTour-backend
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Pull code
+        uses: git pull
+        working-directory: ${{ env.working-directory }}
 
       - name: Download Go dependencies
         run: go mod download
+        working-directory: ${{ env.working-directory }}
 
       - name: Build Go
         run: go build -o main .
+        working-directory: ${{ env.working-directory }}
 
       - name: Init swagger
         run: swag init
+        working-directory: ${{ env.working-directory }}
 
       - name: Build docker compose
         run: docker-compose up -d
+        working-directory: ${{ env.working-directory }}
   deploy:
     runs-on: self-hosted
     needs: build
+    env:
+      working-directory: ...../DebTour/DebTour-backend
     steps:
       - name: Run Go
         run: |
           kill -9 `cat save_pid.txt`
           nohup ./main  > my.log 2>&1 &
           echo $! > save_pid.txt
+        working-directory: ${{ env.working-directory }}
