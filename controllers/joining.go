@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"DebTour/models"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // JoinTour godoc
@@ -13,7 +14,7 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.Joining
-// @Router /joinings/join-tour [post]
+// @Router /joinings [post]
 func JoinTour(c *gin.Context) {
 	type JoinTourRequest struct {
 		TourId          uint   `json:"tourId"`
@@ -26,7 +27,7 @@ func JoinTour(c *gin.Context) {
 	}
 	var joinTourRequest JoinTourRequest
 	if err := c.BindJSON(&joinTourRequest); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
@@ -38,12 +39,12 @@ func JoinTour(c *gin.Context) {
 			MemberLastName:  member.LastName,
 			MemberAge:       member.Age,
 		}
-		if err := models.CreateJoining(joining); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err := models.CreateJoining(&joining); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 			return
 		}
 	}
-
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "join tour successfully"})
 }
 
 // GetAllJoinings godoc
@@ -56,8 +57,8 @@ func JoinTour(c *gin.Context) {
 func GetAllJoinings(c *gin.Context) {
 	joinings, err := models.GetALlJoinings()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": true, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"joinings": joinings})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": joinings})
 }

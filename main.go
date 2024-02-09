@@ -45,10 +45,14 @@ func main() {
 		v1.DELETE("/users/:username", controllers.DeleteUser)
 		v1.PUT("/users", controllers.UpdateUser)
 
+		v1.GET("/tours", controllers.GetAllTours)
 		v1.GET("/tours/:id", controllers.GetTourByID)
+		v1.POST("/tours", controllers.CreateTour)
+		v1.PUT("/tours/:id", controllers.UpdateTour)
+		v1.DELETE("/tours/:id", controllers.DeleteTour)
 		v1.GET("/tours/filter", controllers.FilterTours)
 
-		v1.POST("/joinings/join-tour", controllers.JoinTour)
+		v1.POST("/joinings", controllers.JoinTour)
 		v1.GET("/joinings", controllers.GetAllJoinings)
 
 	}
