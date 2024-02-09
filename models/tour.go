@@ -18,6 +18,12 @@ type Tour struct {
 	CreatedTimestamp time.Time `gorm:"autoCreateTime" json:"createdTimestamp"`
 }
 
+func GetTourById(tourId int) (Tour, error) {
+	var tour Tour
+	result := db.First(&tour, tourId)
+	return tour, result.Error
+}
+
 func FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo string, offset, limit int) ([]Tour, error) {
 	var tours []Tour
 	result := db.Model(&Tour{}).Select("tour_id, name, start_date, end_date, overview_location, member_count, max_member_count, price").Where("name LIKE ? AND start_date >= ? AND end_date <= ? AND overview_location LIKE ? AND member_count >= ? AND member_count <= ? AND price >= ? AND price <= ?", name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo).Limit(limit).Offset(offset).Find(&tours)

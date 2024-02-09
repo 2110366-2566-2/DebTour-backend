@@ -9,6 +9,29 @@ import (
 	"strconv"
 )
 
+// GetTourByID godoc
+// @Summary Get tour by id
+// @Description Get tour by id
+// @ID GetTourByID
+// @Produce json
+// @Param id path int true "Tour ID"
+// @Success 200 {object} models.Tour
+// @Router /tours/{id} [get]
+func GetTourByID(c *gin.Context) {
+	id := c.Param("id")
+	_id, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tour id"})
+		return
+	}
+	tour, err := models.GetTourById(_id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"tour": tour})
+}
+
 // FilterTours godoc
 // @Summary Filter tours
 // @Description Filter tours
