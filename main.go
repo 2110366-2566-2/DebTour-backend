@@ -3,8 +3,10 @@ package main
 import (
 	"DebTour/controllers"
 	"DebTour/models"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -16,7 +18,7 @@ func SetUpSwagger() {
 	docs.SwaggerInfo.Title = "DebTour API"
 	docs.SwaggerInfo.Description = "DebTour API"
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:9000"
+	docs.SwaggerInfo.Host = os.Getenv("HOST")
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }
