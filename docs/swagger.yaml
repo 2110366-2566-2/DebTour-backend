@@ -1,4 +1,46 @@
 definitions:
+  models.Joining:
+    properties:
+      memberAge:
+        type: integer
+      memberFirstName:
+        type: string
+      memberLastName:
+        type: string
+      tourId:
+        type: integer
+      touristUsername:
+        type: string
+    type: object
+  models.Tour:
+    properties:
+      agencyUsername:
+        type: string
+      createdTimestamp:
+        type: string
+      description:
+        type: string
+      endDate:
+        type: string
+      maxMemberCount:
+        type: integer
+      memberCount:
+        type: integer
+      name:
+        type: string
+      overviewLocation:
+        type: string
+      price:
+        type: number
+      refundDueDate:
+        type: string
+      startDate:
+        type: string
+      status:
+        type: string
+      tourId:
+        type: integer
+    type: object
   models.User:
     properties:
       createdTime:
@@ -29,6 +71,164 @@ paths:
           schema:
             type: string
       summary: Hello World
+  /joinings:
+    get:
+      description: Get all joinings
+      operationId: GetAllJoinings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Joining'
+            type: array
+      summary: Get all joinings
+    post:
+      consumes:
+      - application/json
+      description: Join tour
+      operationId: JoinTour
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Joining'
+      summary: Join tour
+  /tours:
+    get:
+      description: Get all tours
+      operationId: GetAllTours
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Tour'
+            type: array
+      summary: Get all tours
+    post:
+      consumes:
+      - application/json
+      description: Create a tour with the input JSON data
+      operationId: CreateTour
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tour'
+      summary: Create a tour
+  /tours/{id}:
+    get:
+      description: Get tour by id
+      operationId: GetTourByID
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tour'
+      summary: Get tour by id
+  /tours/{tourId}:
+    delete:
+      description: Delete a tour
+      operationId: DeleteTour
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete a tour
+    put:
+      consumes:
+      - application/json
+      description: Update a tour with the input JSON data
+      operationId: UpdateTour
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tour'
+      summary: Update a tour
+  /tours/filter:
+    get:
+      description: Filter tours
+      operationId: FilterTours
+      parameters:
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Start date
+        in: query
+        name: startDate
+        type: string
+      - description: End date
+        in: query
+        name: endDate
+        type: string
+      - description: Overview location
+        in: query
+        name: overviewLocation
+        type: string
+      - description: Member count from
+        in: query
+        name: memberCountFrom
+        type: string
+      - description: Member count to
+        in: query
+        name: memberCountTo
+        type: string
+      - description: Price from
+        in: query
+        name: priceFrom
+        type: string
+      - description: Price to
+        in: query
+        name: priceTo
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      - description: Offset
+        in: query
+        name: offset
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Tour'
+            type: array
+      summary: Filter tours
   /users:
     get:
       description: Get all users

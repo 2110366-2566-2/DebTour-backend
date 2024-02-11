@@ -49,4 +49,3 @@ func MigrateDB() {
 
 	db.AutoMigrate(Models...)
 }
-

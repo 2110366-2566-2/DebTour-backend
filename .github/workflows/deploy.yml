@@ -4,20 +4,42 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: self-hosted
+    env:
+      working-directory: /home/ec2-user/DebTour/DebTour-backend
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Pull code
+        run: git pull
+        working-directory: ${{ env.working-directory }}
 
-      - name: Stop existing containers
+      - name: Stop existing docker containers
         run: docker-compose down
-        
-      - name: Build docker compose
-        run: docker-compose up -d --build
+        working-directory: ${{ env.working-directory }}
+
+      - name: Download Go dependencies
+        run: go mod download
+        working-directory: ${{ env.working-directory }}
 
       - name: Build Go
         run: go build -o main .
+        working-directory: ${{ env.working-directory }}
 
+      - name: Init swagger
+        run: swag init
+        working-directory: ${{ env.working-directory }}
+
+      - name: Build docker compose
+        run: docker-compose up -d
+        working-directory: ${{ env.working-directory }}
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    env:
+      working-directory: /home/ec2-user/DebTour/DebTour-backend
+    steps:
       - name: Run Go
-        run: ./main
+        run: |
+          pid=$(cat save_pid.txt) && [ -n "$pid" ] && ps -p "$pid" >/dev/null && kill "$pid"
+          RUNNER_TRACKING_ID="" && (nohup ./main  > my.log 2>&1 & echo $! > save_pid.txt)
+        working-directory: ${{ env.working-directory }}

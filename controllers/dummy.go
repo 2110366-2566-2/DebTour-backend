@@ -17,6 +17,6 @@ import (
 func HelloWorld(c *gin.Context) {
 	fmt.Println("Hello World!")
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Hello World!",
+		"message": "Hello World!!!!|!",
 	})
 }
