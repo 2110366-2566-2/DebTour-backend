@@ -86,6 +86,7 @@ func GetTouristByTourId(c *gin.Context) {
 // @id CreateTour
 // @accept json
 // @produce json
+// @param tour body models.TourRequest true "Tour"
 // @success 200 {object} models.Tour
 // @router /tours [post]
 func CreateTour(c *gin.Context) {
@@ -113,6 +114,8 @@ func CreateTour(c *gin.Context) {
 // @id UpdateTour
 // @accept json
 // @produce json
+// @param id path int true "Tour ID"
+// @param tour body models.TourRequest true "Tour"
 // @success 200 {object} models.Tour
 // @router /tours/{tourId} [put]
 func UpdateTour(c *gin.Context) {

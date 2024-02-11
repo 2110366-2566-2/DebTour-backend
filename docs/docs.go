@@ -103,6 +103,17 @@ const docTemplate = `{
                 ],
                 "summary": "Create a tour",
                 "operationId": "CreateTour",
+                "parameters": [
+                    {
+                        "description": "Tour",
+                        "name": "tour",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TourRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -234,6 +245,24 @@ const docTemplate = `{
                 ],
                 "summary": "Update a tour",
                 "operationId": "UpdateTour",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tour ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Tour",
+                        "name": "tour",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TourRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -411,6 +440,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.ActivityRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "endTimestamp": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/models.LocationRequest"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startTimestamp": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Joining": {
             "type": "object",
             "properties": {
@@ -427,6 +476,26 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "touristUsername": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LocationRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -472,6 +541,41 @@ const docTemplate = `{
                 },
                 "tourId": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.TourRequest": {
+            "type": "object",
+            "properties": {
+                "activities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ActivityRequest"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "maxMemberCount": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "overviewLocation": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "refundDueDate": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
                 }
             }
         },
