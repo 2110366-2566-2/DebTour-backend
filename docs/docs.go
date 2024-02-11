@@ -63,6 +63,17 @@ const docTemplate = `{
                 ],
                 "summary": "Join tour",
                 "operationId": "JoinTour",
+                "parameters": [
+                    {
+                        "description": "Join tour request",
+                        "name": "joinTourRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.JoinTourRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -456,6 +467,34 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "startTimestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.JoinTourRequest": {
+            "type": "object",
+            "properties": {
+                "joinedMembers": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "age": {
+                                "type": "integer"
+                            },
+                            "firstName": {
+                                "type": "string"
+                            },
+                            "lastName": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "tourId": {
+                    "type": "integer"
+                },
+                "touristUsername": {
                     "type": "string"
                 }
             }
