@@ -12,6 +12,24 @@ definitions:
       startTimestamp:
         type: string
     type: object
+  models.JoinTourRequest:
+    properties:
+      joinedMembers:
+        items:
+          properties:
+            age:
+              type: integer
+            firstName:
+              type: string
+            lastName:
+              type: string
+          type: object
+        type: array
+      tourId:
+        type: integer
+      touristUsername:
+        type: string
+    type: object
   models.Joining:
     properties:
       memberAge:
@@ -139,6 +157,13 @@ paths:
       - application/json
       description: Join tour
       operationId: JoinTour
+      parameters:
+      - description: Join tour request
+        in: body
+        name: joinTourRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.JoinTourRequest'
       produces:
       - application/json
       responses:

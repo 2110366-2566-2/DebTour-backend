@@ -10,6 +10,16 @@ type Joining struct {
 	MemberAge       uint   `json:"memberAge"`
 }
 
+type JoinTourRequest struct {
+	TourId          uint   `json:"tourId"`
+	TouristUsername string `json:"touristUsername"`
+	JoinedMembers   []struct {
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Age       uint   `json:"age"`
+	} `json:"joinedMembers"`
+}
+
 func GetALlJoinings() ([]Joining, error) {
 	var joining []Joining
 	result := db.Model(&Joining{}).Find(&joining)

@@ -13,19 +13,11 @@ import (
 // @ID JoinTour
 // @Accept json
 // @Produce json
+// @Param joinTourRequest body models.JoinTourRequest true "Join tour request"
 // @Success 200 {object} models.Joining
 // @Router /joinings [post]
 func JoinTour(c *gin.Context) {
-	type JoinTourRequest struct {
-		TourId          uint   `json:"tourId"`
-		TouristUsername string `json:"touristUsername"`
-		JoinedMembers   []struct {
-			FirstName string `json:"firstName"`
-			LastName  string `json:"lastName"`
-			Age       uint   `json:"age"`
-		} `json:"joinedMembers"`
-	}
-	var joinTourRequest JoinTourRequest
+	var joinTourRequest models.JoinTourRequest
 	if err := c.BindJSON(&joinTourRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
