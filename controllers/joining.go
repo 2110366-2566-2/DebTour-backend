@@ -10,6 +10,7 @@ import (
 // JoinTour godoc
 // @Summary Join tour
 // @Description Join tour
+// @tags joinings
 // @ID JoinTour
 // @Accept json
 // @Produce json
@@ -42,6 +43,7 @@ func JoinTour(c *gin.Context) {
 // GetAllJoinings godoc
 // @Summary Get all joinings
 // @Description Get all joinings
+// @Tags joinings
 // @ID GetAllJoinings
 // @Produce json
 // @Success 200 {array} models.Joining

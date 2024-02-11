@@ -13,6 +13,7 @@ import (
 // GetAllTours godoc
 // @summary Get all tours
 // @description Get all tours
+// @tags tours
 // @id GetAllTours
 // @produce json
 // @success 200 {array} models.Tour
@@ -26,12 +27,13 @@ func GetAllTours(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tours})
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tours), "data": tours})
 }
 
 // GetTourByID godoc
 // @Summary Get tour by id
 // @Description Get tour by id
+// @Tags tours
 // @ID GetTourByID
 // @Produce json
 // @Param id path int true "Tour ID"
@@ -52,14 +54,15 @@ func GetTourByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": false, "data": tour})
 }
 
-// // GetTouristByTourId godoc
-// // @summary Get a tourist by tourId
-// // @description Get a tourist by tourId
-// // @id GetTouristByTourId
-// // @produce json
-// // @param id path int true "Tour ID"
-// // @success 200 {array} models.Joining
-// // @router /tours/{tourId}/tourists [get]
+// GetTouristByTourId godoc
+// @summary Get a tourist by tourId
+// @description Get a tourist by tourId
+// @tags tours
+// @id GetTouristByTourId
+// @produce json
+// @param id path int true "Tour ID"
+// @success 200 {array} models.Joining
+// @router /tours/{tourId}/tourists [get]
 func GetTouristByTourId(c *gin.Context) {
 
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -70,19 +73,20 @@ func GetTouristByTourId(c *gin.Context) {
 	}
 
 	id := uint(id64)
-	joining, err := models.GetJoiningByTourId(id)
+	joinings, err := models.GetJoiningByTourId(id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": joining})
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(joinings), "data": joinings})
 }
 
 // CreateTour godoc
 // @summary Create a tour
 // @description Create a tour with the input JSON data
+// @tags tours
 // @id CreateTour
 // @accept json
 // @produce json
@@ -111,6 +115,7 @@ func CreateTour(c *gin.Context) {
 // UpdateTour godoc
 // @summary Update a tour
 // @description Update a tour with the input JSON data
+// @tags tours
 // @id UpdateTour
 // @accept json
 // @produce json
@@ -152,6 +157,7 @@ func UpdateTour(c *gin.Context) {
 // DeleteTour godoc
 // @summary Delete a tour
 // @description Delete a tour
+// @tags tours
 // @id DeleteTour
 // @produce json
 // @param id path int true "Tour ID"
@@ -180,6 +186,7 @@ func DeleteTour(c *gin.Context) {
 // FilterTours godoc
 // @Summary Filter tours
 // @Description Filter tours
+// @Tags tours
 // @ID FilterTours
 // @Produce json
 // @Param name query string false "Name"
@@ -262,19 +269,9 @@ func FilterTours(c *gin.Context) {
 
 	tours, err := models.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, offsetInt, limitInt)
 
-	type FilteredToursResponse struct {
-		TourId           int     `json:"tourId"`
-		TourName         string  `json:"tourName"`
-		StartDate        string  `json:"startDate"`
-		EndDate          string  `json:"endDate"`
-		OverviewLocation string  `json:"overviewLocation"`
-		MemberCount      uint    `json:"memberCount"`
-		MaxMemberCount   uint    `json:"maxMemberCount"`
-		Price            float64 `json:"price"`
-	}
-	var filteredToursResponse []FilteredToursResponse
+	var filteredToursResponse []models.FilteredToursResponse
 	for _, tour := range tours {
-		filteredToursResponse = append(filteredToursResponse, FilteredToursResponse{
+		filteredToursResponse = append(filteredToursResponse, models.FilteredToursResponse{
 			TourId:           int(tour.TourId),
 			TourName:         tour.Name,
 			StartDate:        tour.StartDate,
@@ -291,5 +288,5 @@ func FilterTours(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": false, "data": filteredToursResponse})
+	c.JSON(http.StatusOK, gin.H{"success": false, "count": len(filteredToursResponse), "data": filteredToursResponse})
 }

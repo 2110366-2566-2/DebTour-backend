@@ -92,6 +92,17 @@ func ToTourResponse(tour Tour, activities []Activity) (TourResponse, error) {
 	}, nil
 }
 
+type FilteredToursResponse struct {
+	TourId           int     `json:"tourId"`
+	TourName         string  `json:"tourName"`
+	StartDate        string  `json:"startDate"`
+	EndDate          string  `json:"endDate"`
+	OverviewLocation string  `json:"overviewLocation"`
+	MemberCount      uint    `json:"memberCount"`
+	MaxMemberCount   uint    `json:"maxMemberCount"`
+	Price            float64 `json:"price"`
+}
+
 func GetAllTours() (tours []Tour, err error) {
 	result := db.Find(&tours)
 

@@ -39,6 +39,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "joinings"
+                ],
                 "summary": "Get all joinings",
                 "operationId": "GetAllJoinings",
                 "responses": {
@@ -60,6 +63,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "joinings"
                 ],
                 "summary": "Join tour",
                 "operationId": "JoinTour",
@@ -90,6 +96,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "tours"
+                ],
                 "summary": "Get all tours",
                 "operationId": "GetAllTours",
                 "responses": {
@@ -111,6 +120,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "tours"
                 ],
                 "summary": "Create a tour",
                 "operationId": "CreateTour",
@@ -140,6 +152,9 @@ const docTemplate = `{
                 "description": "Filter tours",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "tours"
                 ],
                 "summary": "Filter tours",
                 "operationId": "FilterTours",
@@ -224,6 +239,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "tours"
+                ],
                 "summary": "Get tour by id",
                 "operationId": "GetTourByID",
                 "parameters": [
@@ -253,6 +271,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "tours"
                 ],
                 "summary": "Update a tour",
                 "operationId": "UpdateTour",
@@ -288,6 +309,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "tours"
+                ],
                 "summary": "Delete a tour",
                 "operationId": "DeleteTour",
                 "parameters": [
@@ -309,11 +333,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/tours/{tourId}/tourists": {
+            "get": {
+                "description": "Get a tourist by tourId",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tours"
+                ],
+                "summary": "Get a tourist by tourId",
+                "operationId": "GetTouristByTourId",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tour ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Joining"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Get all users",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "Get all users",
                 "operationId": "GetAllUsers",
@@ -336,6 +396,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "Create a user",
                 "operationId": "CreateUser",
@@ -366,6 +429,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "summary": "Get user by username",
                 "operationId": "GetUserByUsername",
                 "parameters": [
@@ -393,6 +459,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "Update a user",
                 "operationId": "UpdateUser",
@@ -427,6 +496,9 @@ const docTemplate = `{
                 "description": "Delete a user",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "Delete a user",
                 "operationId": "DeleteUser",
