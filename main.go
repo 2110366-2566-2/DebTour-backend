@@ -28,7 +28,6 @@ func SetupRouter() *gin.Engine {
 }
 
 func main() {
-
 	models.InitDB()
 
 	router := SetupRouter()
