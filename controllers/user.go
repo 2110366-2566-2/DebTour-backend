@@ -10,6 +10,7 @@ import (
 // GetAllUsers godoc
 // @summary Get all users
 // @description Get all users
+// @tags users
 // @id GetAllUsers
 // @produce json
 // @response 200 {array} models.User
@@ -20,12 +21,13 @@ func GetAllUsers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": users})
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(users), "data": users})
 }
 
 // GetUserByUsername godoc
 // @summary Get user by username
 // @description Get user by username
+// @tags users
 // @id GetUserByUsername
 // @produce json
 // @param username path string true "Username"
@@ -44,6 +46,7 @@ func GetUserByUsername(c *gin.Context) {
 // CreateUser godoc
 // @summary Create a user
 // @description Create a user
+// @tags users
 // @id CreateUser
 // @accept json
 // @produce json
@@ -67,6 +70,7 @@ func CreateUser(c *gin.Context) {
 // DeleteUser godoc
 // @summary Delete a user
 // @description Delete a user
+// @tags users
 // @id DeleteUser
 // @param username path string true "Username"
 // @produce json
@@ -89,6 +93,7 @@ func DeleteUser(c *gin.Context) {
 // UpdateUser godoc
 // @summary Update a user
 // @description Update a user
+// @tags users
 // @id UpdateUser
 // @accept json
 // @produce json

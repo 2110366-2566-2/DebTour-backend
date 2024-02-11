@@ -152,6 +152,8 @@ paths:
               $ref: '#/definitions/models.Joining'
             type: array
       summary: Get all joinings
+      tags:
+      - joinings
     post:
       consumes:
       - application/json
@@ -172,6 +174,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Joining'
       summary: Join tour
+      tags:
+      - joinings
   /tours:
     get:
       description: Get all tours
@@ -186,6 +190,8 @@ paths:
               $ref: '#/definitions/models.Tour'
             type: array
       summary: Get all tours
+      tags:
+      - tours
     post:
       consumes:
       - application/json
@@ -206,6 +212,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Tour'
       summary: Create a tour
+      tags:
+      - tours
   /tours/{id}:
     get:
       description: Get tour by id
@@ -224,6 +232,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Tour'
       summary: Get tour by id
+      tags:
+      - tours
   /tours/{tourId}:
     delete:
       description: Delete a tour
@@ -242,6 +252,8 @@ paths:
           schema:
             type: string
       summary: Delete a tour
+      tags:
+      - tours
     put:
       consumes:
       - application/json
@@ -267,6 +279,30 @@ paths:
           schema:
             $ref: '#/definitions/models.Tour'
       summary: Update a tour
+      tags:
+      - tours
+  /tours/{tourId}/tourists:
+    get:
+      description: Get a tourist by tourId
+      operationId: GetTouristByTourId
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Joining'
+            type: array
+      summary: Get a tourist by tourId
+      tags:
+      - tours
   /tours/filter:
     get:
       description: Filter tours
@@ -322,6 +358,8 @@ paths:
               $ref: '#/definitions/models.Tour'
             type: array
       summary: Filter tours
+      tags:
+      - tours
   /users:
     get:
       description: Get all users
@@ -336,6 +374,8 @@ paths:
               $ref: '#/definitions/models.User'
             type: array
       summary: Get all users
+      tags:
+      - users
     post:
       consumes:
       - application/json
@@ -356,6 +396,8 @@ paths:
           schema:
             $ref: '#/definitions/models.User'
       summary: Create a user
+      tags:
+      - users
   /users/{username}:
     delete:
       description: Delete a user
@@ -374,6 +416,8 @@ paths:
           schema:
             type: string
       summary: Delete a user
+      tags:
+      - users
     get:
       description: Get user by username
       operationId: GetUserByUsername
@@ -391,6 +435,8 @@ paths:
           schema:
             $ref: '#/definitions/models.User'
       summary: Get user by username
+      tags:
+      - users
     put:
       consumes:
       - application/json
@@ -416,4 +462,6 @@ paths:
           schema:
             type: string
       summary: Update a user
+      tags:
+      - users
 swagger: "2.0"
