@@ -86,17 +86,19 @@ func GetTouristByTourId(c *gin.Context) {
 // @id CreateTour
 // @accept json
 // @produce json
+// @param tour body models.TourRequest true "Tour"
 // @success 200 {object} models.Tour
 // @router /tours [post]
 func CreateTour(c *gin.Context) {
 
-	var tour models.Tour
-	if err := c.ShouldBindJSON(&tour); err != nil {
+	var TourRequest models.TourRequest
+	if err := c.ShouldBindJSON(&TourRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	err := models.CreateTour(&tour)
+	tour := models.ToTour(TourRequest)
+	err := models.CreateTour(&tour, TourRequest.Activities)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -112,6 +114,8 @@ func CreateTour(c *gin.Context) {
 // @id UpdateTour
 // @accept json
 // @produce json
+// @param id path int true "Tour ID"
+// @param tour body models.TourRequest true "Tour"
 // @success 200 {object} models.Tour
 // @router /tours/{tourId} [put]
 func UpdateTour(c *gin.Context) {

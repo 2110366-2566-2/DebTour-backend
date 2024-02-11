@@ -1,4 +1,17 @@
 definitions:
+  models.ActivityRequest:
+    properties:
+      description:
+        type: string
+      endTimestamp:
+        type: string
+      location:
+        $ref: '#/definitions/models.LocationRequest'
+      name:
+        type: string
+      startTimestamp:
+        type: string
+    type: object
   models.Joining:
     properties:
       memberAge:
@@ -10,6 +23,19 @@ definitions:
       tourId:
         type: integer
       touristUsername:
+        type: string
+    type: object
+  models.LocationRequest:
+    properties:
+      address:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      name:
+        type: string
+      type:
         type: string
     type: object
   models.Tour:
@@ -40,6 +66,29 @@ definitions:
         type: string
       tourId:
         type: integer
+    type: object
+  models.TourRequest:
+    properties:
+      activities:
+        items:
+          $ref: '#/definitions/models.ActivityRequest'
+        type: array
+      description:
+        type: string
+      endDate:
+        type: string
+      maxMemberCount:
+        type: integer
+      name:
+        type: string
+      overviewLocation:
+        type: string
+      price:
+        type: number
+      refundDueDate:
+        type: string
+      startDate:
+        type: string
     type: object
   models.User:
     properties:
@@ -117,6 +166,13 @@ paths:
       - application/json
       description: Create a tour with the input JSON data
       operationId: CreateTour
+      parameters:
+      - description: Tour
+        in: body
+        name: tour
+        required: true
+        schema:
+          $ref: '#/definitions/models.TourRequest'
       produces:
       - application/json
       responses:
@@ -166,6 +222,18 @@ paths:
       - application/json
       description: Update a tour with the input JSON data
       operationId: UpdateTour
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Tour
+        in: body
+        name: tour
+        required: true
+        schema:
+          $ref: '#/definitions/models.TourRequest'
       produces:
       - application/json
       responses:

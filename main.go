@@ -54,6 +54,8 @@ func main() {
 		v1.DELETE("/tours/:id", controllers.DeleteTour)
 		v1.GET("/tours/filter", controllers.FilterTours)
 
+		v1.GET("/activities", controllers.GetAllActivities)
+
 		v1.POST("/joinings", controllers.JoinTour)
 		v1.GET("/joinings", controllers.GetAllJoinings)
 
