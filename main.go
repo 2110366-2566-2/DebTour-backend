@@ -28,6 +28,15 @@ func SetUpSwagger() {
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
+	return router
+}
+
+func main() {
+
+	models.InitDB()
+
+	router := SetupRouter()
+
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELTE"}
@@ -37,15 +46,6 @@ func SetupRouter() *gin.Engine {
 	corsConfig.MaxAge = 12 * time.Hour
 
 	router.Use(cors.New(corsConfig))
-
-	return router
-}
-
-func main() {
-
-	models.InitDB()
-
-	router := SetupRouter()
 
 	SetUpSwagger()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
