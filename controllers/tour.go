@@ -37,21 +37,22 @@ func GetAllTours(c *gin.Context) {
 // @ID GetTourByID
 // @Produce json
 // @Param id path int true "Tour ID"
-// @Success 200 {object} models.Tour
+// @Success 200 {object} models.TourResponse
 // @Router /tours/{id} [get]
 func GetTourByID(c *gin.Context) {
-	id := c.Param("id")
-	_id, err := strconv.Atoi(id)
+	_id := c.Param("id")
+	id, err := strconv.Atoi(_id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
-	tour, err := models.GetTourById(_id)
+	tourResponse, err := models.GetTourById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": false, "data": tour})
+
+	c.JSON(http.StatusOK, gin.H{"success": false, "data": tourResponse})
 }
 
 // GetTouristByTourId godoc
@@ -120,7 +121,7 @@ func CreateTour(c *gin.Context) {
 // @accept json
 // @produce json
 // @param id path int true "Tour ID"
-// @param tour body models.TourRequest true "Tour"
+// @param tour body models.Tour true "Tour"
 // @success 200 {object} models.Tour
 // @router /tours/{tourId} [put]
 func UpdateTour(c *gin.Context) {
@@ -132,7 +133,7 @@ func UpdateTour(c *gin.Context) {
 		return
 	}
 
-	tour, err := models.GetTourById(tourId)
+	tour, err := models.GetOnlyTourById(tourId)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})

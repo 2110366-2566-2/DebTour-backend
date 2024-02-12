@@ -46,7 +46,7 @@ type TourResponse struct {
 	Status           string             `json:"status"`
 	AgencyUsername   string             `json:"agencyUsername"`
 	CreatedTimestamp time.Time          `json:"createdTimestamp"`
-	Activity         []ActivityResponse `json:"activity"`
+	Activities       []ActivityResponse `json:"activity"`
 }
 
 func ToTour(tourRequest TourRequest) Tour {
@@ -88,7 +88,7 @@ func ToTourResponse(tour Tour, activities []Activity) (TourResponse, error) {
 		Status:           tour.Status,
 		AgencyUsername:   tour.AgencyUsername,
 		CreatedTimestamp: tour.CreatedTimestamp,
-		Activity:         activityResponses,
+		Activities:       activityResponses,
 	}, nil
 }
 
@@ -109,9 +109,31 @@ func GetAllTours() (tours []Tour, err error) {
 	return tours, result.Error
 }
 
-func GetTourById(tourId int) (Tour, error) {
+func GetTourById(tourId int) (TourResponse, error) {
 	var tour Tour
 	result := db.First(&tour, tourId)
+
+	var tourResponse TourResponse
+
+	if result.Error != nil {
+		return tourResponse, result.Error
+	}
+
+	acitivities, err := GetAllActivitiesByTourId(tour.TourId)
+
+	if err != nil {
+		return tourResponse, err
+	}
+
+	tourResponse, err = ToTourResponse(tour, acitivities)
+
+	return tourResponse, err
+}
+
+func GetOnlyTourById(tourId int) (Tour, error) {
+	var tour Tour
+	result := db.First(&tour, tourId)
+
 	return tour, result.Error
 }
 
