@@ -62,8 +62,8 @@ func GetTourByID(c *gin.Context) {
 // @id GetTouristByTourId
 // @produce json
 // @param id path int true "Tour ID"
-// @success 200 {array} models.Joining
-// @router /tours/{tourId}/tourists [get]
+// @success 200 {array} models.JoinedMembers
+// @router /tours/tourists/{id} [get]
 func GetTouristByTourId(c *gin.Context) {
 
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -74,14 +74,14 @@ func GetTouristByTourId(c *gin.Context) {
 	}
 
 	id := uint(id64)
-	joinings, err := models.GetJoiningByTourId(id)
+	joinedMembers, err := models.GetJoinedMembersByTourId(id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(joinings), "data": joinings})
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(joinedMembers), "data": joinedMembers})
 }
 
 // CreateTour godoc
