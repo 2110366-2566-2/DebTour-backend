@@ -257,7 +257,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Tour"
+                            "$ref": "#/definitions/models.TourResponse"
                         }
                     }
                 }
@@ -291,7 +291,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TourRequest"
+                            "$ref": "#/definitions/models.Tour"
                         }
                     }
                 ],
@@ -543,6 +543,29 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ActivityResponse": {
+            "type": "object",
+            "properties": {
+                "activityId": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endTimestamp": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/models.Location"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startTimestamp": {
+                    "type": "string"
+                }
+            }
+        },
         "models.JoinTourRequest": {
             "type": "object",
             "properties": {
@@ -587,6 +610,29 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "touristUsername": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Location": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "locationId": {
+                    "type": "integer"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -687,6 +733,56 @@ const docTemplate = `{
                 },
                 "startDate": {
                     "type": "string"
+                }
+            }
+        },
+        "models.TourResponse": {
+            "type": "object",
+            "properties": {
+                "activity": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ActivityResponse"
+                    }
+                },
+                "agencyUsername": {
+                    "type": "string"
+                },
+                "createdTimestamp": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "maxMemberCount": {
+                    "type": "integer"
+                },
+                "memberCount": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "overviewLocation": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "refundDueDate": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tourId": {
+                    "type": "integer"
                 }
             }
         },

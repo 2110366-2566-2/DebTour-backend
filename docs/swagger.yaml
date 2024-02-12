@@ -12,6 +12,21 @@ definitions:
       startTimestamp:
         type: string
     type: object
+  models.ActivityResponse:
+    properties:
+      activityId:
+        type: integer
+      description:
+        type: string
+      endTimestamp:
+        type: string
+      location:
+        $ref: '#/definitions/models.Location'
+      name:
+        type: string
+      startTimestamp:
+        type: string
+    type: object
   models.JoinTourRequest:
     properties:
       joinedMembers:
@@ -41,6 +56,21 @@ definitions:
       tourId:
         type: integer
       touristUsername:
+        type: string
+    type: object
+  models.Location:
+    properties:
+      address:
+        type: string
+      latitude:
+        type: number
+      locationId:
+        type: integer
+      longitude:
+        type: number
+      name:
+        type: string
+      type:
         type: string
     type: object
   models.LocationRequest:
@@ -107,6 +137,39 @@ definitions:
         type: string
       startDate:
         type: string
+    type: object
+  models.TourResponse:
+    properties:
+      activity:
+        items:
+          $ref: '#/definitions/models.ActivityResponse'
+        type: array
+      agencyUsername:
+        type: string
+      createdTimestamp:
+        type: string
+      description:
+        type: string
+      endDate:
+        type: string
+      maxMemberCount:
+        type: integer
+      memberCount:
+        type: integer
+      name:
+        type: string
+      overviewLocation:
+        type: string
+      price:
+        type: number
+      refundDueDate:
+        type: string
+      startDate:
+        type: string
+      status:
+        type: string
+      tourId:
+        type: integer
     type: object
   models.User:
     properties:
@@ -230,7 +293,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Tour'
+            $ref: '#/definitions/models.TourResponse'
       summary: Get tour by id
       tags:
       - tours
@@ -270,7 +333,7 @@ paths:
         name: tour
         required: true
         schema:
-          $ref: '#/definitions/models.TourRequest'
+          $ref: '#/definitions/models.Tour'
       produces:
       - application/json
       responses:
