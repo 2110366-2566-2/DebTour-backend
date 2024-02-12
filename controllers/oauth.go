@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -75,5 +76,17 @@ func HandleGoogleCallback(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, "Content: %s\n", contents)
+	var buffer map[string]interface{}
+	output := make(map[string]interface{})
+	err = json.Unmarshal(contents, &buffer)
+	if err != nil {
+		fmt.Println("Failed to decode response body:", err)
+	}
+	output["token"] = token.AccessToken
+	output["username"] = buffer["id"]
+	output["email"] = buffer["email"]
+	output["firstname"] = buffer["given_name"]
+	output["lastname"] = buffer["family_name"]
+	output["picture"] = buffer["picture"]
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": output})
 }
