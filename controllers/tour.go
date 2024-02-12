@@ -52,7 +52,7 @@ func GetTourByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": false, "data": tourResponse})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourResponse})
 }
 
 // GetTouristByTourId godoc
