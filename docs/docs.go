@@ -257,7 +257,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TourResponse"
+                            "$ref": "#/definitions/models.TourActivityLocation"
                         }
                     }
                 }
@@ -701,42 +701,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TourRequest": {
-            "type": "object",
-            "properties": {
-                "activities": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ActivityRequest"
-                    }
-                },
-                "description": {
-                    "type": "string"
-                },
-                "endDate": {
-                    "type": "string"
-                },
-                "maxMemberCount": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "overviewLocation": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "number"
-                },
-                "refundDueDate": {
-                    "type": "string"
-                },
-                "startDate": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.TourResponse": {
+        "models.TourActivityLocation": {
             "type": "object",
             "properties": {
                 "activity": {
@@ -783,6 +748,41 @@ const docTemplate = `{
                 },
                 "tourId": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.TourRequest": {
+            "type": "object",
+            "properties": {
+                "activities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ActivityRequest"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "maxMemberCount": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "overviewLocation": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "refundDueDate": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
                 }
             }
         },

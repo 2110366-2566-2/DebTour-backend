@@ -115,30 +115,7 @@ definitions:
       tourId:
         type: integer
     type: object
-  models.TourRequest:
-    properties:
-      activities:
-        items:
-          $ref: '#/definitions/models.ActivityRequest'
-        type: array
-      description:
-        type: string
-      endDate:
-        type: string
-      maxMemberCount:
-        type: integer
-      name:
-        type: string
-      overviewLocation:
-        type: string
-      price:
-        type: number
-      refundDueDate:
-        type: string
-      startDate:
-        type: string
-    type: object
-  models.TourResponse:
+  models.TourActivityLocation:
     properties:
       activity:
         items:
@@ -170,6 +147,29 @@ definitions:
         type: string
       tourId:
         type: integer
+    type: object
+  models.TourRequest:
+    properties:
+      activities:
+        items:
+          $ref: '#/definitions/models.ActivityRequest'
+        type: array
+      description:
+        type: string
+      endDate:
+        type: string
+      maxMemberCount:
+        type: integer
+      name:
+        type: string
+      overviewLocation:
+        type: string
+      price:
+        type: number
+      refundDueDate:
+        type: string
+      startDate:
+        type: string
     type: object
   models.User:
     properties:
@@ -293,7 +293,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.TourResponse'
+            $ref: '#/definitions/models.TourActivityLocation'
       summary: Get tour by id
       tags:
       - tours
