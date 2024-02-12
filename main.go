@@ -4,9 +4,7 @@ import (
 	"DebTour/controllers"
 	"DebTour/models"
 	"os"
-	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 
@@ -31,21 +29,23 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		c.Next()
+	}
+}
+
 func main() {
 
 	models.InitDB()
 
 	router := SetupRouter()
 
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowAllOrigins = true
-	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELTE"}
-	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
-	corsConfig.ExposeHeaders = []string{"Content-Length"}
-	corsConfig.AllowCredentials = true
-	corsConfig.MaxAge = 12 * time.Hour
-
-	router.Use(cors.New(corsConfig))
+	router.Use(corsMiddleware())
 
 	SetUpSwagger()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
