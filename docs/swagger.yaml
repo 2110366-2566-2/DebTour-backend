@@ -45,6 +45,15 @@ definitions:
       touristUsername:
         type: string
     type: object
+  models.JoinedMembers:
+    properties:
+      age:
+        type: integer
+      firstName:
+        type: string
+      lastName:
+        type: string
+    type: object
   models.Joining:
     properties:
       memberAge:
@@ -344,28 +353,6 @@ paths:
       summary: Update a tour
       tags:
       - tours
-  /tours/{tourId}/tourists:
-    get:
-      description: Get a tourist by tourId
-      operationId: GetTouristByTourId
-      parameters:
-      - description: Tour ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Joining'
-            type: array
-      summary: Get a tourist by tourId
-      tags:
-      - tours
   /tours/filter:
     get:
       description: Filter tours
@@ -421,6 +408,28 @@ paths:
               $ref: '#/definitions/models.Tour'
             type: array
       summary: Filter tours
+      tags:
+      - tours
+  /tours/tourists/{id}:
+    get:
+      description: Get a tourist by tourId
+      operationId: GetTouristByTourId
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.JoinedMembers'
+            type: array
+      summary: Get a tourist by tourId
       tags:
       - tours
   /users:

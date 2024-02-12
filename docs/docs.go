@@ -233,6 +233,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/tours/tourists/{id}": {
+            "get": {
+                "description": "Get a tourist by tourId",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tours"
+                ],
+                "summary": "Get a tourist by tourId",
+                "operationId": "GetTouristByTourId",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tour ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.JoinedMembers"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/tours/{id}": {
             "get": {
                 "description": "Get tour by id",
@@ -328,39 +361,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/tours/{tourId}/tourists": {
-            "get": {
-                "description": "Get a tourist by tourId",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tours"
-                ],
-                "summary": "Get a tourist by tourId",
-                "operationId": "GetTouristByTourId",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Tour ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Joining"
-                            }
                         }
                     }
                 }
@@ -590,6 +590,20 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "touristUsername": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.JoinedMembers": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
                     "type": "string"
                 }
             }
