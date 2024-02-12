@@ -5,6 +5,7 @@ import (
 	"DebTour/models"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 
@@ -29,23 +30,17 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
-func corsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-		c.Next()
-	}
-}
-
 func main() {
 
 	models.InitDB()
 
 	router := SetupRouter()
 
-	router.Use(corsMiddleware())
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELTE"}
+
+	router.Use(cors.New(corsConfig))
 
 	SetUpSwagger()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
