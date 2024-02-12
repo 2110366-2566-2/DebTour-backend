@@ -37,7 +37,7 @@ func GetAllTours(c *gin.Context) {
 // @ID GetTourByID
 // @Produce json
 // @Param id path int true "Tour ID"
-// @Success 200 {object} models.TourResponse
+// @Success 200 {object} models.TourActivityLocation
 // @Router /tours/{id} [get]
 func GetTourByID(c *gin.Context) {
 	_id := c.Param("id")
@@ -46,13 +46,13 @@ func GetTourByID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
-	tourResponse, err := models.GetTourById(id)
+	tourActivityLocation, err := models.GetTourById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourResponse})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourActivityLocation})
 }
 
 // GetTouristByTourId godoc

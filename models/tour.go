@@ -32,7 +32,7 @@ type TourRequest struct {
 	Activities       []ActivityRequest `json:"activities"`
 }
 
-type TourResponse struct {
+type TourActivityLocation struct {
 	TourId           uint               `json:"tourId"`
 	Name             string             `json:"name"`
 	StartDate        string             `json:"startDate"`
@@ -64,17 +64,17 @@ func ToTour(tourRequest TourRequest) Tour {
 	}
 }
 
-func ToTourResponse(tour Tour, activities []Activity) (TourResponse, error) {
+func ToTourActivityLocation(tour Tour, activities []Activity) (TourActivityLocation, error) {
 	var activityResponses []ActivityResponse
 	for _, activity := range activities {
 		activityResponse, err := ToActivityResponse(activity)
 		if err != nil {
-			return TourResponse{}, err
+			return TourActivityLocation{}, err
 		}
 		activityResponses = append(activityResponses, activityResponse)
 	}
 
-	return TourResponse{
+	return TourActivityLocation{
 		TourId:           tour.TourId,
 		Name:             tour.Name,
 		StartDate:        tour.StartDate,
@@ -109,25 +109,25 @@ func GetAllTours() (tours []Tour, err error) {
 	return tours, result.Error
 }
 
-func GetTourById(tourId int) (TourResponse, error) {
+func GetTourById(tourId int) (TourActivityLocation, error) {
 	var tour Tour
 	result := db.First(&tour, tourId)
 
-	var tourResponse TourResponse
+	var tourActivityLocation TourActivityLocation
 
 	if result.Error != nil {
-		return tourResponse, result.Error
+		return tourActivityLocation, result.Error
 	}
 
 	acitivities, err := GetAllActivitiesByTourId(tour.TourId)
 
 	if err != nil {
-		return tourResponse, err
+		return tourActivityLocation, err
 	}
 
-	tourResponse, err = ToTourResponse(tour, acitivities)
+	tourActivityLocation, err = ToTourActivityLocation(tour, acitivities)
 
-	return tourResponse, err
+	return tourActivityLocation, err
 }
 
 func GetOnlyTourById(tourId int) (Tour, error) {
