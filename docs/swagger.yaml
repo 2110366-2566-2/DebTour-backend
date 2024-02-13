@@ -21,7 +21,7 @@ definitions:
       endTimestamp:
         type: string
       location:
-        $ref: '#/definitions/models.LocationRequest'
+        $ref: '#/definitions/models.Location'
       name:
         type: string
       startTimestamp:
@@ -83,21 +83,6 @@ definitions:
         type: string
     type: object
   models.Location:
-    properties:
-      address:
-        type: string
-      latitude:
-        type: number
-      locationId:
-        type: integer
-      longitude:
-        type: number
-      name:
-        type: string
-      type:
-        type: string
-    type: object
-  models.LocationRequest:
     properties:
       address:
         type: string
@@ -386,6 +371,35 @@ paths:
       tags:
       - tours
   /tours/activities/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Create activities for a tour
+      operationId: CreateTourActivities
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Activities
+        in: body
+        name: activities
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.ActivityResponse'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Create activities for a tour
+      tags:
+      - tours
     put:
       consumes:
       - application/json

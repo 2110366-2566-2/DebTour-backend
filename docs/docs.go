@@ -214,6 +214,49 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Create activities for a tour",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tours"
+                ],
+                "summary": "Create activities for a tour",
+                "operationId": "CreateTourActivities",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tour ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Activities",
+                        "name": "activities",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ActivityResponse"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         },
         "/tours/filter": {
@@ -623,7 +666,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "location": {
-                    "$ref": "#/definitions/models.LocationRequest"
+                    "$ref": "#/definitions/models.Location"
                 },
                 "name": {
                     "type": "string"
@@ -719,29 +762,6 @@ const docTemplate = `{
             }
         },
         "models.Location": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "locationId": {
-                    "type": "integer"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.LocationRequest": {
             "type": "object",
             "properties": {
                 "address": {
