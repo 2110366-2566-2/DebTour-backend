@@ -62,7 +62,6 @@ func main() {
 		v1.DELETE("/tours/:id", controllers.DeleteTour)
 		v1.GET("/tours/filter", controllers.FilterTours)
 		v1.PUT("/tours/activities/:id", controllers.UpdateTourActivities)
-		v1.POST("/tours/activities/:id", controllers.CreateTourActivities)
 
 		v1.GET("/activities", controllers.GetAllActivities)
 
