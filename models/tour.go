@@ -46,7 +46,7 @@ type TourActivityLocation struct {
 	Status           string             `json:"status"`
 	AgencyUsername   string             `json:"agencyUsername"`
 	CreatedTimestamp time.Time          `json:"createdTimestamp"`
-	Activities       []ActivityResponse `json:"activity"`
+	Activities       []ActivityResponse `json:"activities"`
 }
 
 func ToTour(tourRequest TourRequest) Tour {
@@ -140,7 +140,7 @@ func GetOnlyTourById(tourId int) (Tour, error) {
 func CreateTour(tour *Tour, activitiesRequest []ActivityRequest) (err error) {
 	tx := db.Begin()
 
-	result := db.Model(&Tour{}).Create(tour)
+	result := tx.Model(&Tour{}).Create(tour)
 	if result.Error != nil {
 		tx.Rollback()
 		return result.Error
