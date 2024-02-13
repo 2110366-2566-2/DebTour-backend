@@ -289,7 +289,7 @@ func FilterTours(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": false, "count": len(filteredToursResponse), "data": filteredToursResponse})
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(filteredToursResponse), "data": filteredToursResponse})
 }
 
 // UpdateActivitiesByTourId godoc
