@@ -212,13 +212,33 @@ func UpdateActivitiesByTourId(tourId uint, activitiesResponse *[]ActivityRespons
 			return err
 		}
 
-		err = UpdateLocation(&activityResponse.Location)
+		// if the activity has a location, update the location
+		if activityResponse.Location != (Location{}) {
+			err = UpdateLocation(&activityResponse.Location)
+
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+		}
+
+	}
+
+	tx.Commit()
+	return nil
+}
+
+func CreateTourActivities(tourId uint, acitivitiesResponse []ActivityResponse) (err error) {
+	tx := db.Begin()
+
+	for _, activityResponse := range acitivitiesResponse {
+		activity := ToActivityFromResponse(activityResponse, tourId)
+		err = CreateActivity(&activity, activityResponse.Location, tx)
 
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
-
 	}
 
 	tx.Commit()
