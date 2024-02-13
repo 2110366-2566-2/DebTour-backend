@@ -24,6 +24,17 @@ func JoinTour(c *gin.Context) {
 		return
 	}
 
+	tour, err := models.GetOnlyTourById(int(joinTourRequest.TourId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	if tour.MemberCount+uint(len(joinTourRequest.JoinedMembers)) > tour.MaxMemberCount {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "The joining members is exceed the max member count of the tour"})
+		return
+	}
+
 	for _, member := range joinTourRequest.JoinedMembers {
 		joining := models.Joining{
 			TourId:          joinTourRequest.TourId,
@@ -37,6 +48,13 @@ func JoinTour(c *gin.Context) {
 			return
 		}
 	}
+
+	tour.MemberCount += uint(len(joinTourRequest.JoinedMembers))
+	if err := models.UpdateTour(&tour); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "join tour successfully"})
 }
 
