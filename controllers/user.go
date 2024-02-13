@@ -53,6 +53,7 @@ func GetUserByUsername(c *gin.Context) {
 // @param user body models.User true "User"
 // @success 200 {object} models.User
 // @router /users [post]
+// I want to use this api in postman how can I do that
 func CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
