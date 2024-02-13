@@ -1,2 +1,5 @@
 docs/
 .env
+.gitignore
+test-clientid.google.json
+index.html
