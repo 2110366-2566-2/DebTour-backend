@@ -4,7 +4,7 @@ on:
       - main
 
 jobs:
-  build:
+  prebuild:
     runs-on: self-hosted
     env:
       working-directory: /home/ec2-user/DebTour/DebTour-backend
@@ -21,12 +21,16 @@ jobs:
         run: go mod download
         working-directory: ${{ env.working-directory }}
 
-      - name: Build Go
-        run: go build -o main .
-        working-directory: ${{ env.working-directory }}
-
       - name: Init swagger
         run: swag init
+        working-directory: ${{ env.working-directory }}
+  build:
+    runs-on: self-hosted
+    env:
+      working-directory: /home/ec2-user/DebTour/DebTour-backend
+    steps:
+      - name: Build Go
+        run: go build -o main .
         working-directory: ${{ env.working-directory }}
 
       - name: Build docker compose
