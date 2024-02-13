@@ -38,7 +38,7 @@ func main() {
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
-	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELTE"}
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 
 	router.Use(cors.New(corsConfig))
 
