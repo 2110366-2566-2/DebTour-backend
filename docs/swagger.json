@@ -1,814 +1,748 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "contact": {}
-    },
-    "paths": {
-        "/hello": {
-            "get": {
-                "description": "Just reply Hello World!",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Hello World",
-                "operationId": "HelloWorld",
-                "responses": {
-                    "200": {
-                        "description": "Hello World!",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
+  "swagger": "2.0",
+  "info": {
+    "contact": {}
+  },
+  "paths": {
+    "/hello": {
+      "get": {
+        "description": "Just reply Hello World!",
+        "produces": ["application/json"],
+        "summary": "Hello World",
+        "operationId": "HelloWorld",
+        "responses": {
+          "200": {
+            "description": "Hello World!",
+            "schema": {
+              "type": "string"
             }
-        },
-        "/joinings": {
-            "get": {
-                "description": "Get all joinings",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "joinings"
-                ],
-                "summary": "Get all joinings",
-                "operationId": "GetAllJoinings",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Joining"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Join tour",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "joinings"
-                ],
-                "summary": "Join tour",
-                "operationId": "JoinTour",
-                "parameters": [
-                    {
-                        "description": "Join tour request",
-                        "name": "joinTourRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.JoinTourRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Joining"
-                        }
-                    }
-                }
-            }
-        },
-        "/tours": {
-            "get": {
-                "description": "Get all tours",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tours"
-                ],
-                "summary": "Get all tours",
-                "operationId": "GetAllTours",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Tour"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a tour with the input JSON data",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tours"
-                ],
-                "summary": "Create a tour",
-                "operationId": "CreateTour",
-                "parameters": [
-                    {
-                        "description": "Tour",
-                        "name": "tour",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.TourRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Tour"
-                        }
-                    }
-                }
-            }
-        },
-        "/tours/filter": {
-            "get": {
-                "description": "Filter tours",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tours"
-                ],
-                "summary": "Filter tours",
-                "operationId": "FilterTours",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Name",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Start date",
-                        "name": "startDate",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "End date",
-                        "name": "endDate",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Overview location",
-                        "name": "overviewLocation",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Member count from",
-                        "name": "memberCountFrom",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Member count to",
-                        "name": "memberCountTo",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Price from",
-                        "name": "priceFrom",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Price to",
-                        "name": "priceTo",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Tour"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/tours/tourists/{id}": {
-            "get": {
-                "description": "Get a tourist by tourId",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tours"
-                ],
-                "summary": "Get a tourist by tourId",
-                "operationId": "GetTouristByTourId",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Tour ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.JoinedMembers"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/tours/{id}": {
-            "get": {
-                "description": "Get tour by id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tours"
-                ],
-                "summary": "Get tour by id",
-                "operationId": "GetTourByID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Tour ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TourActivityLocation"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update a tour with the input JSON data",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tours"
-                ],
-                "summary": "Update a tour",
-                "operationId": "UpdateTour",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Tour ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Tour",
-                        "name": "tour",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Tour"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Tour"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a tour",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tours"
-                ],
-                "summary": "Delete a tour",
-                "operationId": "DeleteTour",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Tour ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/users": {
-            "get": {
-                "description": "Get all users",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Get all users",
-                "operationId": "GetAllUsers",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.User"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Create a user",
-                "operationId": "CreateUser",
-                "parameters": [
-                    {
-                        "description": "User",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/{username}": {
-            "get": {
-                "description": "Get user by username",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Get user by username",
-                "operationId": "GetUserByUsername",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Username",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update a user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Update a user",
-                "operationId": "UpdateUser",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Username",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "User",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User updated",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a user",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Delete a user",
-                "operationId": "DeleteUser",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Username",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User deleted",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
+          }
         }
+      }
     },
-    "definitions": {
-        "models.ActivityRequest": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "endTimestamp": {
-                    "type": "string"
-                },
-                "location": {
-                    "$ref": "#/definitions/models.LocationRequest"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "startTimestamp": {
-                    "type": "string"
-                }
+    "/joinings": {
+      "get": {
+        "description": "Get all joinings",
+        "produces": ["application/json"],
+        "tags": ["joinings"],
+        "summary": "Get all joinings",
+        "operationId": "GetAllJoinings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/models.Joining"
+              }
             }
-        },
-        "models.ActivityResponse": {
-            "type": "object",
-            "properties": {
-                "activityId": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "endTimestamp": {
-                    "type": "string"
-                },
-                "location": {
-                    "$ref": "#/definitions/models.Location"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "startTimestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.JoinTourRequest": {
-            "type": "object",
-            "properties": {
-                "joinedMembers": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "age": {
-                                "type": "integer"
-                            },
-                            "firstName": {
-                                "type": "string"
-                            },
-                            "lastName": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                "tourId": {
-                    "type": "integer"
-                },
-                "touristUsername": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.JoinedMembers": {
-            "type": "object",
-            "properties": {
-                "age": {
-                    "type": "integer"
-                },
-                "firstName": {
-                    "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Joining": {
-            "type": "object",
-            "properties": {
-                "memberAge": {
-                    "type": "integer"
-                },
-                "memberFirstName": {
-                    "type": "string"
-                },
-                "memberLastName": {
-                    "type": "string"
-                },
-                "tourId": {
-                    "type": "integer"
-                },
-                "touristUsername": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Location": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "locationId": {
-                    "type": "integer"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.LocationRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Tour": {
-            "type": "object",
-            "properties": {
-                "agencyUsername": {
-                    "type": "string"
-                },
-                "createdTimestamp": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "endDate": {
-                    "type": "string"
-                },
-                "maxMemberCount": {
-                    "type": "integer"
-                },
-                "memberCount": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "overviewLocation": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "number"
-                },
-                "refundDueDate": {
-                    "type": "string"
-                },
-                "startDate": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "tourId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.TourActivityLocation": {
-            "type": "object",
-            "properties": {
-                "activities": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ActivityResponse"
-                    }
-                },
-                "agencyUsername": {
-                    "type": "string"
-                },
-                "createdTimestamp": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "endDate": {
-                    "type": "string"
-                },
-                "maxMemberCount": {
-                    "type": "integer"
-                },
-                "memberCount": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "overviewLocation": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "number"
-                },
-                "refundDueDate": {
-                    "type": "string"
-                },
-                "startDate": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "tourId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.TourRequest": {
-            "type": "object",
-            "properties": {
-                "activities": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ActivityRequest"
-                    }
-                },
-                "description": {
-                    "type": "string"
-                },
-                "endDate": {
-                    "type": "string"
-                },
-                "maxMemberCount": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "overviewLocation": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "number"
-                },
-                "refundDueDate": {
-                    "type": "string"
-                },
-                "startDate": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "createdTime": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "image": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
+          }
         }
+      },
+      "post": {
+        "description": "Join tour",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["joinings"],
+        "summary": "Join tour",
+        "operationId": "JoinTour",
+        "parameters": [
+          {
+            "description": "Join tour request",
+            "name": "joinTourRequest",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/models.JoinTourRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.Joining"
+            }
+          }
+        }
+      }
+    },
+    "/tours": {
+      "get": {
+        "description": "Get all tours",
+        "produces": ["application/json"],
+        "tags": ["tours"],
+        "summary": "Get all tours",
+        "operationId": "GetAllTours",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/models.Tour"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a tour with the input JSON data",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["tours"],
+        "summary": "Create a tour",
+        "operationId": "CreateTour",
+        "parameters": [
+          {
+            "description": "Tour",
+            "name": "tour",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/models.TourRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.Tour"
+            }
+          }
+        }
+      }
+    },
+    "/tours/filter": {
+      "get": {
+        "description": "Filter tours",
+        "produces": ["application/json"],
+        "tags": ["tours"],
+        "summary": "Filter tours",
+        "operationId": "FilterTours",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Name",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Start date",
+            "name": "startDate",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "End date",
+            "name": "endDate",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Overview location",
+            "name": "overviewLocation",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Member count from",
+            "name": "memberCountFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Member count to",
+            "name": "memberCountTo",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Price from",
+            "name": "priceFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Price to",
+            "name": "priceTo",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Limit",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/models.Tour"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tours/tourists/{id}": {
+      "get": {
+        "description": "Get a tourist by tourId",
+        "produces": ["application/json"],
+        "tags": ["tours"],
+        "summary": "Get a tourist by tourId",
+        "operationId": "GetTouristByTourId",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Tour ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/models.JoinedMembers"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tours/{id}": {
+      "get": {
+        "description": "Get tour by id",
+        "produces": ["application/json"],
+        "tags": ["tours"],
+        "summary": "Get tour by id",
+        "operationId": "GetTourByID",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Tour ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.TourActivityLocation"
+            }
+          }
+        }
+      }
+    },
+    "/tours/{tourId}": {
+      "put": {
+        "description": "Update a tour with the input JSON data",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["tours"],
+        "summary": "Update a tour",
+        "operationId": "UpdateTour",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Tour ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Tour",
+            "name": "tour",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/models.Tour"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.Tour"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a tour",
+        "produces": ["application/json"],
+        "tags": ["tours"],
+        "summary": "Delete a tour",
+        "operationId": "DeleteTour",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Tour ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "description": "Get all users",
+        "produces": ["application/json"],
+        "tags": ["users"],
+        "summary": "Get all users",
+        "operationId": "GetAllUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/models.User"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a user",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["users"],
+        "summary": "Create a user",
+        "operationId": "CreateUser",
+        "parameters": [
+          {
+            "description": "User",
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/models.User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.User"
+            }
+          }
+        }
+      }
+    },
+    "/users/{username}": {
+      "get": {
+        "description": "Get user by username",
+        "produces": ["application/json"],
+        "tags": ["users"],
+        "summary": "Get user by username",
+        "operationId": "GetUserByUsername",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Username",
+            "name": "username",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.User"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Update a user",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["users"],
+        "summary": "Update a user",
+        "operationId": "UpdateUser",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Username",
+            "name": "username",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "User",
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/models.User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a user",
+        "produces": ["application/json"],
+        "tags": ["users"],
+        "summary": "Delete a user",
+        "operationId": "DeleteUser",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Username",
+            "name": "username",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
+  },
+  "definitions": {
+    "models.ActivityRequest": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "endTimestamp": {
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/definitions/models.LocationRequest"
+        },
+        "name": {
+          "type": "string"
+        },
+        "startTimestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "models.ActivityResponse": {
+      "type": "object",
+      "properties": {
+        "activityId": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "endTimestamp": {
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/definitions/models.Location"
+        },
+        "name": {
+          "type": "string"
+        },
+        "startTimestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "models.JoinTourRequest": {
+      "type": "object",
+      "properties": {
+        "joinedMembers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "age": {
+                "type": "integer"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tourId": {
+          "type": "integer"
+        },
+        "touristUsername": {
+          "type": "string"
+        }
+      }
+    },
+    "models.JoinedMembers": {
+      "type": "object",
+      "properties": {
+        "age": {
+          "type": "integer"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        }
+      }
+    },
+    "models.Joining": {
+      "type": "object",
+      "properties": {
+        "memberAge": {
+          "type": "integer"
+        },
+        "memberFirstName": {
+          "type": "string"
+        },
+        "memberLastName": {
+          "type": "string"
+        },
+        "tourId": {
+          "type": "integer"
+        },
+        "touristUsername": {
+          "type": "string"
+        }
+      }
+    },
+    "models.Location": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "number"
+        },
+        "locationId": {
+          "type": "integer"
+        },
+        "longitude": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "models.LocationRequest": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "number"
+        },
+        "longitude": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "models.Tour": {
+      "type": "object",
+      "properties": {
+        "agencyUsername": {
+          "type": "string"
+        },
+        "createdTimestamp": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "endDate": {
+          "type": "string"
+        },
+        "maxMemberCount": {
+          "type": "integer"
+        },
+        "memberCount": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "overviewLocation": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "refundDueDate": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tourId": {
+          "type": "integer"
+        }
+      }
+    },
+    "models.TourActivityLocation": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/models.ActivityResponse"
+          }
+        },
+        "agencyUsername": {
+          "type": "string"
+        },
+        "createdTimestamp": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "endDate": {
+          "type": "string"
+        },
+        "maxMemberCount": {
+          "type": "integer"
+        },
+        "memberCount": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "overviewLocation": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "refundDueDate": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tourId": {
+          "type": "integer"
+        }
+      }
+    },
+    "models.TourRequest": {
+      "type": "object",
+      "properties": {
+        "activities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/models.ActivityRequest"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "endDate": {
+          "type": "string"
+        },
+        "maxMemberCount": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "overviewLocation": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "refundDueDate": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string"
+        }
+      }
+    },
+    "models.User": {
+      "type": "object",
+      "properties": {
+        "createdTime": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    }
+  }
 }

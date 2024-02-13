@@ -126,7 +126,7 @@ definitions:
     type: object
   models.TourActivityLocation:
     properties:
-      activities:
+      activity:
         items:
           $ref: '#/definitions/models.ActivityResponse'
         type: array
@@ -287,25 +287,6 @@ paths:
       tags:
       - tours
   /tours/{id}:
-    delete:
-      description: Delete a tour
-      operationId: DeleteTour
-      parameters:
-      - description: Tour ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Delete a tour
-      tags:
-      - tours
     get:
       description: Get tour by id
       operationId: GetTourByID
@@ -323,6 +304,26 @@ paths:
           schema:
             $ref: '#/definitions/models.TourActivityLocation'
       summary: Get tour by id
+      tags:
+      - tours
+  /tours/{tourId}:
+    delete:
+      description: Delete a tour
+      operationId: DeleteTour
+      parameters:
+      - description: Tour ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete a tour
       tags:
       - tours
     put:

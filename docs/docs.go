@@ -294,7 +294,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/tours/{tourId}": {
             "put": {
                 "description": "Update a tour with the input JSON data",
                 "consumes": [
@@ -716,7 +718,7 @@ const docTemplate = `{
         "models.TourActivityLocation": {
             "type": "object",
             "properties": {
-                "activities": {
+                "activity": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.ActivityResponse"
