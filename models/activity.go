@@ -23,6 +23,16 @@ type ActivityRequest struct {
 	Location       LocationRequest `json:"location"`
 }
 
+func ToActivity(activityRequest ActivityRequest, tourId uint) Activity {
+	return Activity{
+		TourId:         tourId,
+		Name:           activityRequest.Name,
+		Description:    activityRequest.Description,
+		StartTimestamp: activityRequest.StartTimestamp,
+		EndTimestamp:   activityRequest.EndTimestamp,
+	}
+}
+
 type ActivityResponse struct {
 	ActivityId     uint      `json:"activityId"`
 	Name           string    `json:"name"`
@@ -32,13 +42,14 @@ type ActivityResponse struct {
 	Location       Location  `json:"location"`
 }
 
-func ToActivity(activityRequest ActivityRequest, tourId uint) Activity {
+func ToActivityFromResponse(activityResponse ActivityResponse, tourId uint) Activity {
 	return Activity{
 		TourId:         tourId,
-		Name:           activityRequest.Name,
-		Description:    activityRequest.Description,
-		StartTimestamp: activityRequest.StartTimestamp,
-		EndTimestamp:   activityRequest.EndTimestamp,
+		ActivityId:     activityResponse.ActivityId,
+		Name:           activityResponse.Name,
+		Description:    activityResponse.Description,
+		StartTimestamp: activityResponse.StartTimestamp,
+		EndTimestamp:   activityResponse.EndTimestamp,
 	}
 }
 
