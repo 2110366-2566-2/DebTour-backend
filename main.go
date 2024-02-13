@@ -9,10 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 
+	"DebTour/docs"
+
+	"github.com/zalando/gin-oauth2/google"
+
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"DebTour/docs"
 )
 
 func SetUpSwagger() {
@@ -26,13 +28,14 @@ func SetUpSwagger() {
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
-
 	return router
 }
 
-func main() {
+var sessionName string
 
+func main() {
 	models.InitDB()
+	sessionName = controllers.InitOauth()
 
 	router := SetupRouter()
 
@@ -42,7 +45,12 @@ func main() {
 
 	router.Use(cors.New(corsConfig))
 
+	router.LoadHTMLFiles("index.html")
 	SetUpSwagger()
+
+	router.Use(google.Session(sessionName)) // new
+
+	// SetupOauth()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1 := router.Group("/api/v1")
@@ -68,6 +76,12 @@ func main() {
 		v1.POST("/joinings", controllers.JoinTour)
 		v1.GET("/joinings", controllers.GetAllJoinings)
 
+		v1.GET("/login", google.LoginHandler)
+		v1.Use(google.Auth())
+		v1.GET("/auth", controllers.UserInfoHandler)
+		v1.GET("/api", func(ctx *gin.Context) {
+			ctx.JSON(200, gin.H{"message": "Hello from private for groups"})
+		})
 	}
 
 	router.Run(":9000")
