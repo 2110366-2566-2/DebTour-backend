@@ -46,7 +46,7 @@ type TourActivityLocation struct {
 	Status           string             `json:"status"`
 	AgencyUsername   string             `json:"agencyUsername"`
 	CreatedTimestamp time.Time          `json:"createdTimestamp"`
-	Activities       []ActivityResponse `json:"activity"`
+	Activities       []ActivityResponse `json:"activities"`
 }
 
 func ToTour(tourRequest TourRequest) Tour {
