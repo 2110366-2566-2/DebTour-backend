@@ -26,6 +26,7 @@ jobs:
         working-directory: ${{ env.working-directory }}
   build:
     runs-on: self-hosted
+    needs: prebuild
     env:
       working-directory: /home/ec2-user/DebTour/DebTour-backend
     steps:
