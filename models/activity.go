@@ -16,11 +16,11 @@ type Activity struct {
 }
 
 type ActivityRequest struct {
-	Name           string          `json:"name"`
-	Description    *string         `json:"description"`
-	StartTimestamp time.Time       `json:"startTimestamp"`
-	EndTimestamp   time.Time       `json:"endTimestamp"`
-	Location       LocationRequest `json:"location"`
+	Name           string    `json:"name"`
+	Description    *string   `json:"description"`
+	StartTimestamp time.Time `json:"startTimestamp"`
+	EndTimestamp   time.Time `json:"endTimestamp"`
+	Location       Location  `json:"location"`
 }
 
 func ToActivity(activityRequest ActivityRequest, tourId uint) Activity {
@@ -88,13 +88,12 @@ func GetAllActivitiesByTourId(tourId uint) (activities []Activity, err error) {
 	return activities, result.Error
 }
 
-func CreateActivity(activity *Activity, locationRequest LocationRequest, db *gorm.DB) (err error) {
+func CreateActivity(activity *Activity, location Location, db *gorm.DB) (err error) {
 	result := db.Model(&Activity{}).Create(activity)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	location := ToLocation(locationRequest)
 	err = CreateLocation(&location)
 
 	if err != nil {
