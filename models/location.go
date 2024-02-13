@@ -9,25 +9,6 @@ type Location struct {
 	Address    string  `gorm:"not null" json:"address"`
 }
 
-type LocationRequest struct {
-	LocationId uint    `json:"locationId"`
-	Name       string  `json:"name"`
-	Latitude   float64 `json:"latitude"`
-	Longitude  float64 `json:"longitude"`
-	Type       string  `json:"type"`
-	Address    string  `json:"address"`
-}
-
-func ToLocation(locationRequest LocationRequest) Location {
-	return Location{
-		Name:      locationRequest.Name,
-		Latitude:  locationRequest.Latitude,
-		Longitude: locationRequest.Longitude,
-		Type:      locationRequest.Type,
-		Address:   locationRequest.Address,
-	}
-}
-
 func GetAllLocations() (locations []Location, err error) {
 	result := db.Model(&Location{}).Find(&locations)
 
