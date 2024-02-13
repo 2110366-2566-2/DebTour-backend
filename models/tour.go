@@ -140,7 +140,7 @@ func GetOnlyTourById(tourId int) (Tour, error) {
 func CreateTour(tour *Tour, activitiesRequest []ActivityRequest) (err error) {
 	tx := db.Begin()
 
-	result := db.Model(&Tour{}).Create(tour)
+	result := tx.Model(&Tour{}).Create(tour)
 	if result.Error != nil {
 		tx.Rollback()
 		return result.Error
