@@ -10,11 +10,12 @@ type Location struct {
 }
 
 type LocationRequest struct {
-	Name      string  `json:"name"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Type      string  `json:"type"`
-	Address   string  `json:"address"`
+	LocationId uint    `json:"locationId"`
+	Name       string  `json:"name"`
+	Latitude   float64 `json:"latitude"`
+	Longitude  float64 `json:"longitude"`
+	Type       string  `json:"type"`
+	Address    string  `json:"address"`
 }
 
 func ToLocation(locationRequest LocationRequest) Location {

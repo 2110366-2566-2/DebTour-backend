@@ -7,6 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetAllActivities godoc
+// @Summary Get all activities
+// @Description Get all activities
+// @Tags activities
+// @ID GetAllActivities
+// @Produce json
+// @Success 200 {array} models.Activity
+// @Router /activities [get]
 func GetAllActivities(c *gin.Context) {
 	activities, err := models.GetAllActivities()
 	if err != nil {

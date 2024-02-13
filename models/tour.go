@@ -199,3 +199,28 @@ func FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, me
 	result := db.Model(&Tour{}).Select("tour_id, name, start_date, end_date, overview_location, member_count, max_member_count, price").Where("name LIKE ? AND start_date >= ? AND end_date <= ? AND overview_location LIKE ? AND member_count >= ? AND member_count <= ? AND price >= ? AND price <= ?", name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo).Limit(limit).Offset(offset).Find(&tours)
 	return tours, result.Error
 }
+
+func UpdateActivitiesByTourId(tourId uint, activitiesResponse *[]ActivityResponse) (err error) {
+	tx := db.Begin()
+
+	for _, activityResponse := range *activitiesResponse {
+		activity := ToActivityFromResponse(activityResponse, tourId)
+		err = UpdateActivity(&activity)
+
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		err = UpdateLocation(&activityResponse.Location)
+
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+	}
+
+	tx.Commit()
+	return nil
+}
