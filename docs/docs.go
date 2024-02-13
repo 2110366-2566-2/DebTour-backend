@@ -15,6 +15,30 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/activities": {
+            "get": {
+                "description": "Get all activities",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "activities"
+                ],
+                "summary": "Get all activities",
+                "operationId": "GetAllActivities",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Activity"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/hello": {
             "get": {
                 "description": "Just reply Hello World!",
@@ -90,6 +114,132 @@ const docTemplate = `{
                 }
             }
         },
+        "/oauth/clear-session": {
+            "get": {
+                "description": "Clear session data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "Clear session data",
+                "operationId": "ClearSessionData",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/oauth/getuserdata": {
+            "get": {
+                "description": "Get user data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "Get user data",
+                "operationId": "GetUserData",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/oauth/getusersession": {
+            "get": {
+                "description": "Get user session",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "Get user session",
+                "operationId": "GetUserSession",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/oauth/logout": {
+            "get": {
+                "description": "Logout",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "Logout",
+                "operationId": "LogoutHandler",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/oauth/setusersession": {
+            "get": {
+                "description": "Set user session",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "Set user session",
+                "operationId": "SetUserSession",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/oauth/userinfo": {
+            "get": {
+                "description": "Get user info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "Get user info",
+                "operationId": "UserInfoHandler",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/tours": {
             "get": {
                 "description": "Get all tours",
@@ -142,6 +292,51 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Tour"
+                        }
+                    }
+                }
+            }
+        },
+        "/tours/activities/{id}": {
+            "put": {
+                "description": "Update activities by tourId",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tours"
+                ],
+                "summary": "Update activities by tourId",
+                "operationId": "UpdateActivitiesByTourId",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tour ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Activities Update",
+                        "name": "activitiesUpdate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ActivityResponse"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -294,9 +489,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/tours/{tourId}": {
+            },
             "put": {
                 "description": "Update a tour with the input JSON data",
                 "consumes": [
@@ -523,6 +716,29 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Activity": {
+            "type": "object",
+            "properties": {
+                "activityId": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endTimestamp": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startTimestamp": {
+                    "type": "string"
+                },
+                "tourId": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.ActivityRequest": {
             "type": "object",
             "properties": {
@@ -660,6 +876,9 @@ const docTemplate = `{
                 "latitude": {
                     "type": "number"
                 },
+                "locationId": {
+                    "type": "integer"
+                },
                 "longitude": {
                     "type": "number"
                 },
@@ -718,7 +937,7 @@ const docTemplate = `{
         "models.TourActivityLocation": {
             "type": "object",
             "properties": {
-                "activity": {
+                "activities": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.ActivityResponse"
