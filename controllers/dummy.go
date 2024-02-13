@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ import (
 // @response 200 {string} string "Hello World!"
 // @router /hello [get]
 func HelloWorld(c *gin.Context) {
+	fmt.Println("Hello World!")
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Hello World!!!!|!",
 	})

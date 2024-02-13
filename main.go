@@ -9,10 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 
+	"DebTour/docs"
+	//"net/http"
+
+	"github.com/zalando/gin-oauth2/google"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"DebTour/docs"
 )
 
 func SetUpSwagger() {
@@ -26,13 +31,15 @@ func SetUpSwagger() {
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
-
 	return router
 }
 
-func main() {
+var sessionName string
+var sessionStore = make(map[string]interface{})
 
+func main() {
 	models.InitDB()
+	sessionName = controllers.InitOauth()
 
 	router := SetupRouter()
 
@@ -40,9 +47,16 @@ func main() {
 	corsConfig.AllowAllOrigins = true
 	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions(sessionName, store))
+
 	router.Use(cors.New(corsConfig))
 
+	router.LoadHTMLFiles("index.html")
 	SetUpSwagger()
+
+	router.Use(google.Session(sessionName)) // new
+	//router.Use(google.Auth())
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1 := router.Group("/api/v1")
@@ -68,6 +82,13 @@ func main() {
 
 		v1.POST("/joinings", controllers.JoinTour)
 		v1.GET("/joinings", controllers.GetAllJoinings)
+
+		v1.GET("/login", google.LoginHandler)
+		v1.Use(google.Auth())
+		v1.GET("/auth", controllers.UserInfoHandler)
+		v1.GET("/logout", controllers.LogoutHandler)
+		v1.GET("/set-session", controllers.SetUserSession)
+		v1.GET("/getuserdata", controllers.GetUserData)
 
 	}
 
