@@ -327,39 +327,3 @@ func UpdateTourActivities(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": activitiesResponse})
 }
-
-// CreateTourActivities godoc
-// @summary Create activities for a tour
-// @description Create activities for a tour
-// @tags tours
-// @id CreateTourActivities
-// @accept json
-// @produce json
-// @param id path int true "Tour ID"
-// @param activities body []models.ActivityResponse true "Activities"
-// @success 200 {string} string
-// @router /tours/activities/{id} [post]
-func CreateTourActivities(c *gin.Context) {
-
-	tourId, err := strconv.Atoi(c.Param("id"))
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	var activitiesResponse []models.ActivityResponse
-	if err := c.ShouldBindJSON(&activitiesResponse); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	err = models.CreateTourActivities(uint(tourId), activitiesResponse)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": activitiesResponse})
-}
