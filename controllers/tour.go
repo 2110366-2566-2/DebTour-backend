@@ -123,7 +123,7 @@ func CreateTour(c *gin.Context) {
 // @param id path int true "Tour ID"
 // @param tour body models.Tour true "Tour"
 // @success 200 {object} models.Tour
-// @router /tours/{id} [put]
+// @router /tours/{tourId} [put]
 func UpdateTour(c *gin.Context) {
 
 	tourId, err := strconv.Atoi(c.Param("id"))
@@ -163,7 +163,7 @@ func UpdateTour(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @success 200 {string} string
-// @router /tours/{id} [delete]
+// @router /tours/{tourId} [delete]
 func DeleteTour(c *gin.Context) {
 
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
