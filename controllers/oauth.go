@@ -10,8 +10,10 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
+	// ginoauth2 "github.com/zalando/gin-oauth2"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+	gooauth "google.golang.org/api/oauth2/v2"
 )
 
 var (
@@ -89,4 +91,30 @@ func HandleGoogleCallback(c *gin.Context) {
 	output["lastname"] = buffer["family_name"]
 	output["picture"] = buffer["picture"]
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": output})
+	c.Set("token", token)
+	TestGet(c)
+}
+
+//	func TestValidateToken(c *gin.Context) {
+//		token := "ya29.a0AfB_byAeLyvjfDdC2OBWWc6mOOIX3DheupLBsu7PvkQq0bDy-7Of_wy8ZxAOxH-q0sj8xC4EZWBAjVPyKNxcCs33ZB0tRx6JwgabC8wBhFgIFooQphShlVbPKYnRul98Ap9ASh-zfC83AvMQSnl4q92T1E-iZQlhgQaCgYKAbkSARMSFQHGX2MimxEd9B_PLJZOXENGLqI3tA0169"
+//		t, err := ginoauth2.GetTokenContainer(token)
+//	}
+func TestGet(c *gin.Context) {
+	token, exist := c.Get("token")
+	var t *oauth2.Token = token.(*oauth2.Token)
+	if !exist {
+		fmt.Println("Token does not exist")
+	}
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	fmt.Println(t.AccessToken)
+
+	httpClient := &http.Client{}
+	oauth2Service, err := gooauth.New(httpClient)
+	tokenInfoCall := oauth2Service.Tokeninfo()
+	tokenInfoCall.IdToken(t.AccessToken)
+	tokenInfo, err := tokenInfoCall.Do()
+	if err != nil {
+		fmt.Println("\nError: ", err)
+	}
+	fmt.Println("\nTokenInfo: ", tokenInfo)
 }
