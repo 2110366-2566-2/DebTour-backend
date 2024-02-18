@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"DebTour/database"
 	"DebTour/models"
 	"net/http"
 
@@ -16,7 +17,7 @@ import (
 // @response 200 {array} models.User
 // @router /users [get]
 func GetAllUsers(c *gin.Context) {
-	users, err := models.GetAllUsers()
+	users, err := database.GetAllUsers(database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -35,7 +36,7 @@ func GetAllUsers(c *gin.Context) {
 // @router /users/{username} [get]
 func GetUserByUsername(c *gin.Context) {
 	username := c.Param("username")
-	user, err := models.GetUserByUsername(username)
+	user, err := database.GetUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -59,7 +60,7 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err := models.CreateUser(&user)
+	err := database.CreateUser(&user, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -82,7 +83,7 @@ func DeleteUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err := models.DeleteUser(&user)
+	err := database.DeleteUser(&user, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -107,7 +108,7 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err := models.UpdateUser(&user)
+	err := database.UpdateUser(&user, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

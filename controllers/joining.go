@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"DebTour/database"
 	"DebTour/models"
 	"net/http"
 
@@ -24,7 +25,7 @@ func JoinTour(c *gin.Context) {
 		return
 	}
 
-	tour, err := models.GetOnlyTourById(int(joinTourRequest.TourId))
+	tour, err := database.GetTourByTourId(int(joinTourRequest.TourId), database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -43,14 +44,14 @@ func JoinTour(c *gin.Context) {
 			MemberLastName:  member.LastName,
 			MemberAge:       member.Age,
 		}
-		if err := models.CreateJoining(&joining); err != nil {
+		if err := database.CreateJoining(&joining, database.MainDB); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 			return
 		}
 	}
 
 	tour.MemberCount += uint(len(joinTourRequest.JoinedMembers))
-	if err := models.UpdateTour(&tour); err != nil {
+	if err := database.UpdateTour(&tour, database.MainDB); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
@@ -67,7 +68,7 @@ func JoinTour(c *gin.Context) {
 // @Success 200 {array} models.Joining
 // @Router /joinings [get]
 func GetAllJoinings(c *gin.Context) {
-	joinings, err := models.GetALlJoinings()
+	joinings, err := database.GetALlJoinings(database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": true, "error": err.Error()})
 		return
