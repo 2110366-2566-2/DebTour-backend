@@ -4,14 +4,14 @@ import (
 	"DebTour/models"
 	"gorm.io/gorm"
 )
-//Checked
+
 func GetAllActivities(db *gorm.DB) (activities []models.Activity, err error) {
 	// find all activities in the database
 	result := db.Model(&models.Activity{}).Find(&activities)
 
 	return activities, result.Error
 }
-//Checked
+
 func GetActivityById(activityId uint, db *gorm.DB) (activity models.Activity, err error) {
 	// find activity by id in the database
 	result := db.Model(&models.Activity{}).First(&activity, activityId)
@@ -19,7 +19,6 @@ func GetActivityById(activityId uint, db *gorm.DB) (activity models.Activity, er
 	return activity, result.Error
 }
 
-//Checked
 func GetActivityWithLocationById(activityId uint, db *gorm.DB) (activityWithLocation models.ActivityWithLocation, err error) {
 	var activity models.Activity
 	// find activity by id in the database
@@ -49,7 +48,7 @@ func GetActivityWithLocationById(activityId uint, db *gorm.DB) (activityWithLoca
 
 	return activityWithLocation, result.Error
 }
-//Checked
+
 func GetAllActivitiesWithLocationByTourId(tourId uint, db *gorm.DB) (activitiesWithLocation []models.ActivityWithLocation, err error) {
 
 	// find all activities by tour id in the database
@@ -73,7 +72,7 @@ func GetAllActivitiesWithLocationByTourId(tourId uint, db *gorm.DB) (activitiesW
 
 	return activitiesWithLocation, result.Error
 }
-//Checked
+
 func CreateActivity(activity *models.Activity, location *models.Location, db *gorm.DB) (err error) {
 	tx := db.SavePoint("BeforeCreateActivity")
 
@@ -105,7 +104,7 @@ func CreateActivity(activity *models.Activity, location *models.Location, db *go
 
 	return nil
 }
-//Checked
+
 func UpdateActivity(activity *models.Activity, db *gorm.DB) (err error) {
 
 	// check if activity exists
@@ -122,7 +121,7 @@ func UpdateActivity(activity *models.Activity, db *gorm.DB) (err error) {
 
 	return nil
 }
-//Checked
+
 func DeleteActivity(activityId uint, db *gorm.DB) (err error) {
 	tx := db.SavePoint("BeforeDeleteActivity")
 
@@ -151,7 +150,7 @@ func DeleteActivity(activityId uint, db *gorm.DB) (err error) {
 
 	return nil
 }
-//Checked
+
 func DeleteAllActivitiesByTourId(tourId uint, db *gorm.DB) (err error) {
 	tx := db.SavePoint("BeforeDeleteAllActivitiesByTourId")
 

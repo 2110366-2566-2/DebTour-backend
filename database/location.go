@@ -4,7 +4,7 @@ import (
 	"DebTour/models"
 	"gorm.io/gorm"
 )
-//Checked
+
 func GetAllLocations(db *gorm.DB) (locations []models.Location, err error) {
 
 	// find all locations in the database
@@ -12,7 +12,7 @@ func GetAllLocations(db *gorm.DB) (locations []models.Location, err error) {
 
 	return locations, result.Error
 }
-//Checked
+
 func GetLocationById(locationId uint, db *gorm.DB) (location models.Location, err error) {
 
 	// find location by id in the database
@@ -20,7 +20,7 @@ func GetLocationById(locationId uint, db *gorm.DB) (location models.Location, er
 
 	return location, result.Error
 }
-//Checked
+
 func CreateLocation(location *models.Location, db *gorm.DB) (err error) {
 
 	// create location in the database
@@ -32,7 +32,7 @@ func CreateLocation(location *models.Location, db *gorm.DB) (err error) {
 
 	return nil
 }
-//Checked
+
 func UpdateLocation(location *models.Location, db *gorm.DB) (err error) {
 
 	// check if location exists
@@ -49,7 +49,7 @@ func UpdateLocation(location *models.Location, db *gorm.DB) (err error) {
 
 	return nil
 }
-//Checked
+
 func DeleteLocation(locationId uint, db *gorm.DB) (err error) {
 
 	// check if location exists

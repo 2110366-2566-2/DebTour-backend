@@ -48,5 +48,8 @@ func MigrateDB() {
 		&models.User{},
 	}
 
-	MainDB.AutoMigrate(Models...)
+	err := MainDB.AutoMigrate(Models...)
+	if err != nil {
+		return 
+	}
 }

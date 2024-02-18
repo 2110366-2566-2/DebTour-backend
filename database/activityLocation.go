@@ -37,7 +37,6 @@ func GetActivityLocationByActivityId(activityId uint, db *gorm.DB) (activityLoca
 	return activityLocations, result.Error
 }
 
-//Checked
 func CreateActivityLocation(activityLocation *models.ActivityLocation, db *gorm.DB) (err error) {
 
 	// create the activityLocation in the database
@@ -50,7 +49,7 @@ func CreateActivityLocation(activityLocation *models.ActivityLocation, db *gorm.
 	return nil
 }
 
-func updateActivityLocation(activityLocation *models.ActivityLocation, db *gorm.DB) (err error) {
+func UpdateActivityLocation(activityLocation *models.ActivityLocation, db *gorm.DB) (err error) {
 
 	// check if activityLocation exists
 	if _, err = GetActivityLocation(activityLocation.TourId, activityLocation.ActivityId, activityLocation.LocationId, db); err != nil {

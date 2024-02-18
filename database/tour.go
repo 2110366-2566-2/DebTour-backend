@@ -115,6 +115,7 @@ func UpdateActivitiesByTourId(tourId uint, activitiesWithLocation *[]models.Acti
 
 	for _, activityWithLocation := range *activitiesWithLocation {
 		activity := models.BackToActivity(activityWithLocation)
+		activity.TourId = tourId
 
 		err = UpdateActivity(&activity, tx)
 

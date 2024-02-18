@@ -83,23 +83,6 @@ func ToTourWithActivitiesWithLocation(tour Tour, activities []ActivityWithLocati
 	}, nil
 }
 
-func BackToTour(tourWithActivitiesWithLocation TourWithActivitiesWithLocation) (Tour, error) {
-	return Tour{
-		TourId:           tourWithActivitiesWithLocation.TourId,
-		Name:             tourWithActivitiesWithLocation.Name,
-		StartDate:        tourWithActivitiesWithLocation.StartDate,
-		EndDate:          tourWithActivitiesWithLocation.EndDate,
-		Description:      tourWithActivitiesWithLocation.Description,
-		OverviewLocation: tourWithActivitiesWithLocation.OverviewLocation,
-		Price:            tourWithActivitiesWithLocation.Price,
-		RefundDueDate:    tourWithActivitiesWithLocation.RefundDueDate,
-		MaxMemberCount:   tourWithActivitiesWithLocation.MaxMemberCount,
-		MemberCount:      tourWithActivitiesWithLocation.MemberCount,
-		Status:           tourWithActivitiesWithLocation.Status,
-		AgencyUsername:   tourWithActivitiesWithLocation.AgencyUsername,
-	}, nil
-}
-
 type FilteredToursResponse struct {
 	TourId           int     `json:"tourId"`
 	TourName         string  `json:"tourName"`
