@@ -75,6 +75,13 @@ func GetTouristByTourId(c *gin.Context) {
 	}
 
 	id := uint(id64)
+
+	// check if tour exists
+	if _, err := database.GetTourByTourId(int(id), database.MainDB); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
+		return
+	}
+
 	joinedMembers, err := database.GetJoinedMembersByTourId(id, database.MainDB)
 
 	if err != nil {
@@ -147,6 +154,12 @@ func UpdateTour(c *gin.Context) {
 
 	tourId, err := strconv.Atoi(c.Param("id"))
 
+	// check if tour exists
+	if _, err := database.GetTourByTourId(tourId, database.MainDB); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
+		return
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -197,6 +210,14 @@ func DeleteTour(c *gin.Context) {
 	}
 
 	id := uint(id64)
+
+	// check if tour exists
+	if _, err := database.GetTourByTourId(int(id), tx); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
+		tx.Rollback()
+		return
+	}
+
 	err = database.DeleteTour(id, tx)
 
 	if err != nil {
