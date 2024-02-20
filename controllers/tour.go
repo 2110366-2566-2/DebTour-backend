@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"DebTour/database"
 	"DebTour/models"
 	"fmt"
 	"math"
@@ -20,7 +21,7 @@ import (
 // @router /tours [get]
 func GetAllTours(c *gin.Context) {
 
-	tours, err := models.GetAllTours()
+	tours, err := database.GetAllTours(database.MainDB)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -37,7 +38,7 @@ func GetAllTours(c *gin.Context) {
 // @ID GetTourByID
 // @Produce json
 // @Param id path int true "Tour ID"
-// @Success 200 {object} models.TourActivityLocation
+// @Success 200 {object} models.TourWithActivitiesWithLocation
 // @Router /tours/{id} [get]
 func GetTourByID(c *gin.Context) {
 	_id := c.Param("id")
@@ -46,7 +47,7 @@ func GetTourByID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
-	tourActivityLocation, err := models.GetTourById(id)
+	tourActivityLocation, err := database.GetTourWithActivitiesWithLocationByTourId(id, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -74,7 +75,14 @@ func GetTouristByTourId(c *gin.Context) {
 	}
 
 	id := uint(id64)
-	joinedMembers, err := models.GetJoinedMembersByTourId(id)
+
+	// check if tour exists
+	if _, err := database.GetTourByTourId(int(id), database.MainDB); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
+		return
+	}
+
+	joinedMembers, err := database.GetJoinedMembersByTourId(id, database.MainDB)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -91,26 +99,44 @@ func GetTouristByTourId(c *gin.Context) {
 // @id CreateTour
 // @accept json
 // @produce json
-// @param tour body models.TourRequest true "Tour"
-// @success 200 {object} models.Tour
+// @param tour body models.TourWithActivitiesWithLocationRequest true "Tour"
+// @success 200 {object} models.TourWithActivitiesWithLocation
 // @router /tours [post]
 func CreateTour(c *gin.Context) {
 
-	var TourRequest models.TourRequest
-	if err := c.ShouldBindJSON(&TourRequest); err != nil {
+	tx := database.MainDB.Begin()
+
+	var tourWithActivitiesWithLocationRequest models.TourWithActivitiesWithLocationRequest
+	if err := c.ShouldBindJSON(&tourWithActivitiesWithLocationRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	tour := models.ToTour(TourRequest)
-	err := models.CreateTour(&tour, TourRequest.Activities)
+	tour, err := models.ToTour(tourWithActivitiesWithLocationRequest, 0, "dummyAgency")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
+		return
+	}
+	err = database.CreateTour(&tour, tourWithActivitiesWithLocationRequest.Activities, tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tour})
+	tourWithActivitiesWithLocation, err := database.GetTourWithActivitiesWithLocationByTourId(int(tour.TourId), tx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourWithActivitiesWithLocation})
 }
 
 // UpdateTour godoc
@@ -122,18 +148,24 @@ func CreateTour(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @param tour body models.Tour true "Tour"
-// @success 200 {object} models.Tour
+// @success 200 {object} string
 // @router /tours/{id} [put]
 func UpdateTour(c *gin.Context) {
 
 	tourId, err := strconv.Atoi(c.Param("id"))
+
+	// check if tour exists
+	if _, err := database.GetTourByTourId(tourId, database.MainDB); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
+		return
+	}
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	tour, err := models.GetOnlyTourById(tourId)
+	tour, err := database.GetTourByTourId(tourId, database.MainDB)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
@@ -144,15 +176,16 @@ func UpdateTour(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	tour.TourId = uint(tourId)
 
-	err = models.UpdateTour(&tour)
+	err = database.UpdateTour(&tour, database.MainDB)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tour})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Tour updated successfully"})
 }
 
 // DeleteTour godoc
@@ -166,21 +199,34 @@ func UpdateTour(c *gin.Context) {
 // @router /tours/{id} [delete]
 func DeleteTour(c *gin.Context) {
 
+	tx := database.MainDB.Begin()
+
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
 	id := uint(id64)
-	err = models.DeleteTour(id)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+	// check if tour exists
+	if _, err := database.GetTourByTourId(int(id), tx); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
+		tx.Rollback()
 		return
 	}
 
+	err = database.DeleteTour(id, tx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Tour deleted successfully"})
 }
 
@@ -268,7 +314,7 @@ func FilterTours(c *gin.Context) {
 
 	fmt.Println(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, limitInt, offsetInt)
 
-	tours, err := models.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, offsetInt, limitInt)
+	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
 
 	var filteredToursResponse []models.FilteredToursResponse
 	for _, tour := range tours {
@@ -292,7 +338,7 @@ func FilterTours(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(filteredToursResponse), "data": filteredToursResponse})
 }
 
-// UpdateActivitiesByTourId godoc
+// UpdateTourActivities godoc
 // @summary Update activities by tourId
 // @description Update activities by tourId
 // @tags tours
@@ -300,32 +346,38 @@ func FilterTours(c *gin.Context) {
 // @accept json
 // @produce json
 // @param id path int true "Tour ID"
-// @param activitiesUpdate body []models.ActivityResponse true "Activities Update"
+// @param activitiesWithLocation body []models.ActivityWithLocation true "Activities with location"
 // @success 200 {string} string
 // @router /tours/activities/{id} [put]
 func UpdateTourActivities(c *gin.Context) {
+
+	tx := database.MainDB.Begin()
 
 	tourId, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	var activitiesResponse []models.ActivityResponse
-	if err := c.ShouldBindJSON(&activitiesResponse); err != nil {
+	var activitiesWithLocation []models.ActivityWithLocation
+	if err := c.ShouldBindJSON(&activitiesWithLocation); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	err = models.UpdateActivitiesByTourId(uint(tourId), &activitiesResponse)
+	err = database.UpdateActivitiesByTourId(uint(tourId), &activitiesWithLocation, tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": activitiesResponse})
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Activities updated successfully"})
 }
 
 // CreateTourActivities godoc
@@ -336,30 +388,43 @@ func UpdateTourActivities(c *gin.Context) {
 // @accept json
 // @produce json
 // @param id path int true "Tour ID"
-// @param activities body []models.ActivityResponse true "Activities"
-// @success 200 {string} string
+// @param activitiesWithLocationRequest body []models.ActivityWithLocationRequest true "Activities with location request"
+// @success 200 {object} models.TourWithActivitiesWithLocation
 // @router /tours/activities/{id} [post]
 func CreateTourActivities(c *gin.Context) {
+	tx := database.MainDB.Begin()
 
 	tourId, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	var activitiesResponse []models.ActivityResponse
-	if err := c.ShouldBindJSON(&activitiesResponse); err != nil {
+	var activitiesWithLocationRequest []models.ActivityWithLocationRequest
+	if err := c.ShouldBindJSON(&activitiesWithLocationRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	err = models.CreateTourActivities(uint(tourId), activitiesResponse)
+	err = database.CreateTourActivities(uint(tourId), activitiesWithLocationRequest, tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": activitiesResponse})
+	tourWithActivitiesWithLocation, err := database.GetTourWithActivitiesWithLocationByTourId(tourId, tx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourWithActivitiesWithLocation})
 }

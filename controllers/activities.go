@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"DebTour/models"
+	"DebTour/database"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +16,7 @@ import (
 // @Success 200 {array} models.Activity
 // @Router /activities [get]
 func GetAllActivities(c *gin.Context) {
-	activities, err := models.GetAllActivities()
+	activities, err := database.GetAllActivities(database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

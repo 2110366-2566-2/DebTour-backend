@@ -10,10 +10,3 @@ type Tourist struct {
 	Gender         string `json:"Gender"`
 	DefaultPayment string `json:"defaultPayment"`
 }
-
-func GetTouristByUsername(username string) (Tourist, error) {
-	var tourist Tourist
-	result := db.Model(&Tourist{}).First(&tourist, username)
-
-	return tourist, result.Error
-}

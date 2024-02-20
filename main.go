@@ -2,7 +2,7 @@ package main
 
 import (
 	"DebTour/controllers"
-	"DebTour/models"
+	"DebTour/database"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -32,7 +32,7 @@ func SetupRouter() *gin.Engine {
 
 func main() {
 
-	models.InitDB()
+	database.InitDB()
 
 	router := SetupRouter()
 
@@ -71,5 +71,8 @@ func main() {
 
 	}
 
-	router.Run(":9000")
+	err := router.Run(":9000")
+	if err != nil {
+		return 
+	}
 }

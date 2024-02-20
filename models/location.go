@@ -9,38 +9,21 @@ type Location struct {
 	Address    string  `gorm:"not null" json:"address"`
 }
 
-func GetAllLocations() (locations []Location, err error) {
-	result := db.Model(&Location{}).Find(&locations)
-
-	return locations, result.Error
+type LocationRequest struct {
+	Name      string  `json:"name"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Type      string  `json:"type"`
+	Address   string  `json:"address"`
 }
 
-func GetLocationById(locationId uint) (Location, error) {
-	var location Location
-	result := db.Model(&Location{}).First(&location, locationId)
-	return location, result.Error
-}
-
-func CreateLocation(location *Location) (err error) {
-	result := db.Model(&Location{}).Create(location)
-
-	return result.Error
-}
-
-func UpdateLocation(location *Location) (err error) {
-	_, err = GetLocationById(location.LocationId)
-
-	if err != nil {
-		return err
+func ToLocation(locationRequest LocationRequest, locationId uint) Location {
+	return Location{
+		LocationId: locationId,
+		Name:      locationRequest.Name,
+		Latitude:  locationRequest.Latitude,
+		Longitude: locationRequest.Longitude,
+		Type:      locationRequest.Type,
+		Address:   locationRequest.Address,
 	}
-
-	result := db.Model(&Location{}).Where("location_id = ?", location.LocationId).Updates(location)
-
-	return result.Error
-}
-
-func DeleteLocation(locationId uint) (err error) {
-	result := db.Model(&Location{}).Where("location_id = ?", locationId).Delete(&Location{})
-
-	return result.Error
 }
