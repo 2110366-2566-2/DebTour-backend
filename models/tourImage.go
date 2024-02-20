@@ -1,6 +1,6 @@
 package models
 
 type TourImage struct {
-	TourImage uint   `gorm:"primaryKey" json:"tourImage"`
+	TourId uint   `gorm:"foreignKey;not null" json:"tourId"`
 	Image     string `gorm:"primaryKey" json:"image"`
 }
