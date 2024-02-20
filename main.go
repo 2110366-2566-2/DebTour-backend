@@ -81,6 +81,7 @@ func main() {
 		v1.GET("/api", func(ctx *gin.Context) {
 			ctx.JSON(200, gin.H{"message": "Hello from private for groups"})
 		})
+		v1.GET("/logout", controllers.OauthLogout)
 	}
 
 	router.Run(":9000")

@@ -9,7 +9,7 @@ import (
 	"os"
 	"path"
 
-	// "github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/zalando/gin-oauth2/google"
 	goauth "google.golang.org/api/oauth2/v2"
@@ -59,6 +59,8 @@ func UserInfoHandler(ctx *gin.Context) { // new
 	}
 
 	// ctx.JSON(http.StatusOK, gin.H{"Hello": "from private", "user": res.Email})
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	// fmt.Println(ctx.Query("state"))
 
 	output := make(map[string]interface{})
 	output["username"] = res.Id
@@ -68,4 +70,19 @@ func UserInfoHandler(ctx *gin.Context) { // new
 	output["picture"] = res.Picture
 
 	ctx.JSON(http.StatusOK, gin.H{"success": true, "data": output})
+}
+
+func OauthLogout(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	existSession := session.Get("ginoauth_google_session")
+	if existSession == nil {
+		fmt.Println("No session found")
+	} else {
+		fmt.Println("Session found")
+		fmt.Println(existSession)
+	}
+	session.Clear()
+	// session.values = make(map[interface{}]interface{})
+	session.Save()
+	ctx.JSON(http.StatusOK, gin.H{"message": "Logout successful"})
 }
