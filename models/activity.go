@@ -8,7 +8,7 @@ type Activity struct {
 	TourId         uint      `gorm:"foreignKey;not null" json:"tourId"`
 	ActivityId     uint      `gorm:"primaryKey;autoIncrement" json:"activityId"`
 	Name           string    `gorm:"not null" json:"name"`
-	Description    *string   `gorm:"not null" json:"description"`
+	Description    *string   `json:"description"`
 	StartTimestamp time.Time `gorm:"not null" json:"startTimestamp"`
 	EndTimestamp   time.Time `gorm:"not null" json:"endTimestamp"`
 }
