@@ -3,16 +3,20 @@ package main
 import (
 	"DebTour/controllers"
 	"DebTour/database"
+	"net/http"
 	"os"
+
+	//"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 
+	"DebTour/docs"
+	"DebTour/middleware"
+
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"DebTour/docs"
 )
 
 func SetUpSwagger() {
@@ -30,7 +34,14 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
+func SetupOauth() {
+	controllers.InitializeOauthenv()
+}
+
 func main() {
+	var loginService controllers.LoginService = controllers.StaticLoginService()
+	var jwtService controllers.JWTService = controllers.JWTAuthService()
+	var loginController controllers.LoginController = controllers.LoginHandler(loginService, jwtService)
 
 	database.InitDB()
 
@@ -45,8 +56,22 @@ func main() {
 	SetUpSwagger()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	//Set up Oauth
+	SetupOauth()
+	router.POST("/login", func(ctx *gin.Context) {
+		token := loginController.Login(ctx)
+		if token != "" {
+			ctx.JSON(http.StatusOK, gin.H{
+				"token": token,
+			})
+		} else {
+			ctx.JSON(http.StatusUnauthorized, nil)
+		}
+	})
 	v1 := router.Group("/api/v1")
+	v1.Use(middleware.AuthorizeJWT())
 	{
+
 		v1.GET("/hello", controllers.HelloWorld)
 		v1.GET("/users", controllers.GetAllUsers)
 		v1.GET("/users/:username", controllers.GetUserByUsername)
@@ -69,10 +94,16 @@ func main() {
 		v1.POST("/joinings", controllers.JoinTour)
 		v1.GET("/joinings", controllers.GetAllJoinings)
 
-	}
+		v1.GET("/google/login", controllers.HandleGoogleLogin)
+		v1.GET("/google/callback", controllers.HandleGoogleCallback)
+		v1.GET("/test", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+		})
 
+	}
 	err := router.Run(":9000")
 	if err != nil {
-		return 
+		return
 	}
+
 }
