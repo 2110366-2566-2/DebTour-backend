@@ -3,6 +3,7 @@ package main
 import (
 	"DebTour/controllers"
 	"DebTour/database"
+	"DebTour/middleware"
 	"net/http"
 	"os"
 
@@ -86,7 +87,13 @@ func main() {
 		v1.GET("/test", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})
-
+	}
+	v2 := router.Group("/api/v2")
+	v2.Use(middleware.AuthorizeJWT())
+	{
+		v2.GET("/test", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+		})
 	}
 	err := router.Run(":9000")
 	if err != nil {

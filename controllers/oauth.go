@@ -91,19 +91,18 @@ func HandleGoogleCallback(c *gin.Context) {
 	if err != nil {
 		fmt.Println("Failed to decode response body:", err)
 	}
-	token_string := loginController.Login(c)
-	if token_string == "" {
+	token_jwt := loginController.Login(c)
+	if token_jwt == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve username from context"})
 		return
 	}
-	output["token"] = token_string
+	output["token"] = token_jwt
 	output["username"] = buffer["id"]
 	output["email"] = buffer["email"]
 	output["firstname"] = buffer["given_name"]
 	output["lastname"] = buffer["family_name"]
 	output["picture"] = buffer["picture"]
-	c.Set("token", token)
-	c.Set("username", buffer["id"])
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": output})
 
 	//c.Redirect(http.StatusTemporaryRedirect, "/protected/profile")
