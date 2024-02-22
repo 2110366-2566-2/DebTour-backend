@@ -42,6 +42,7 @@ func MigrateDB() {
 		&models.Suggestion{},
 		&models.SuggestionLocation{},
 		&models.Tour{},
+		&models.TourImage{},
 		&models.Tourist{},
 		&models.Transaction{},
 		&models.TransactionPayment{},
