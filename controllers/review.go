@@ -166,3 +166,28 @@ func DeleteReview(c *gin.Context) {
 
 	err = database.DeleteReview(uint(reviewId), database.MainDB)
 }
+
+// DeleteReviewsByTourId godoc
+// @Summary Delete reviews by tour id
+// @Description Delete reviews by tour id
+// @Tags review
+// @Produce json
+// @Param tourId path int true "Tour ID"
+// @Success 200
+// @Router /reviews/tour/{tourId} [delete]
+func DeleteReviewsByTourId(c *gin.Context) {
+	tourIdString := c.Param("tourId")
+	tourId, err := strconv.ParseInt(tourIdString, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	err = database.DeleteReviewsByTourId(uint(tourId), database.MainDB)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+}
