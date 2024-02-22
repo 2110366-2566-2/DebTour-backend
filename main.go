@@ -73,6 +73,13 @@ func main() {
 		v1.POST("/joinings", controllers.JoinTour)
 		v1.GET("/joinings", controllers.GetAllJoinings)
 
+		v1.GET("/reviews", controllers.GetAllReviews)
+		v1.GET("/reviews/:id", controllers.GetReviewById)
+		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)
+		v1.POST("/reviews", controllers.CreateReview)
+		v1.PUT("/reviews/:id", controllers.UpdateReview)
+		v1.DELETE("/reviews/:id", controllers.DeleteReview)
+
 	}
 
 	err := router.Run(":9000")
