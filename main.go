@@ -79,6 +79,7 @@ func main() {
 		v1.POST("/reviews", controllers.CreateReview)
 		v1.PUT("/reviews/:id", controllers.UpdateReview)
 		v1.DELETE("/reviews/:id", controllers.DeleteReview)
+		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
 
 	}
 
