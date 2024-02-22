@@ -72,7 +72,7 @@ func main() {
 		v1.GET("/reviews", controllers.GetAllReviews)
 		v1.GET("/reviews/:id", controllers.GetReviewById)
 		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)
-		v1.POST("/reviews", controllers.CreateReview)
+		v1.POST("/reviews/tour/:id", controllers.CreateReview)
 		v1.PUT("/reviews/:id", controllers.UpdateReview)
 		v1.DELETE("/reviews/:id", controllers.DeleteReview)
 		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
