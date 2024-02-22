@@ -13,7 +13,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 
 	"DebTour/docs"
-	"DebTour/middleware"
+	// "DebTour/middleware"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -39,10 +39,6 @@ func SetupOauth() {
 }
 
 func main() {
-	var loginService controllers.LoginService = controllers.StaticLoginService()
-	var jwtService controllers.JWTService = controllers.JWTAuthService()
-	var loginController controllers.LoginController = controllers.LoginHandler(loginService, jwtService)
-
 	database.InitDB()
 
 	router := SetupRouter()
@@ -58,18 +54,9 @@ func main() {
 
 	//Set up Oauth
 	SetupOauth()
-	router.POST("/login", func(ctx *gin.Context) {
-		token := loginController.Login(ctx)
-		if token != "" {
-			ctx.JSON(http.StatusOK, gin.H{
-				"token": token,
-			})
-		} else {
-			ctx.JSON(http.StatusUnauthorized, nil)
-		}
-	})
+
 	v1 := router.Group("/api/v1")
-	v1.Use(middleware.AuthorizeJWT())
+	// v1.Use(middleware.AuthorizeJWT())
 	{
 
 		v1.GET("/hello", controllers.HelloWorld)

@@ -44,10 +44,17 @@ func HandleMain(c *gin.Context) {
 
 func HandleGoogleLogin(c *gin.Context) {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> In Redirect")
 	c.Redirect(http.StatusTemporaryRedirect, url)
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Redirected")
 }
 
 func HandleGoogleCallback(c *gin.Context) {
+	var loginService LoginService = StaticLoginService()
+	var jwtService JWTService = JWTAuthService()
+	var loginController LoginController = LoginHandler(loginService, jwtService)
+
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> In Callback")
 	state := c.Query("state")
 	if state != oauthStateString {
 		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
@@ -84,7 +91,12 @@ func HandleGoogleCallback(c *gin.Context) {
 	if err != nil {
 		fmt.Println("Failed to decode response body:", err)
 	}
-	output["token"] = token
+	token_string := loginController.Login(c)
+	if token_string == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve username from context"})
+		return
+	}
+	output["token"] = token_string
 	output["username"] = buffer["id"]
 	output["email"] = buffer["email"]
 	output["firstname"] = buffer["given_name"]

@@ -9,10 +9,7 @@ type loginInformation struct {
 }
 
 func StaticLoginService() LoginService {
-	return &loginInformation{
-		email:    "puzan_s@hotmail.com",
-		password: "testing",
-	}
+	return &loginInformation{}
 }
 
 func (info *loginInformation) LoginUser(email string, password string) bool {
