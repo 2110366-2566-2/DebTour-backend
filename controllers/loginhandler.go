@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	// "fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,9 +30,11 @@ func (controllers *loginController) Login(ctx *gin.Context) string {
 	if err != nil {
 		return "no data found"
 	}
+	username := ctx.Param("username")
+	role := ctx.Param("role")
 	isUserAuthenticated := controllers.loginService.LoginUser(credential.Email, credential.Password)
 	if isUserAuthenticated {
-		return controllers.jWtService.GenerateToken(credential.Email, true)
+		return controllers.jWtService.GenerateToken(username, role, true)
 
 	}
 	return ""

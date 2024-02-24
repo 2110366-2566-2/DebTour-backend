@@ -1,19 +1,21 @@
 package controllers
 
 import (
+	"DebTour/database"
+	"DebTour/models"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 
+	// "strings"
+
 	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
-	// ginoauth2 "github.com/zalando/gin-oauth2"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	//goauth "google.golang.org/api/oauth2/v2"
 )
 
 var (
@@ -26,6 +28,7 @@ var (
 		Endpoint: google.Endpoint,
 	}
 	oauthStateString = "EIEI"
+	Role             = ""
 )
 
 func InitializeOauthenv() {
@@ -44,10 +47,11 @@ func HandleMain(c *gin.Context) {
 }
 
 func HandleGoogleLogin(c *gin.Context) {
+	Role = c.Param("role")
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> In Redirect")
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> In Redirect")
 	c.Redirect(http.StatusTemporaryRedirect, url)
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Redirected")
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Redirected")
 }
 
 func HandleGoogleCallback(c *gin.Context) {
@@ -55,7 +59,7 @@ func HandleGoogleCallback(c *gin.Context) {
 	var jwtService JWTService = JWTAuthService()
 	var loginController LoginController = LoginHandler(loginService, jwtService)
 
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> In Callback")
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> In Callback")
 	state := c.Query("state")
 	if state != oauthStateString {
 		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
@@ -92,21 +96,32 @@ func HandleGoogleCallback(c *gin.Context) {
 	if err != nil {
 		fmt.Println("Failed to decode response body:", err)
 	}
+	c.Params = append(c.Params, gin.Param{Key: "username", Value: buffer["id"].(string)})
+	c.Params = append(c.Params, gin.Param{Key: "role", Value: Role})
+
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Params: ", c.Params)
 	token_jwt := loginController.Login(c)
 	if token_jwt == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve username from context"})
 		return
 	}
-	output["token"] = token_jwt
 	output["username"] = buffer["id"]
 	output["email"] = buffer["email"]
+	output["image"] = buffer["picture"]
+	output["role"] = Role
+	output["password"] = "password"
+	output["phone"] = "0000000000"
+
+	var user models.User
+	jsonbyte, _ := json.Marshal(output)
+	json.Unmarshal(jsonbyte, &user)
+	database.CreateUser(&user, database.MainDB)
+
 	output["firstname"] = buffer["given_name"]
 	output["lastname"] = buffer["family_name"]
-	output["picture"] = buffer["picture"]
-
+	output["token"] = token_jwt
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": output})
 
-	//c.Redirect(http.StatusTemporaryRedirect, "/protected/profile")
 }
 
 func GetProfile(c *gin.Context) {

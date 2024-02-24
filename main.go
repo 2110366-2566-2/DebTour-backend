@@ -64,7 +64,7 @@ func main() {
 		v1.GET("/users", controllers.GetAllUsers)
 		v1.GET("/users/:username", controllers.GetUserByUsername)
 		v1.POST("/users", controllers.CreateUser)
-		v1.DELETE("/users/:username", controllers.DeleteUser)
+		v1.DELETE("/users", controllers.DeleteUser)
 		v1.PUT("/users", controllers.UpdateUser)
 
 		v1.GET("/tours", controllers.GetAllTours)
@@ -95,11 +95,12 @@ func main() {
 		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
 		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername)
 
-		v1.GET("/google/login", controllers.HandleGoogleLogin)
+		v1.GET("/google/login/:role", controllers.HandleGoogleLogin)
 		v1.GET("/google/callback", controllers.HandleGoogleCallback)
 		v1.GET("/test", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})
+		v1.GET("/validate/:token", controllers.ValidateTokenHandler)
 	}
 	v2 := router.Group("/api/v2")
 	v2.Use(middleware.AuthorizeJWT())

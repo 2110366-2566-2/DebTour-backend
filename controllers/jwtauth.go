@@ -1,27 +1,40 @@
 package controllers
 
 import (
+	"DebTour/database"
+	"DebTour/models"
 	"fmt"
 	"os"
+	"strings"
+
+	// "strings"
 	"time"
 
+	"net/http"
+
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 // jwt service
 type JWTService interface {
-	GenerateToken(email string, isUser bool) string
+	GenerateToken(username string, role string, isUser bool) string
 	ValidateToken(token string) (*jwt.Token, error)
 }
 type authCustomClaims struct {
-	Name string `json:"name"`
-	User bool   `json:"user"`
+	Username string `json:"username"`
+	Role     string `json:"role"`
+	IsUser   bool   `json:"isuser"`
 	jwt.StandardClaims
 }
 
 type jwtServices struct {
 	secretKey string
 	issure    string
+}
+
+type RoleInput struct {
+	Roles string `json:"roles"`
 }
 
 // auth-jwt
@@ -40,9 +53,11 @@ func getSecretKey() string {
 	return secret
 }
 
-func (controllers *jwtServices) GenerateToken(email string, isUser bool) string {
+func (controllers *jwtServices) GenerateToken(username string, role string, isUser bool) string {
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>> username:", username)
 	claims := &authCustomClaims{
-		email,
+		username,
+		role,
 		isUser,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
@@ -69,4 +84,38 @@ func (controllers *jwtServices) ValidateToken(encodedToken string) (*jwt.Token, 
 		return []byte(controllers.secretKey), nil
 	})
 
+}
+
+func ValidateTokenHandler(c *gin.Context) {
+	encodedToken := c.Param("token")
+	token, err := JWTAuthService().ValidateToken(encodedToken)
+
+	if !token.Valid {
+		fmt.Println("testing")
+		fmt.Println(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
+	} else {
+		claims := token.Claims.(jwt.MapClaims)
+		// fmt.Println(">>>>>>>>>>>>>>>>>> Claimed: ", claims["username"], claims["role"])
+		var user models.User
+		user, err = database.GetUserByUsername(claims["username"].(string), database.MainDB)
+		// check role
+		if err != nil || user.Role != claims["role"] {
+			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid role"})
+			return
+		}
+		var roles RoleInput
+		if c.ShouldBindJSON(&roles) != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid roles type"})
+			return
+		}
+		Roles := strings.Split(roles.Roles, ", ")
+		for _, role := range Roles {
+			if role == user.Role {
+				c.JSON(http.StatusOK, gin.H{"success": true})
+				return
+			}
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "mismatch role"})
+	}
 }
