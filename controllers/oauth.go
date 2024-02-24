@@ -25,7 +25,7 @@ var (
 			"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint: google.Endpoint,
 	}
-	oauthStateString = "random"
+	oauthStateString = "EIEI"
 )
 
 func InitializeOauthenv() {
@@ -36,6 +36,7 @@ func InitializeOauthenv() {
 	googleOauthConfig.RedirectURL = os.Getenv("GOOGLE_REDIRECT_URL")
 	googleOauthConfig.ClientID = os.Getenv("GOOGLE_CLIENT_ID")
 	googleOauthConfig.ClientSecret = os.Getenv("GOOGLE_CLIENT_SECRET")
+	oauthStateString = os.Getenv("OAUTH_STATE_STRING")
 }
 
 func HandleMain(c *gin.Context) {
