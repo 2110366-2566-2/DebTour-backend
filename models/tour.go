@@ -16,7 +16,7 @@ type Tour struct {
 	MaxMemberCount   uint      `gorm:"not null" json:"maxMemberCount"`
 	MemberCount      uint      `gorm:"not null" json:"memberCount"`
 	Status           string    `gorm:"not null" json:"status"`
-	AgencyUsername   string    `gorm:"foreignKey:UserRefer" json:"agencyUsername"`
+	AgencyUsername   string    `gorm:"not null" json:"agencyUsername"`
 	CreatedTimestamp time.Time `gorm:"autoCreateTime" json:"createdTimestamp"`
 }
 

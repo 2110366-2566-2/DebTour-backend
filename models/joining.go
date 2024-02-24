@@ -3,9 +3,9 @@ package models
 type Joining struct {
 	TourId          uint   `gorm:"foreignKey" json:"tourId"`
 	TouristUsername string `gorm:"foreignKey" json:"touristUsername"`
-	MemberFirstName string `json:"memberFirstName"`
-	MemberLastName  string `json:"memberLastName"`
-	MemberAge       uint   `json:"memberAge"`
+	MemberFirstName string `gorm:"not null" json:"memberFirstName"`
+	MemberLastName  string `gorm:"not null" json:"memberLastName"`
+	MemberAge       uint   `gorm:"not null" json:"memberAge"`
 }
 
 type JoinTourRequest struct {

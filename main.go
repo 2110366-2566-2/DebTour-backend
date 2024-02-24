@@ -77,6 +77,10 @@ func main() {
 		v1.PUT("/tours/activities/:id", controllers.UpdateTourActivities)
 		v1.POST("/tours/activities/:id", controllers.CreateTourActivities)
 
+		v1.GET("/tours/images/:id", controllers.GetTourImages)
+		v1.POST("/tours/images/:id", controllers.CreateTourImagesByTourId)
+		v1.DELETE("/tours/images/:id", controllers.DeleteTourImagesByTourId)
+
 		v1.GET("/activities", controllers.GetAllActivities)
 
 		v1.POST("/joinings", controllers.JoinTour)

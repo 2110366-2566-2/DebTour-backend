@@ -341,7 +341,7 @@ func FilterTours(c *gin.Context) {
 // UpdateTourActivities godoc
 // @summary Update activities by tourId
 // @description Update activities by tourId
-// @tags tours
+// @tags tour-activities
 // @id UpdateActivitiesByTourId
 // @accept json
 // @produce json
@@ -383,7 +383,7 @@ func UpdateTourActivities(c *gin.Context) {
 // CreateTourActivities godoc
 // @summary Create activities for a tour
 // @description Create activities for a tour
-// @tags tours
+// @tags tour-activities
 // @id CreateTourActivities
 // @accept json
 // @produce json
