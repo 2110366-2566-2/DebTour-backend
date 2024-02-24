@@ -3,16 +3,21 @@ package main
 import (
 	"DebTour/controllers"
 	"DebTour/database"
+	"DebTour/middleware"
+	"net/http"
 	"os"
+
+	//"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 
+	"DebTour/docs"
+	// "DebTour/middleware"
+
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"DebTour/docs"
 )
 
 func SetUpSwagger() {
@@ -30,8 +35,11 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
-func main() {
+func SetupOauth() {
+	controllers.InitializeOauthenv()
+}
 
+func main() {
 	database.InitDB()
 
 	router := SetupRouter()
@@ -45,13 +53,18 @@ func main() {
 	SetUpSwagger()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	//Set up Oauth
+	SetupOauth()
+
 	v1 := router.Group("/api/v1")
+	// v1.Use(middleware.AuthorizeJWT())
 	{
+
 		v1.GET("/hello", controllers.HelloWorld)
 		v1.GET("/users", controllers.GetAllUsers)
 		v1.GET("/users/:username", controllers.GetUserByUsername)
 		v1.POST("/users", controllers.CreateUser)
-		v1.DELETE("/users/:username", controllers.DeleteUser)
+		v1.DELETE("/users", controllers.DeleteUser)
 		v1.PUT("/users", controllers.UpdateUser)
 
 		v1.GET("/tours", controllers.GetAllTours)
@@ -82,11 +95,24 @@ func main() {
 		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
 		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername)
 
-
+		v1.GET("/google/login/:role", controllers.HandleGoogleLogin)
+		v1.GET("/google/callback", controllers.HandleGoogleCallback)
+		v1.GET("/test", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+		})
+		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler)
+		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)
 	}
-
+	v2 := router.Group("/api/v2")
+	v2.Use(middleware.AuthorizeJWT())
+	{
+		v2.GET("/test", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+		})
+	}
 	err := router.Run(":9000")
 	if err != nil {
-		return 
+		return
 	}
+
 }

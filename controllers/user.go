@@ -3,6 +3,7 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -54,8 +55,15 @@ func GetUserByUsername(c *gin.Context) {
 // @param user body models.User true "User"
 // @success 200 {object} models.User
 // @router /users [post]
+type CreateUserInput struct {
+	Username string `json:"username"`
+}
+
 func CreateUser(c *gin.Context) {
 	var user models.User
+	var username CreateUserInput
+	c.ShouldBindJSON(&username)
+	fmt.Println(">>>>>>>>>>>>>>>> User: ", username.Username)
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return

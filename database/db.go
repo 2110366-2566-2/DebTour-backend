@@ -50,6 +50,6 @@ func MigrateDB() {
 
 	err := MainDB.AutoMigrate(Models...)
 	if err != nil {
-		return 
+		return
 	}
 }
