@@ -100,7 +100,8 @@ func main() {
 		v1.GET("/test", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})
-		v1.GET("/validate/:token", controllers.ValidateTokenHandler)
+		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler)
+		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)
 	}
 	v2 := router.Group("/api/v2")
 	v2.Use(middleware.AuthorizeJWT())
