@@ -86,6 +86,15 @@ func main() {
 		v1.POST("/joinings", controllers.JoinTour)
 		v1.GET("/joinings", controllers.GetAllJoinings)
 
+		v1.GET("/reviews", controllers.GetAllReviews)
+		v1.GET("/reviews/:id", controllers.GetReviewById)
+		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)
+		v1.POST("/reviews/tour/:id", controllers.CreateReview)
+		v1.GET("/reviews/tourist/:username", controllers.GetReviewsByTouristUsername)
+		v1.DELETE("/reviews/:id", controllers.DeleteReview)
+		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
+		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername)
+
 		v1.GET("/google/login", controllers.HandleGoogleLogin)
 		v1.GET("/google/callback", controllers.HandleGoogleCallback)
 		v1.GET("/test", func(ctx *gin.Context) {
