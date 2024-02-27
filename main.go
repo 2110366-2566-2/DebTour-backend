@@ -3,18 +3,14 @@ package main
 import (
 	"DebTour/controllers"
 	"DebTour/database"
+	"DebTour/docs"
 	"DebTour/middleware"
 	"net/http"
 	"os"
 
-	//"time"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
-
-	"DebTour/docs"
-	// "DebTour/middleware"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -57,7 +53,6 @@ func main() {
 	SetupOauth()
 
 	v1 := router.Group("/api/v1")
-	// v1.Use(middleware.AuthorizeJWT())
 	{
 
 		v1.GET("/hello", controllers.HelloWorld)
@@ -100,8 +95,10 @@ func main() {
 		v1.GET("/test", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})
-		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler) // for debugging
-		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)   // for debugging
+		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler)
+		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)
+
+		v1.GET("/issues", controllers.GetAllIssues)
 	}
 
 	v2 := router.Group("/api/v2")
