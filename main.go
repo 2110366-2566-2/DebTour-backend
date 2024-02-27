@@ -3,22 +3,17 @@ package main
 import (
 	"DebTour/controllers"
 	"DebTour/database"
+	"DebTour/docs"
 	"DebTour/middleware"
 	"net/http"
 	"os"
-
-	//"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 
-	// "DebTour/docs"
-	// "DebTour/middleware"
-
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/swag/example/basic/docs"
 )
 
 func SetUpSwagger() {
@@ -58,7 +53,6 @@ func main() {
 	SetupOauth()
 
 	v1 := router.Group("/api/v1")
-	// v1.Use(middleware.AuthorizeJWT())
 	{
 
 		v1.GET("/hello", controllers.HelloWorld)
@@ -106,6 +100,7 @@ func main() {
 
 		v1.GET("/issues", controllers.GetAllIssues)
 	}
+
 	v2 := router.Group("/api/v2")
 	v2.Use(middleware.AuthorizeJWT())
 	{
@@ -113,6 +108,7 @@ func main() {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})
 	}
+
 	err := router.Run(":9000")
 	if err != nil {
 		return
