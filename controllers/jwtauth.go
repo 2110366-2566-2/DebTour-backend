@@ -6,7 +6,7 @@ import (
 	"DebTour/models"
 	"fmt"
 	"os"
-	"strings"
+	// "strings"
 
 	// "strings"
 	"time"
@@ -121,14 +121,22 @@ func ValidateRoleHandler(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid role"})
 		return
 	}
-	var roles RoleInput
-	if c.ShouldBindJSON(&roles) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid roles type"})
-		return
-	}
-	Roles := strings.Split(roles.Roles, ", ")
-	for _, role := range Roles {
+	// var roles []string
+	// if c.ShouldBindJSON(&roles) != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid roles type"})
+	// 	return
+	// }
+	roles := []string{"admin", "user"}
+	// Roles := strings.Split(roles.Roles, ", ")
+	// for _, role := range Roles {
+	// 	if role == user.Role {
+	// 		c.JSON(http.StatusOK, gin.H{"success": true})
+	// 		return
+	// 	}
+	// }
+	for _, role := range roles {
 		if role == user.Role {
+			fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>", role, user.Role)
 			c.JSON(http.StatusOK, gin.H{"success": true})
 			return
 		}

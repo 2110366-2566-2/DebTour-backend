@@ -3,13 +3,17 @@ package middleware
 import (
 	"DebTour/controllers"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
+	// "fmt"
+	"DebTour/database"
+	"DebTour/models"
 	"net/http"
 	"strings"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
-func AuthorizeJWT() gin.HandlerFunc {
+func AuthorizeJWT(roles []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const BEARER_SCHEMA = "Bearer "
 
@@ -25,14 +29,25 @@ func AuthorizeJWT() gin.HandlerFunc {
 		}
 		tokenString := authHeader[len(BEARER_SCHEMA):]
 		token, err := controllers.JWTAuthService().ValidateToken(tokenString)
-		if token.Valid {
-			claims := token.Claims.(jwt.MapClaims)
-			fmt.Println(claims)
-		} else {
-			fmt.Println("testing")
-			fmt.Println(err)
-			c.AbortWithStatus(http.StatusUnauthorized)
+		if !token.Valid {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
+			return
 		}
-
+		claims := token.Claims.(jwt.MapClaims)
+		var user models.User
+		user, err = database.GetUserByUsername(claims["username"].(string), database.MainDB)
+		// check role
+		if err != nil || user.Role != claims["role"] {
+			fmt.Print(">>>>>>>>>>>>>>>>>>>>>>>>>>", user.Role, " ", claims["role"])
+			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid role"})
+			return
+		}
+		for _, role := range roles {
+			if role == user.Role {
+				// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>", role, user.Role)
+				return
+			}
+		}
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "mismatch role"})
 	}
 }
