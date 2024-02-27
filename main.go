@@ -101,16 +101,50 @@ func main() {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})
 		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler) // for debugging
-		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)   // for e
+		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)   // for debugging
 	}
+
 	v2 := router.Group("/api/v2")
-	a := []string{"admin", "adminn"}
-	v2.Use(middleware.AuthorizeJWT(a))
 	{
+		v2.Use(middleware.AuthorizeJWT([]string{"admin", "tourist"}))
 		v2.GET("/test", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})
 	}
+
+	// a: admin, g: agency, t: tourist
+	v2_a := router.Group("/api/v2/admin")
+	{
+		v2_a.Use(middleware.AuthorizeJWT([]string{"admin"}))
+		v2_a.GET("/test", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+		})
+	}
+
+	v2_ag := router.Group("/api/v2/agency")
+	{
+		v2_ag.Use(middleware.AuthorizeJWT([]string{"admin", "agency"}))
+		v2_ag.GET("/test", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+		})
+	}
+
+	v2_at := router.Group("/api/v2/tourist")
+	{
+		v2_at.Use(middleware.AuthorizeJWT([]string{"admin", "tourist"}))
+		v2_at.GET("/test", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+		})
+	}
+
+	v2_agt := router.Group("/api/v2/all")
+	{
+		v2_agt.Use(middleware.AuthorizeJWT([]string{"admin", "agency", "tourist"}))
+		v2_agt.GET("/test", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+		})
+	}
+
 	err := router.Run(":9000")
 	if err != nil {
 		return
