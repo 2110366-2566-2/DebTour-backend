@@ -3,9 +3,8 @@
 .idea/
 .vscode/
 
+docs/
 
 mockData/
 
 test-clientid.google.json
-
-.gitignore
