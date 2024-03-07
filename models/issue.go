@@ -12,5 +12,5 @@ type Issue struct {
 	ResolverAdminId  *int       `json:"resolverAdminId"`
 	ResolveMessage   *string    `json:"resolveMessage"`
 	ResolveTimestamp *time.Time `json:"resolveTimestamp"`
-	Image            string     `json:image`
+	Image            string     `json:"image"`
 }
