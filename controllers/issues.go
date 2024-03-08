@@ -32,7 +32,7 @@ func GetAllIssues(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.Issue
-// @Router /v1/issues [post]
+// @Router /issues [post]
 func CreateIssueReport(c *gin.Context) {
 	// Create a new issue obj
 	var issue models.Issue
