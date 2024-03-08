@@ -99,6 +99,8 @@ func main() {
 		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)
 
 		v1.GET("/issues", controllers.GetAllIssues)
+		v1.POST("/issues", controllers.CreateIssueReport)
+
 	}
 
 	v2 := router.Group("/api/v2")
