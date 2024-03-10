@@ -18,6 +18,8 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+var Blacklist = make(map[string]bool)
+
 var (
 	googleOauthConfig = &oauth2.Config{
 		RedirectURL:  "NOT_HERE",
@@ -135,4 +137,18 @@ func GetProfile(c *gin.Context) {
 	// You can use the username to fetch user profile information from the database or any other source
 	// For demonstration purposes, we'll simply return the username
 	c.JSON(http.StatusOK, gin.H{"username": username})
+}
+
+func HandleGoogleLogout(c *gin.Context) {
+	const BEARER_SCHEMA = "Bearer "
+	authHeader := c.GetHeader("Authorization")
+	tokenString := authHeader[len(BEARER_SCHEMA):]
+
+	// Add the token to the blacklist
+	Blacklist[tokenString] = true
+
+	// You may want to add additional logic such as removing the token from client storage
+	// and performing any cleanup tasks
+
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
