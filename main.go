@@ -113,7 +113,7 @@ func main() {
 
 		v1.GET("/issues", controllers.GetIssues)
 		v1.POST("/issues", controllers.CreateIssueReport)
-
+		v1.PUT("/issues/:issue_id", controllers.UpdateIssueReport)
 	}
 
 	v2 := router.Group("/api/v2")

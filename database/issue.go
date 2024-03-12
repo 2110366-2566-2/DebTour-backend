@@ -21,3 +21,8 @@ func CreateIssue(db *gorm.DB, issue *models.Issue) error {
 	result := db.Create(issue)
 	return result.Error
 }
+
+func UpdateIssue(db *gorm.DB, issue *models.Issue) error {
+	result := db.Model(&models.Issue{}).Where("issue_id = ?", issue.IssueId).Updates(issue)
+	return result.Error
+}
