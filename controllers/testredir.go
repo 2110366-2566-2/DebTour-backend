@@ -30,3 +30,9 @@ func TestLogin(c *gin.Context) {
 	email := c.Query("email")
 	c.JSON(http.StatusOK, gin.H{"username": username, "email": email})
 }
+
+func TestRegister(c *gin.Context) {
+	username := c.Query("username")
+	email := c.Query("email")
+	c.JSON(http.StatusOK, gin.H{"username": username, "email": email})
+}
