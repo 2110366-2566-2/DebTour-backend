@@ -10,3 +10,7 @@ type Tourist struct {
 	Gender         string `gorm:"not null" json:"Gender"`
 	DefaultPayment string `gorm:"not null" json:"defaultPayment"`
 }
+
+type TouristWithUser struct {
+	//destruct user model
+}

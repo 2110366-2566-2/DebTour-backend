@@ -78,16 +78,16 @@ func main() {
 
 		v1.GET("/agencies", controllers.GetAllAgencies)
 		v1.GET("/agencies/:username", controllers.GetAgencyByUsername)
-		v1.POST("/agencies", controllers.CreateAgency)
+		v1.POST("/agencies", controllers.RegisterAgency)
 		v1.PUT("/agencies/:username", controllers.UpdateAgency)
 		v1.DELETE("/agencies/:username", controllers.DeleteAgency)
 
 		v1.GET("/tourists", controllers.GetAllTourists)
 		v1.GET("/tourists/:username", controllers.GetTouristByUsername)
-		v1.POST("/tourists", controllers.CreateTourist)
+		v1.POST("/tourists", controllers.RegisterTourist)
+		//v1.POST("/tourists", controllers.CreateTourist)
 		v1.PUT("/tourists/:username", controllers.UpdateTourist)
 		v1.DELETE("/tourists/:username", controllers.DeleteTourist)
-
 
 		v1.GET("/activities", controllers.GetAllActivities)
 

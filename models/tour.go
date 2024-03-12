@@ -21,15 +21,15 @@ type Tour struct {
 }
 
 type TourWithActivitiesWithLocationRequest struct {
-	Name             string            `json:"name"`
-	StartDate        string            `json:"startDate"`
-	EndDate          string            `json:"endDate"`
-	Description      string            `json:"description"`
-	OverviewLocation string            `json:"overviewLocation"`
-	Price            float64           `json:"price"`
-	RefundDueDate    string            `json:"refundDueDate"`
-	MaxMemberCount   uint              `json:"maxMemberCount"`
-	Activities    []ActivityWithLocationRequest `json:"activities"`
+	Name             string                        `json:"name"`
+	StartDate        string                        `json:"startDate"`
+	EndDate          string                        `json:"endDate"`
+	Description      string                        `json:"description"`
+	OverviewLocation string                        `json:"overviewLocation"`
+	Price            float64                       `json:"price"`
+	RefundDueDate    string                        `json:"refundDueDate"`
+	MaxMemberCount   uint                          `json:"maxMemberCount"`
+	Activities       []ActivityWithLocationRequest `json:"activities"`
 }
 
 func ToTour(tourRequest TourWithActivitiesWithLocationRequest, tourId uint, agencyUsername string) (Tour, error) {
@@ -50,18 +50,18 @@ func ToTour(tourRequest TourWithActivitiesWithLocationRequest, tourId uint, agen
 }
 
 type TourWithActivitiesWithLocation struct {
-	TourId		   uint                  `gorm:"primaryKey;autoIncrement" json:"tourId"`
-	Name             string                `gorm:"not null" json:"name"`
-	StartDate        string                `gorm:"not null" json:"startDate"`
-	EndDate          string                `gorm:"not null" json:"endDate"`
-	Description      string                `gorm:"not null" json:"description"`
-	OverviewLocation string                `gorm:"not null" json:"overviewLocation"`
-	Price            float64               `gorm:"not null;check:price > 0" json:"price"`
-	RefundDueDate    string                `gorm:"not null" json:"refundDueDate"`
-	MaxMemberCount   uint                  `gorm:"not null" json:"maxMemberCount"`
-	MemberCount      uint                  `gorm:"not null" json:"memberCount"`
-	Status           string                `gorm:"not null" json:"status"`
-	AgencyUsername   string                `gorm:"foreignKey:UserRefer" json:"agencyUsername"`
+	TourId           uint                   `gorm:"primaryKey;autoIncrement" json:"tourId"`
+	Name             string                 `gorm:"not null" json:"name"`
+	StartDate        string                 `gorm:"not null" json:"startDate"`
+	EndDate          string                 `gorm:"not null" json:"endDate"`
+	Description      string                 `gorm:"not null" json:"description"`
+	OverviewLocation string                 `gorm:"not null" json:"overviewLocation"`
+	Price            float64                `gorm:"not null;check:price > 0" json:"price"`
+	RefundDueDate    string                 `gorm:"not null" json:"refundDueDate"`
+	MaxMemberCount   uint                   `gorm:"not null" json:"maxMemberCount"`
+	MemberCount      uint                   `gorm:"not null" json:"memberCount"`
+	Status           string                 `gorm:"not null" json:"status"`
+	AgencyUsername   string                 `gorm:"foreignKey:UserRefer" json:"agencyUsername"`
 	Activities       []ActivityWithLocation `json:"activities"`
 }
 
@@ -79,7 +79,7 @@ func ToTourWithActivitiesWithLocation(tour Tour, activities []ActivityWithLocati
 		MemberCount:      tour.MemberCount,
 		Status:           tour.Status,
 		AgencyUsername:   tour.AgencyUsername,
-		Activities: activities,
+		Activities:       activities,
 	}, nil
 }
 
