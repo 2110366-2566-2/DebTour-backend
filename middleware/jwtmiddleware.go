@@ -28,6 +28,12 @@ func AuthorizeJWT(roles []string) gin.HandlerFunc {
 			return
 		}
 		tokenString := authHeader[len(BEARER_SCHEMA):]
+
+		if _, ok := controllers.Blacklist[tokenString]; ok {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
 		token, err := controllers.JWTAuthService().ValidateToken(tokenString)
 		if !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})

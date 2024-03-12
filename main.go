@@ -92,6 +92,7 @@ func main() {
 
 		v1.GET("/google/login/:role", controllers.HandleGoogleLogin)
 		v1.GET("/google/callback", controllers.HandleGoogleCallback)
+		v1.GET("/google/logout", controllers.HandleGoogleLogout)
 		v1.GET("/test", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})
