@@ -119,6 +119,7 @@ func main() {
 		v1.GET("/testdir2", controllers.TestDir)
 		v1.GET("/google/testlogin/login", controllers.TestLogin)
 		v1.GET("/google/testlogin/register", controllers.TestRegister)
+		v1.POST("/register/:role", controllers.RegisterHandler)
 	}
 
 	v2 := router.Group("/api/v2")

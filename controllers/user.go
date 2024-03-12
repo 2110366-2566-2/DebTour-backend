@@ -88,9 +88,14 @@ func CreateUser(c *gin.Context) {
 func DeleteUserByUsername(c *gin.Context) {
 	// Extract the username from the URL path parameters
 	username := c.Param("username")
-
+	//check if user exist
+	_, err := database.GetUserByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
+		return
+	}
 	// Delete the user by username
-	err := database.DeleteUserByUsername(username, database.MainDB)
+	err = database.DeleteUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

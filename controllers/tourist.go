@@ -80,11 +80,19 @@ func GetTouristByUsername(c *gin.Context) {
 // @Produce json
 // @Param username path string true "Username"
 // @Success 200 {string} string	"Tourist deleted successfully"
+// @Router /tourists/{username} [delete]
 func DeleteTouristByUsername(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	username := c.Param("username")
 
-	err := database.DeleteUserByUsername(username, database.MainDB)
+	//check is username exist
+	_, err := database.GetUserByUsername(username, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	err = database.DeleteUserByUsername(username, database.MainDB)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -101,34 +109,16 @@ func DeleteTouristByUsername(c *gin.Context) {
 	tx.Commit()
 }
 
-//create function for update tourist
-
-// UpdateTourist godoc
+// UpdateTouristByUsername godoc
 // @Summary Update a tourist
-// @Description Update a tourist
+// @Description Update a tourist and user also
 // @Tags tourists
 // @Accept json
 // @Produce json
-// @Param tourist body models.Tourist true "Tourist"
-// @Success 200 {object} models.Tourist
-// @Router /tourists [put]
-// func UpdateTourist(c *gin.Context) {
-// 	var tourist models.Tourist
-// 	if err := c.ShouldBindJSON(&tourist); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	err := database.UpdateTourist(tourist, database.MainDB)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourist})
-// }
-
-//create function for update tourist and user by username
-//input is TouristWithUser struct
-
+// @Param username path string true "Username"
+// @Param tourist body models.TouristWithUser true "Tourist"
+// @Success 200 {object} models.TouristWithUser
+// @Router /tourists/{username} [put]
 func UpdateTouristByUsername(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	username := c.Param("username")

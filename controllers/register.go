@@ -10,18 +10,36 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// JSON payload must be in the form of: TouristWithUser
-
-// RegisterTourist godoc
-// @Summary Register a tourist
-// @Description Register a tourist and create a user
-// @Tags tourist
+// RegisterHandler godoc
+// @Summary Register a user
+// @Description Register a user
+// @Tags register
 // @Accept  json
 // @Produce  json
-// @Param tourist body TouristWithUser true "TouristWithUser"
-// @Success 200 {object} models.TouristWithUser
+// @Param role path string true "Role"
+// @Param touristwithuser body models.TouristWithUser true "TouristWithUser"
+// @Param agencywithuser body models.AgencyWithUser true "AgencyWithUser"
+// @Success 200 {object} models.User
+// @Router /register/{role} [post]
+func RegisterHandler(c *gin.Context) {
+	role := c.Param("role")
+	if role == "tourist" {
+		RegisterTourist(c)
+		return
+	}
+	if role == "agency" {
+		RegisterAgency(c)
+		return
+	}
+	c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid role"})
+}
+
 func RegisterTourist(c *gin.Context) {
 	tx := database.MainDB.Begin()
+	var loginService LoginService = StaticLoginService()
+	var jwtService JWTService = JWTAuthService()
+	var loginController LoginController = LoginHandler(loginService, jwtService)
+	role := c.Param("role")
 	var payload models.TouristWithUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		tx.Rollback()
@@ -36,7 +54,7 @@ func RegisterTourist(c *gin.Context) {
 	user.Phone = payload.Phone
 	user.Email = payload.Email
 	user.Image = payload.Image
-	user.Role = payload.Role
+	user.Role = role
 
 	var tourist models.Tourist
 	tourist.Username = payload.Username
@@ -64,6 +82,17 @@ func RegisterTourist(c *gin.Context) {
 		return
 	}
 	// Create combined data
+
+	c.Params = append(c.Params, gin.Param{Key: "username", Value: user.Username})
+	// c.Params = append(c.Params, gin.Param{Key: "role", Value: Role})
+
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Params: ", c.Params)
+	token_jwt := loginController.Login(c) // crap..., must move
+	if token_jwt == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve username from context"})
+		return
+	}
+
 	data := gin.H{
 		"username":       user.Username,
 		"password":       user.Password,
@@ -79,21 +108,18 @@ func RegisterTourist(c *gin.Context) {
 		"birthDate":      tourist.BirthDate,
 		"gender":         tourist.Gender,
 		"defaultPayment": tourist.DefaultPayment,
+		"token":          token_jwt,
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 	tx.Commit()
 }
 
-// RegisterAgency godoc
-// @Summary Register an agency
-// @Description Register an agency and create a user
-// @Tags agency
-// @Accept  json
-// @Produce  json
-// @Param agency body AgencyWithUser true "AgencyWithUser"
-// @Success 200 {object} models.AgencyWithUser
 func RegisterAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
+	var loginService LoginService = StaticLoginService()
+	var jwtService JWTService = JWTAuthService()
+	var loginController LoginController = LoginHandler(loginService, jwtService)
+	role := c.Param("role")
 	var payload models.AgencyWithUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		tx.Rollback()
@@ -108,7 +134,7 @@ func RegisterAgency(c *gin.Context) {
 	user.Phone = payload.Phone
 	user.Email = payload.Email
 	user.Image = payload.Image
-	user.Role = payload.Role
+	user.Role = role
 
 	var agency models.Agency
 	agency.Username = payload.Username
@@ -135,6 +161,17 @@ func RegisterAgency(c *gin.Context) {
 	}
 
 	// Create combined data
+
+	c.Params = append(c.Params, gin.Param{Key: "username", Value: user.Username})
+	// c.Params = append(c.Params, gin.Param{Key: "role", Value: Role})
+
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Params: ", c.Params)
+	token_jwt := loginController.Login(c) // crap..., must move
+	if token_jwt == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve username from context"})
+		return
+	}
+
 	data := gin.H{
 		"username":         user.Username,
 		"password":         user.Password,
@@ -149,6 +186,7 @@ func RegisterAgency(c *gin.Context) {
 		"authorizeAdminId": agency.AuthorizeAdminId,
 		"authorizeStatus":  agency.AuthorizeStatus,
 		"approveTime":      agency.ApproveTime,
+		"token":            token_jwt,
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 	tx.Commit()

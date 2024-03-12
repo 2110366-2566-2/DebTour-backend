@@ -179,8 +179,15 @@ func UpdateAgency(c *gin.Context) {
 func DeleteAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	username := c.Param("username")
+	//check if user exist
+	_, err := database.GetUserByUsername(username, tx)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
 
-	err := database.DeleteUserByUsername(username, tx)
+	err = database.DeleteUserByUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
