@@ -88,7 +88,6 @@ func main() {
 		v1.PUT("/tourists/:username", controllers.UpdateTourist)
 		v1.DELETE("/tourists/:username", controllers.DeleteTourist)
 
-
 		v1.GET("/activities", controllers.GetAllActivities)
 
 		v1.POST("/joinings", controllers.JoinTour)
@@ -112,7 +111,7 @@ func main() {
 		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler)
 		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)
 
-		v1.GET("/issues", controllers.GetAllIssues)
+		v1.GET("/issues", controllers.GetIssues)
 		v1.POST("/issues", controllers.CreateIssueReport)
 
 	}

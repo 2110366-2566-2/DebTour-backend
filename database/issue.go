@@ -6,16 +6,18 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetAllIssues(db *gorm.DB) (issues []models.Issue, err error) {
-	// find all issues in DB
-	result := db.Model(&models.Issue{}).Find(&issues)
+func GetIssues(db *gorm.DB, username ...string) (issues []models.Issue, err error) {
+	query := db.Model(&models.Issue{})
 
+	if len(username) > 0 {
+		query = query.Where("reporter_username = ?", username[0])
+	}
+
+	result := query.Find(&issues)
 	return issues, result.Error
 }
 
 func CreateIssue(db *gorm.DB, issue *models.Issue) error {
-	// Create a new issue report in DB
 	result := db.Create(issue)
-
 	return result.Error
 }
