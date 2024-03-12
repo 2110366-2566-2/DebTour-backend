@@ -102,17 +102,67 @@ func GetAgencyByUsername(c *gin.Context) {
 // @Success 200 {object} models.Agency
 // @Router /agencies [put]
 func UpdateAgency(c *gin.Context) {
-	var agency models.Agency
-	if err := c.ShouldBindJSON(&agency); err != nil {
+	tx := database.MainDB.Begin()
+	username := c.Param("username")
+	var payload models.AgencyWithUser
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err := database.UpdateAgency(agency, database.MainDB)
+
+	var user models.User
+	// Populate user fields from payload
+	user.Username = payload.Username
+	user.Password = payload.Password
+	user.Phone = payload.Phone
+	user.Email = payload.Email
+	user.Image = payload.Image
+	user.Role = payload.Role
+
+	var agency models.Agency
+	agency.Username = payload.Username
+	agency.AgencyName = payload.AgencyName
+	agency.LicenseNo = payload.LicenseNo
+	agency.BankAccount = payload.BankAccount
+	agency.AuthorizeAdminId = payload.AuthorizeAdminId
+	agency.AuthorizeStatus = payload.AuthorizeStatus
+	agency.ApproveTime = payload.ApproveTime
+
+	// Now you can access agencyWithUser.User and agencyWithUser.Agency
+	err := database.UpdateUserByUsername(username, user, tx)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agency})
+
+	err = database.UpdateAgencyByUsername(username, agency, tx)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	// Create combined data
+	data := gin.H{
+		"username":         user.Username,
+		"password":         user.Password,
+		"phone":            user.Phone,
+		"email":            user.Email,
+		"image":            user.Image,
+		"role":             user.Role,
+		"agencyName":       agency.AgencyName,
+		"licenseNo":        agency.LicenseNo,
+		"bankAccount":      agency.BankAccount,
+		"authorizeAdminId": agency.AuthorizeAdminId,
+		"authorizeStatus":  agency.AuthorizeStatus,
+		"approveTime":      agency.ApproveTime,
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	tx.Commit()
+
 }
 
 //create function for delete agency
@@ -127,15 +177,23 @@ func UpdateAgency(c *gin.Context) {
 // @Success 200 {object} models.Agency
 // @Router /agencies [delete]
 func DeleteAgency(c *gin.Context) {
-	var agency models.Agency
-	if err := c.ShouldBindJSON(&agency); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err := database.DeleteAgency(agency, database.MainDB)
+	tx := database.MainDB.Begin()
+	username := c.Param("username")
+
+	err := database.DeleteUserByUsername(username, tx)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agency})
+
+	err = database.DeleteAgencyByUsername(username, tx)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Agency deleted successfully"})
+	tx.Commit()
 }

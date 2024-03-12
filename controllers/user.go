@@ -85,18 +85,17 @@ func CreateUser(c *gin.Context) {
 // @produce json
 // @response 200 {string} string "User deleted"
 // @router /users/{username} [delete]
-func DeleteUser(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err := database.DeleteUser(&user, database.MainDB)
+func DeleteUserByUsername(c *gin.Context) {
+	// Extract the username from the URL path parameters
+	username := c.Param("username")
+
+	// Delete the user by username
+	err := database.DeleteUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Delete user successfully"})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User deleted successfully"})
 }
 
 // UpdateUser godoc
@@ -110,16 +109,43 @@ func DeleteUser(c *gin.Context) {
 // @param user body models.User true "User"
 // @response 200 {string} string "User updated"
 // @router /users/{username} [put]
-func UpdateUser(c *gin.Context) {
+// func UpdateUser(c *gin.Context) {
+// 	var user models.User
+// 	if err := c.ShouldBindJSON(&user); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+// 		return
+// 	}
+// 	err := database.UpdateUser(&user, database.MainDB)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
+// }
+
+func UpdateUserByUsername(c *gin.Context) {
+	// Extract the username from the URL path parameters
+	username := c.Param("username")
+
+	// Bind the request body to a user struct
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err := database.UpdateUser(&user, database.MainDB)
+	//get user by username check if username exists
+	_, err := database.GetUserByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
+		return
+	}
+
+	// Call the database function to update the user
+	err = database.UpdateUserByUsername(username, user, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User updated successfully"})
 }

@@ -8,7 +8,7 @@ import (
 
 func GetAgencyByUsername(username string, db *gorm.DB) (models.Agency, error) {
 	var agency models.Agency
-	result := db.Model(&models.Agency{}).First(&agency, username)
+	result := db.Model(&models.Agency{}).Where("username = ?", username).First(&agency)
 
 	return agency, result.Error
 }
@@ -24,16 +24,16 @@ func GetAllAgencies(db *gorm.DB) ([]models.Agency, error) {
 	return agencies, result.Error
 }
 
-func DeleteAgency(agency models.Agency, db *gorm.DB) error {
-	result := db.Model(&models.Agency{}).Where("username = ?", agency.Username).Delete(agency)
+func DeleteAgencyByUsername(username string, db *gorm.DB) error {
+	result := db.Model(&models.Agency{}).Where("username = ?", username).Delete(&models.Agency{})
 	return result.Error
 }
 
-func UpdateAgency(agency models.Agency, db *gorm.DB) error {
-	_, err := GetAgencyByUsername(agency.Username, db)
+func UpdateAgencyByUsername(username string, agency models.Agency, db *gorm.DB) error {
+	existingUser, err := GetAgencyByUsername(agency.Username, db)
 	if err != nil {
 		return err
 	}
-	result := db.Model(&models.Agency{}).Where("username = ?", agency.Username).Updates(agency)
+	result := db.Model(&existingUser).Where("username = ?", username).Updates(agency)
 	return result.Error
 }
