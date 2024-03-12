@@ -12,9 +12,9 @@ func GetIssues(db *gorm.DB, filters ...interface{}) (issues []models.Issue, err 
 	for _, filter := range filters {
 		switch filter := filter.(type) {
 		case string:
-			query = query.Where("reporterUsername = ?", filter)
+			query = query.Where("reporter_username = ?", filter)
 		case []string:
-			query = query.Where("status IN ?", filter)
+			query = query.Where("status = ?", filter)
 		}
 	}
 
