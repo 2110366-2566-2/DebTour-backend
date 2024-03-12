@@ -1,0 +1,10 @@
+.env
+
+.idea/
+.vscode/
+
+docs/
+
+mockData/
+
+test-clientid.google.json
