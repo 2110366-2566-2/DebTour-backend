@@ -43,8 +43,8 @@ func AuthorizeJWT(roles []string) gin.HandlerFunc {
 		var user models.User
 		user, err = database.GetUserByUsername(claims["username"].(string), database.MainDB)
 		// check role
-		if err != nil || user.Role != claims["role"] {
-			fmt.Print(">>>>>>>>>>>>>>>>>>>>>>>>>>", user.Role, " ", claims["role"])
+		if err != nil {
+			fmt.Print(">>>>>>>>>>>>>>>>>>>>>>>>>>", user.Role, " ", err.Error())
 			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid role"})
 			return
 		}

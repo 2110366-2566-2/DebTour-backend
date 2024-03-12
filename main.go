@@ -103,7 +103,7 @@ func main() {
 		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
 		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername)
 
-		v1.GET("/google/login/:role", controllers.HandleGoogleLogin)
+		v1.GET("/google/login", controllers.HandleGoogleLogin)
 		v1.GET("/google/callback", controllers.HandleGoogleCallback)
 		v1.GET("/google/logout", controllers.HandleGoogleLogout)
 		v1.GET("/test", func(ctx *gin.Context) {
@@ -115,6 +115,9 @@ func main() {
 		v1.GET("/issues", controllers.GetAllIssues)
 		v1.POST("/issues", controllers.CreateIssueReport)
 
+		v1.GET("/testdir3", controllers.TestRedir)
+		v1.GET("/testdir2", controllers.TestDir)
+		v1.GET("/google/testlogin/login", controllers.TestLogin)
 	}
 
 	v2 := router.Group("/api/v2")
