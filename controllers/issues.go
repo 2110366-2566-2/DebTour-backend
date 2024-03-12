@@ -19,20 +19,24 @@ import (
 // @Router /issues [get]
 func GetIssues(c *gin.Context) {
 	username := c.Query("username")
+	status := c.Query("status")
 
 	var issues []models.Issue
 	var err error
 
-	if username != "" {
-		issues, err = database.GetIssues(database.MainDB, username)
-	} else {
+	if username == "" && status == "" {
 		issues, err = database.GetIssues(database.MainDB)
+	} else if username != "" && status != "" {
+		issues, err = database.GetIssues(database.MainDB, username, []string{status})
+	} else {
+		issues, err = database.GetIssues(database.MainDB, username)
 	}
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": issues})
 }
 

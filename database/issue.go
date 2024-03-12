@@ -6,11 +6,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetIssues(db *gorm.DB, username ...string) (issues []models.Issue, err error) {
+func GetIssues(db *gorm.DB, filters ...interface{}) (issues []models.Issue, err error) {
 	query := db.Model(&models.Issue{})
 
-	if len(username) > 0 {
-		query = query.Where("reporter_username = ?", username[0])
+	for _, filter := range filters {
+		switch filter := filter.(type) {
+		case string:
+			query = query.Where("reporterUsername = ?", filter)
+		case []string:
+			query = query.Where("status IN ?", filter)
+		}
 	}
 
 	result := query.Find(&issues)
