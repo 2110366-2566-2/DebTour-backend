@@ -107,6 +107,17 @@ func HandleGoogleCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve username from context"})
 		return
 	}
+
+	// check if user exists
+	// var check_user models.User
+	// check_user, err = database.GetUserByUsername(buffer["id"].(string), database.MainDB)
+	// if err == nil {
+	// 	// user exists
+	// 	output["token"] = token_jwt
+	// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": output})
+	// }
+
+
 	output["username"] = buffer["id"]
 	output["email"] = buffer["email"]
 	output["image"] = buffer["picture"]
