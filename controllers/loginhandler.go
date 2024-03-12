@@ -31,10 +31,11 @@ func (controllers *loginController) Login(ctx *gin.Context) string {
 		return "no data found"
 	}
 	username := ctx.Param("username")
-	role := ctx.Param("role")
+	// role := ctx.Param("role")
 	isUserAuthenticated := controllers.loginService.LoginUser(credential.Email, credential.Password)
 	if isUserAuthenticated {
-		return controllers.jWtService.GenerateToken(username, role, true)
+		// return controllers.jWtService.GenerateToken(username, role, true)
+		return controllers.jWtService.GenerateToken(username, true)
 
 	}
 	return ""
