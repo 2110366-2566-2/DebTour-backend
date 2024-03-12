@@ -8,16 +8,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetAllActivities godoc
-// @Summary Get all activities
-// @Description Get all activities
-// @Tags activities
-// @ID GetAllActivities
+// GetIssues godoc
+// @Summary Get issues
+// @Description Get issues optionally filtered by username
+// @Tags issues
+// @ID GetIssues
 // @Produce json
-// @Success 200 {array} models.Activity
-// @Router /activities [get]
-func GetAllIssues(c *gin.Context) {
-	issues, err := database.GetAllIssues(database.MainDB)
+// @Param username query string false "Username to filter issues"
+// @Success 200 {array} models.Issue
+// @Router /issues [get]
+func GetIssues(c *gin.Context) {
+	username := c.Query("username")
+
+	var issues []models.Issue
+	var err error
+
+	if username != "" {
+		issues, err = database.GetIssues(database.MainDB, username)
+	} else {
+		issues, err = database.GetIssues(database.MainDB)
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
