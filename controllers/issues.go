@@ -10,11 +10,10 @@ import (
 
 // GetIssues godoc
 // @Summary Get issues
-// @Description Get issues optionally filtered by username
+// @Description Get issues optionally filtered by username and/or status
 // @Tags issues
 // @ID GetIssues
 // @Produce json
-// @Param username query string false "Username to filter issues"
 // @Success 200 {array} models.Issue
 // @Router /issues [get]
 func GetIssues(c *gin.Context) {
@@ -46,17 +45,16 @@ func GetIssues(c *gin.Context) {
 // @Tags issues
 // @Accept json
 // @Produce json
+// @Param Issue body models.Issue true "Issue object"
 // @Success 200 {object} models.Issue
 // @Router /issues [post]
 func CreateIssueReport(c *gin.Context) {
-	// Create a new issue obj
 	var issue models.Issue
 	if err := c.ShouldBindJSON(&issue); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Save an issue to DB
 	if err := database.MainDB.Create(&issue).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
