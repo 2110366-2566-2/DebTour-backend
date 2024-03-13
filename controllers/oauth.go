@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"DebTour/database"
+	"DebTour/models"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -171,4 +172,40 @@ func HandleGoogleLogout(c *gin.Context) {
 	// and performing any cleanup tasks
 
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+}
+
+// FirstContact godoc
+// @Summary First Contact
+// @Description First Contact
+// @Tags oauth
+// @Accept  json
+// @Produce  json
+// @Param firstContact body models.FirstContactModel true "First Contact"
+// @Success 200 {object} models.FirstContactModel
+// @Router /auth/firstContact [post]
+func FirstContact(c *gin.Context) {
+	// receive FirstContactModel
+
+	var firstContact models.FirstContactModel
+	err := c.ShouldBindJSON(&firstContact)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	// check if user exists
+
+	user, err := database.GetUserByUsername(firstContact.Id, database.MainDB)
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": false, "error": "Failed to retrieve user from database"})
+		return
+	}
+
+	// Generate JWT Token
+	Token := "ThisIsFuckingToken"
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "token": Token, "id": user.Role})
+
 }

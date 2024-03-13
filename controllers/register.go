@@ -10,36 +10,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterHandler godoc
-// @Summary Register a user
-// @Description Register a user
-// @Tags register
-// @Accept  json
-// @Produce  json
-// @Param role path string true "Role"
-// @Param touristwithuser body models.TouristWithUser true "TouristWithUser"
-// @Param agencywithuser body models.AgencyWithUser true "AgencyWithUser"
-// @Success 200 {object} models.User
-// @Router /register/{role} [post]
-func RegisterHandler(c *gin.Context) {
-	role := c.Param("role")
-	if role == "tourist" {
-		RegisterTourist(c)
-		return
-	}
-	if role == "agency" {
-		RegisterAgency(c)
-		return
-	}
-	c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid role"})
-}
+// func RegisterHandler(c *gin.Context) {
+// 	role := c.Param("role")
+// 	if role == "tourist" {
+// 		RegisterTourist(c)
+// 		return
+// 	}
+// 	if role == "agency" {
+// 		RegisterAgency(c)
+// 		return
+// 	}
+// 	c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid role"})
+// }
 
+// RegisterTourist godoc
+// @Summary Register a tourist
+// @Description Register a tourist
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param tourist body models.TouristWithUser true "Tourist"
+// @Success 200 {object} models.TouristWithUser
+// @Router /auth/registerTourist [post]
 func RegisterTourist(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	var loginService LoginService = StaticLoginService()
 	var jwtService JWTService = JWTAuthService()
 	var loginController LoginController = LoginHandler(loginService, jwtService)
-	role := c.Param("role")
 	var payload models.TouristWithUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		tx.Rollback()
@@ -50,11 +47,10 @@ func RegisterTourist(c *gin.Context) {
 	var user models.User
 	// Populate user fields from payload
 	user.Username = payload.Username
-	user.Password = payload.Password
 	user.Phone = payload.Phone
 	user.Email = payload.Email
 	user.Image = payload.Image
-	user.Role = role
+	user.Role = "Tourist"
 
 	var tourist models.Tourist
 	tourist.Username = payload.Username
@@ -95,7 +91,6 @@ func RegisterTourist(c *gin.Context) {
 
 	data := gin.H{
 		"username":       user.Username,
-		"password":       user.Password,
 		"phone":          user.Phone,
 		"email":          user.Email,
 		"image":          user.Image,
@@ -114,12 +109,20 @@ func RegisterTourist(c *gin.Context) {
 	tx.Commit()
 }
 
+// RegisterAgency godoc
+// @Summary Register an agency
+// @Description Register an agency
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param agency body models.AgencyWithUser true "Agency"
+// @Success 200 {object} models.AgencyWithUser
+// @Router /auth/registerAgency [post]
 func RegisterAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	var loginService LoginService = StaticLoginService()
 	var jwtService JWTService = JWTAuthService()
 	var loginController LoginController = LoginHandler(loginService, jwtService)
-	role := c.Param("role")
 	var payload models.AgencyWithUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		tx.Rollback()
@@ -130,11 +133,10 @@ func RegisterAgency(c *gin.Context) {
 	var user models.User
 	// Populate user fields from payload
 	user.Username = payload.Username
-	user.Password = payload.Password
 	user.Phone = payload.Phone
 	user.Email = payload.Email
 	user.Image = payload.Image
-	user.Role = role
+	user.Role = "Agency"
 
 	var agency models.Agency
 	agency.Username = payload.Username
@@ -174,7 +176,6 @@ func RegisterAgency(c *gin.Context) {
 
 	data := gin.H{
 		"username":         user.Username,
-		"password":         user.Password,
 		"phone":            user.Phone,
 		"email":            user.Email,
 		"image":            user.Image,
