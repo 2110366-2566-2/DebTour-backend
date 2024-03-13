@@ -114,11 +114,10 @@ func UpdateAgency(c *gin.Context) {
 	var user models.User
 	// Populate user fields from payload
 	user.Username = payload.Username
-	user.Password = payload.Password
 	user.Phone = payload.Phone
 	user.Email = payload.Email
 	user.Image = payload.Image
-	user.Role = payload.Role
+	user.Role = "Agency"
 
 	var agency models.Agency
 	agency.Username = payload.Username
@@ -147,7 +146,6 @@ func UpdateAgency(c *gin.Context) {
 	// Create combined data
 	data := gin.H{
 		"username":         user.Username,
-		"password":         user.Password,
 		"phone":            user.Phone,
 		"email":            user.Email,
 		"image":            user.Image,

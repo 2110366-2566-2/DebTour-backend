@@ -131,11 +131,10 @@ func UpdateTouristByUsername(c *gin.Context) {
 
 	var user models.User
 	user.Username = payload.Username
-	user.Password = payload.Password
 	user.Phone = payload.Phone
 	user.Email = payload.Email
 	user.Image = payload.Image
-	user.Role = payload.Role
+	user.Role = "Tourist"
 
 	var tourist models.Tourist
 	tourist.Username = payload.Username
@@ -162,7 +161,6 @@ func UpdateTouristByUsername(c *gin.Context) {
 	}
 	data := gin.H{
 		"username":       user.Username,
-		"password":       user.Password,
 		"phone":          user.Phone,
 		"email":          user.Email,
 		"image":          user.Image,
