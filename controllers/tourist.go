@@ -73,50 +73,110 @@ func GetTouristByUsername(c *gin.Context) {
 
 //create function for delete tourist
 
-// DeleteTourist godoc
-// @Summary Delete a tourist
-// @Description Delete a tourist
+// DeleteTouristByUsername godoc
+// @Summary Delete tourist and user
+// @Description Delete tourist and user by username
 // @Tags tourists
 // @Produce json
 // @Param username path string true "Username"
-// @Success 200 {object} models.Tourist
+// @Success 200 {string} string	"Tourist deleted successfully"
 // @Router /tourists/{username} [delete]
-func DeleteTourist(c *gin.Context) {
+func DeleteTouristByUsername(c *gin.Context) {
+	tx := database.MainDB.Begin()
 	username := c.Param("username")
-	tourist, err := database.GetTouristByUsername(username, database.MainDB)
+
+	//check is username exist
+	_, err := database.GetUserByUsername(username, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err = database.DeleteTourist(tourist, database.MainDB)
+	err = database.DeleteUserByUsername(username, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourist})
+
+	err = database.DeleteTouristByUsername(username, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Tourist deleted successfully"})
+	tx.Commit()
 }
 
-//create function for update tourist
-
-// UpdateTourist godoc
+// UpdateTouristByUsername godoc
 // @Summary Update a tourist
-// @Description Update a tourist
+// @Description Update a tourist and user also
 // @Tags tourists
 // @Accept json
 // @Produce json
-// @Param tourist body models.Tourist true "Tourist"
-// @Success 200 {object} models.Tourist
-// @Router /tourists [put]
-func UpdateTourist(c *gin.Context) {
-	var tourist models.Tourist
-	if err := c.ShouldBindJSON(&tourist); err != nil {
+// @Param username path string true "Username"
+// @Param tourist body models.TouristWithUser true "Tourist"
+// @Success 200 {object} models.TouristWithUser
+// @Router /tourists/{username} [put]
+func UpdateTouristByUsername(c *gin.Context) {
+	tx := database.MainDB.Begin()
+	username := c.Param("username")
+	var payload models.TouristWithUser
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	err := database.UpdateTourist(tourist, database.MainDB)
+
+	var user models.User
+	user.Username = payload.Username
+	user.Password = payload.Password
+	user.Phone = payload.Phone
+	user.Email = payload.Email
+	user.Image = payload.Image
+	user.Role = payload.Role
+
+	var tourist models.Tourist
+	tourist.Username = payload.Username
+	tourist.CitizenId = payload.CitizenId
+	tourist.FirstName = payload.FirstName
+	tourist.LastName = payload.LastName
+	tourist.Address = payload.Address
+	tourist.BirthDate = payload.BirthDate
+	tourist.Gender = payload.Gender
+	tourist.DefaultPayment = payload.DefaultPayment
+
+	err := database.UpdateUserByUsername(username, user, tx)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourist})
+
+	err = database.UpdateTouristByUsername(username, tourist, tx)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	data := gin.H{
+		"username":       user.Username,
+		"password":       user.Password,
+		"phone":          user.Phone,
+		"email":          user.Email,
+		"image":          user.Image,
+		"role":           user.Role,
+		"created_time":   user.CreatedTime,
+		"citizenId":      tourist.CitizenId,
+		"firstName":      tourist.FirstName,
+		"lastName":       tourist.LastName,
+		"address":        tourist.Address,
+		"birthDate":      tourist.BirthDate,
+		"gender":         tourist.Gender,
+		"defaultPayment": tourist.DefaultPayment,
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	tx.Commit()
 }

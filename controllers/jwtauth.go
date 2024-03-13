@@ -6,6 +6,7 @@ import (
 	"DebTour/models"
 	"fmt"
 	"os"
+
 	// "strings"
 
 	// "strings"
@@ -19,15 +20,22 @@ import (
 
 // jwt service
 type JWTService interface {
-	GenerateToken(username string, role string, isUser bool) string
+	// GenerateToken(username string, role string, isUser bool) string
+	GenerateToken(username string, isUser bool) string
 	ValidateToken(token string) (*jwt.Token, error)
 }
 type authCustomClaims struct {
 	Username string `json:"username"`
-	Role     string `json:"role"`
 	IsUser   bool   `json:"isuser"`
 	jwt.StandardClaims
 }
+
+// type authCustomClaims struct {
+// 	Username string `json:"username"`
+// 	Role     string `json:"role"`
+// 	IsUser   bool   `json:"isuser"`
+// 	jwt.StandardClaims
+// }
 
 type jwtServices struct {
 	secretKey string
@@ -54,11 +62,12 @@ func getSecretKey() string {
 	return secret
 }
 
-func (controllers *jwtServices) GenerateToken(username string, role string, isUser bool) string {
+// func (controllers *jwtServices) GenerateToken(username string, role string, isUser bool) string {
+func (controllers *jwtServices) GenerateToken(username string, isUser bool) string {
 	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>> username:", username)
 	claims := &authCustomClaims{
 		username,
-		role,
+		// role,
 		isUser,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),

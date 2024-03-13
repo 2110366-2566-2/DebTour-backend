@@ -59,8 +59,8 @@ func main() {
 		v1.GET("/users", controllers.GetAllUsers)
 		v1.GET("/users/:username", controllers.GetUserByUsername)
 		v1.POST("/users", controllers.CreateUser)
-		v1.DELETE("/users", controllers.DeleteUser)
-		v1.PUT("/users", controllers.UpdateUser)
+		v1.DELETE("/users/:username", controllers.DeleteUserByUsername)
+		v1.PUT("/users/:username", controllers.UpdateUserByUsername)
 
 		v1.GET("/tours", controllers.GetAllTours)
 		v1.GET("/tours/:id", controllers.GetTourByID)
@@ -78,15 +78,16 @@ func main() {
 
 		v1.GET("/agencies", controllers.GetAllAgencies)
 		v1.GET("/agencies/:username", controllers.GetAgencyByUsername)
-		v1.POST("/agencies", controllers.CreateAgency)
+		v1.POST("/agencies", controllers.RegisterAgency)
 		v1.PUT("/agencies/:username", controllers.UpdateAgency)
 		v1.DELETE("/agencies/:username", controllers.DeleteAgency)
 
 		v1.GET("/tourists", controllers.GetAllTourists)
 		v1.GET("/tourists/:username", controllers.GetTouristByUsername)
-		v1.POST("/tourists", controllers.CreateTourist)
-		v1.PUT("/tourists/:username", controllers.UpdateTourist)
-		v1.DELETE("/tourists/:username", controllers.DeleteTourist)
+		v1.POST("/tourists", controllers.RegisterTourist)
+		//v1.POST("/tourists", controllers.CreateTourist)
+		v1.PUT("/tourists/:username", controllers.UpdateTouristByUsername)
+		v1.DELETE("/tourists/:username", controllers.DeleteTouristByUsername)
 
 		v1.GET("/activities", controllers.GetAllActivities)
 
@@ -102,7 +103,7 @@ func main() {
 		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
 		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername)
 
-		v1.GET("/google/login/:role", controllers.HandleGoogleLogin)
+		v1.GET("/google/login", controllers.HandleGoogleLogin)
 		v1.GET("/google/callback", controllers.HandleGoogleCallback)
 		v1.GET("/google/logout", controllers.HandleGoogleLogout)
 		v1.GET("/test", func(ctx *gin.Context) {
@@ -113,7 +114,12 @@ func main() {
 
 		v1.GET("/issues", controllers.GetIssues)
 		v1.POST("/issues", controllers.CreateIssueReport)
-		v1.PUT("/issues/:issue_id", controllers.UpdateIssueReport)
+    v1.PUT("/issues/:issue_id", controllers.UpdateIssueReport)
+		v1.GET("/testdir3", controllers.TestRedir)
+		v1.GET("/testdir2", controllers.TestDir)
+		v1.GET("/google/testlogin/login", controllers.TestLogin)
+		v1.GET("/google/testlogin/register", controllers.TestRegister)
+		v1.POST("/register/:role", controllers.RegisterHandler)
 	}
 
 	v2 := router.Group("/api/v2")

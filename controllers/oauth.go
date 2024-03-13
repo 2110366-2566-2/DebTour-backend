@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"DebTour/database"
-	"DebTour/models"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,6 +11,7 @@ import (
 	// "strings"
 
 	"github.com/joho/godotenv"
+	// "strconv"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -19,6 +19,10 @@ import (
 )
 
 var Blacklist = make(map[string]bool)
+
+type BaseUrlInput struct {
+	Url string `json:"baseurl"`
+}
 
 var (
 	googleOauthConfig = &oauth2.Config{
@@ -30,7 +34,8 @@ var (
 		Endpoint: google.Endpoint,
 	}
 	oauthStateString = "EIEI"
-	Role             = ""
+	Role             = "None"
+	baseurl          BaseUrlInput
 )
 
 func InitializeOauthenv() {
@@ -42,6 +47,7 @@ func InitializeOauthenv() {
 	googleOauthConfig.ClientID = os.Getenv("GOOGLE_CLIENT_ID")
 	googleOauthConfig.ClientSecret = os.Getenv("GOOGLE_CLIENT_SECRET")
 	oauthStateString = os.Getenv("OAUTH_STATE_STRING")
+	baseurl.Url = "testlogin"
 }
 
 func HandleMain(c *gin.Context) {
@@ -49,7 +55,10 @@ func HandleMain(c *gin.Context) {
 }
 
 func HandleGoogleLogin(c *gin.Context) {
-	Role = c.Param("role")
+	// Role = c.Param("role")
+
+	c.ShouldBindJSON(&baseurl)
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>", baseurl.Url)
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
 	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> In Redirect")
 	c.Redirect(http.StatusTemporaryRedirect, url)
@@ -99,40 +108,40 @@ func HandleGoogleCallback(c *gin.Context) {
 		fmt.Println("Failed to decode response body:", err)
 	}
 	c.Params = append(c.Params, gin.Param{Key: "username", Value: buffer["id"].(string)})
-	c.Params = append(c.Params, gin.Param{Key: "role", Value: Role})
+	// c.Params = append(c.Params, gin.Param{Key: "role", Value: Role})
 
 	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Params: ", c.Params)
-	token_jwt := loginController.Login(c)
+	token_jwt := loginController.Login(c) // crap..., must move
 	if token_jwt == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve username from context"})
 		return
 	}
 
-	// check if user exists
-	// var check_user models.User
-	// check_user, err = database.GetUserByUsername(buffer["id"].(string), database.MainDB)
-	// if err == nil {
-	// 	// user exists
-	// 	output["token"] = token_jwt
-	// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": output})
-	// }
+	_, err = database.GetUserByUsername(buffer["id"].(string), database.MainDB)
+	if err != nil && err.Error() == "record not found" {
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Redirecting to ", baseurl.Url+"/register?username="+buffer["id"].(string)+"&email="+buffer["email"].(string))
+		c.Redirect(http.StatusTemporaryRedirect, baseurl.Url+"/register?username="+buffer["id"].(string)+"&email="+buffer["email"].(string))
+	}
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Redirecting to ", baseurl.Url+"/login?username="+buffer["id"].(string)+"&email="+buffer["email"].(string))
+	c.Redirect(http.StatusTemporaryRedirect, baseurl.Url+"/login?username="+buffer["id"].(string)+"&email="+buffer["email"].(string))
 
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>", isSuccess)
 
-	output["username"] = buffer["id"]
-	output["email"] = buffer["email"]
-	output["image"] = buffer["picture"]
-	output["role"] = Role
-	output["password"] = "password"
-	output["phone"] = "0000000000"
+	// output["username"] = buffer["id"]
+	// output["email"] = buffer["email"]
+	// output["image"] = buffer["picture"]
+	// output["role"] = Role
+	// output["password"] = "password"
+	// output["phone"] = "0000000000"
 
-	var user models.User
-	jsonbyte, _ := json.Marshal(output)
-	json.Unmarshal(jsonbyte, &user)
-	database.CreateUser(&user, database.MainDB)
+	// var user models.User
+	// jsonbyte, _ := json.Marshal(output)
+	// json.Unmarshal(jsonbyte, &user)
+	// database.CreateUser(&user, database.MainDB)
 
-	output["firstname"] = buffer["given_name"]
-	output["lastname"] = buffer["family_name"]
-	output["token"] = token_jwt
+	// output["firstname"] = buffer["given_name"]
+	// output["lastname"] = buffer["family_name"]
+	// output["token"] = token_jwt
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": output})
 
 }

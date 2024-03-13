@@ -2,6 +2,7 @@ package database
 
 import (
 	"DebTour/models"
+
 	"gorm.io/gorm"
 )
 
@@ -22,16 +23,19 @@ func GetAllUsers(db *gorm.DB) ([]models.User, error) {
 	return users, result.Error
 }
 
-func DeleteUser(user *models.User, db *gorm.DB) error {
-	result := db.Model(&models.User{}).Where("username = ?", user.Username).Delete(user)
+func DeleteUserByUsername(username string, db *gorm.DB) error {
+	result := db.Model(&models.User{}).Where("username = ?", username).Delete(&models.User{})
 	return result.Error
 }
 
-func UpdateUser(user *models.User, db *gorm.DB) error {
-	_, err := GetUserByUsername(user.Username, db)
+func UpdateUserByUsername(username string, user models.User, db *gorm.DB) error {
+	// Check if the user record exists
+	existingUser, err := GetUserByUsername(username, db)
 	if err != nil {
 		return err
 	}
-	result := db.Model(&models.User{}).Where("username = ?", user.Username).Updates(user)
+
+	// Update the fields of the existing user record with the values from the provided user struct
+	result := db.Model(&existingUser).Updates(user)
 	return result.Error
 }
