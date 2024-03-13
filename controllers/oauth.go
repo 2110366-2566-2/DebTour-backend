@@ -204,7 +204,7 @@ func FirstContact(c *gin.Context) {
 	}
 
 	// Generate JWT Token
-	Token := "ThisIsFuckingToken"
+	Token := hash(firstContact.Id)
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "token": Token, "id": user.Role})
 
