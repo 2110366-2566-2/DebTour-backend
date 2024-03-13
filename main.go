@@ -102,6 +102,7 @@ func main() {
 		v1.DELETE("/reviews/:id", controllers.DeleteReview)
 		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
 		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername)
+		v1.GET("/reviews/averageRating/:id", controllers.GetAverageRatingByTourId)
 
 		v1.GET("/google/login", controllers.HandleGoogleLogin)
 		v1.GET("/google/callback", controllers.HandleGoogleCallback)
