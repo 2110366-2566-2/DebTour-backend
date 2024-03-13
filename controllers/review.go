@@ -93,6 +93,11 @@ func GetAverageRatingByTourId(c *gin.Context) {
 		return
 	}
 
+	if len(reviews) == 0 {
+		c.JSON(http.StatusOK, gin.H{"success": false, "error": "No reviews found"})
+		return
+	}
+
 	averageRating := 0.0
 	for _, review := range reviews {
 		averageRating += float64(review.RatingScore)
