@@ -112,9 +112,9 @@ func main() {
 		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler)
 		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)
 
-		v1.GET("/issues", controllers.GetAllIssues)
+		v1.GET("/issues", controllers.GetIssues)
 		v1.POST("/issues", controllers.CreateIssueReport)
-
+    v1.PUT("/issues/:issue_id", controllers.UpdateIssueReport)
 		v1.GET("/testdir3", controllers.TestRedir)
 		v1.GET("/testdir2", controllers.TestDir)
 		v1.GET("/google/testlogin/login", controllers.TestLogin)
