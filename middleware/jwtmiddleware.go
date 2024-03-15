@@ -16,11 +16,11 @@ import (
 )
 
 func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
-	usernameCheck := 0
-	tourOwnerCheck := 0
+	usernameCheck := false
+	tourOwnerCheck := false
 	if len(arg) > 0 {
-		usernameCheck = ((arg[0] >> 0) & 1)
-		tourOwnerCheck = ((arg[0] >> 1) & 1)
+		usernameCheck = ((arg[0] >> 0) & 1) == 1
+		tourOwnerCheck = ((arg[0] >> 1) & 1) == 1
 	}
 
 	return func(c *gin.Context) {
@@ -55,13 +55,13 @@ func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
 		var tour models.Tour
 		user, err = database.GetUserByUsername(claims["username"].(string), database.MainDB)
 		// check role
-		if usernameCheck == 1 && user.Role != "Admin" {
+		if usernameCheck && user.Role != "Admin" {
 			if user.Username != c.Param("username") {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "mismatch username"})
 				return
 			}
 		}
-		if tourOwnerCheck == 1 && user.Role != "Admin" {
+		if tourOwnerCheck && user.Role != "Admin" {
 			tourStr := c.Param("id")
 			tourID, _ := strconv.Atoi(tourStr)
 			tour, err = database.GetTourByTourId(tourID, database.MainDB)
