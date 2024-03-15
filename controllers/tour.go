@@ -3,7 +3,6 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -242,6 +241,10 @@ func DeleteTour(c *gin.Context) {
 // @Param overviewLocation query string false "Overview location"
 // @Param memberCountFrom query string false "Member count from"
 // @Param memberCountTo query string false "Member count to"
+// @Param maxMemberCountFrom query string false "Max member count from"
+// @Param maxMemberCountTo query string false "Max member count to"
+// @Param availableMemberCountFrom query string false "Available member count from"
+// @Param availableMemberCountTo query string false "Available member count to"
 // @Param priceFrom query string false "Price from"
 // @Param priceTo query string false "Price to"
 // @Param limit query string false "Limit"
@@ -255,6 +258,10 @@ func FilterTours(c *gin.Context) {
 	overviewLocation := c.Query("overviewLocation")
 	memberCountFrom := c.Query("memberCountFrom")
 	memberCountTo := c.Query("memberCountTo")
+	availableMemberCountFrom := c.Query("availableMemberCountFrom")
+	availableMemberCountTo := c.Query("availableMemberCountTo")
+	maxMemberCountFrom := c.Query("maxMemberCountFrom")
+	maxMemberCountTo := c.Query("maxMemberCountTo")
 	priceFrom := c.Query("priceFrom")
 	priceTo := c.Query("priceTo")
 	limit := c.Query("limit")
@@ -281,6 +288,18 @@ func FilterTours(c *gin.Context) {
 	}
 	if memberCountTo == "" {
 		memberCountTo = strconv.Itoa(math.MaxInt)
+	}
+	if availableMemberCountFrom == "" {
+		availableMemberCountFrom = "0"
+	}
+	if availableMemberCountTo == "" {
+		availableMemberCountTo = strconv.Itoa(math.MaxInt)
+	}
+	if maxMemberCountFrom == "" {
+		maxMemberCountFrom = "0"
+	}
+	if maxMemberCountTo == "" {
+		maxMemberCountTo = strconv.Itoa(math.MaxInt)
 	}
 	if priceFrom == "" {
 		priceFrom = "0"
@@ -311,10 +330,9 @@ func FilterTours(c *gin.Context) {
 			return
 		}
 	}
+	//fmt.Println(maxMemberCountFrom, maxMemberCountTo)
 
-	fmt.Println(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, limitInt, offsetInt)
-
-	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
+	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
 
 	var filteredToursResponse []models.FilteredToursResponse
 	for _, tour := range tours {
