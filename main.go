@@ -58,6 +58,7 @@ func main() {
 		v1.GET("/hello", controllers.HelloWorld)                  // all
 		v1.GET("/users", controllers.GetAllUsers)                 // admin
 		v1.GET("/users/:username", controllers.GetUserByUsername) // admin
+		v1.GET("/getMe", controllers.GetMe)                       // logged in
 
 		v1.GET("/tours", controllers.GetAllTours)                          // all
 		v1.GET("/tours/:id", controllers.GetTourByID)                      // all
@@ -104,7 +105,8 @@ func main() {
 		// auth
 		v1.POST("/auth/registerTourist", controllers.RegisterTourist)
 		v1.POST("/auth/registerAgency", controllers.RegisterAgency)
-		v1.POST("/auth/firstContact", controllers.FirstContact)
+		v1.POST("/auth/login", controllers.Login)
+		v1.GET("/auth/logout", controllers.HandleGoogleLogout)
 		//end auth
 
 		v1.GET("/issues", controllers.GetIssues)                   // all + logged in and only allowed (addmin = all, tourist+agency = only their own)
@@ -131,7 +133,7 @@ func main() {
 
 	v2_ag := router.Group("/api/v2/agency")
 	{
-		v2_ag.Use(middleware.AuthorizeJWT([]string{"admin", "agency"}))
+		v2_ag.Use(middleware.AuthorizeJWT([]string{"admin", "Agency"}))
 		v2_ag.GET("/test", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 		})

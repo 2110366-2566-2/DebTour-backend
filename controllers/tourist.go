@@ -40,6 +40,8 @@ func CreateTourist(c *gin.Context) {
 // @Description Get all tourists
 // @Tags tourists
 // @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {array} models.Tourist
 // @Router /tourists [get]
 func GetAllTourists(c *gin.Context) {
@@ -59,6 +61,8 @@ func GetAllTourists(c *gin.Context) {
 // @Tags tourists
 // @Produce json
 // @Param username path string true "Username"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.Tourist
 // @Router /tourists/{username} [get]
 func GetTouristByUsername(c *gin.Context) {
@@ -79,6 +83,8 @@ func GetTouristByUsername(c *gin.Context) {
 // @Tags tourists
 // @Produce json
 // @Param username path string true "Username"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {string} string	"Tourist deleted successfully"
 // @Router /tourists/{username} [delete]
 func DeleteTouristByUsername(c *gin.Context) {
@@ -117,6 +123,8 @@ func DeleteTouristByUsername(c *gin.Context) {
 // @Produce json
 // @Param username path string true "Username"
 // @Param tourist body models.TouristWithUser true "Tourist"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.TouristWithUser
 // @Router /tourists/{username} [put]
 func UpdateTouristByUsername(c *gin.Context) {
