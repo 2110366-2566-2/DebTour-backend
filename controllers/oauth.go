@@ -11,6 +11,7 @@ import (
 
 	// "strings"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
 	// "strconv"
 
@@ -230,4 +231,30 @@ func Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "token": token_jwt, "id": user.Role})
 
+}
+
+func GetToken(c *gin.Context) {
+	username := c.Param("username")
+	c.Params = append(c.Params, gin.Param{Key: "username", Value: username})
+	// c.Params = append(c.Params, gin.Param{Key: "role", Value: Role})
+
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> Params: ", c.Params)
+	var loginService LoginService = StaticLoginService()
+	var jwtService JWTService = JWTAuthService()
+	var loginController LoginController = LoginHandler(loginService, jwtService)
+	token := loginController.Login(c)
+	c.JSON(http.StatusOK, gin.H{"success": true, "token": token})
+}
+
+func GetUsername(c *gin.Context) {
+	tokenS := c.Param("token")
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> tokenS :", tokenS)
+	token, err := JWTAuthService().ValidateToken(tokenS)
+	if !token.Valid {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username :", claims["username"].(string))
+	c.JSON(http.StatusOK, gin.H{"success": true, "username": claims["username"].(string)})
 }

@@ -14,7 +14,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthorizeJWT(roles []string) gin.HandlerFunc {
+func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
+	usernameCheck := 0
+	if len(arg) > 0 {
+		usernameCheck = arg[0]
+	}
 	return func(c *gin.Context) {
 		const BEARER_SCHEMA = "Bearer "
 
@@ -31,7 +35,7 @@ func AuthorizeJWT(roles []string) gin.HandlerFunc {
 		tokenString := authHeader[len(BEARER_SCHEMA):]
 
 		if _, ok := controllers.Blacklist[tokenString]; ok {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "User is logged out"})
 			return
 		}
 
@@ -41,17 +45,25 @@ func AuthorizeJWT(roles []string) gin.HandlerFunc {
 			return
 		}
 		claims := token.Claims.(jwt.MapClaims)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username :", claims["username"].(string))
 		var user models.User
 		user, err = database.GetUserByUsername(claims["username"].(string), database.MainDB)
 		// check role
+		if usernameCheck == 1 && user.Role != "Admin" {
+			if user.Username != c.Param("username") {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "mismatch username"})
+				return
+			}
+		}
 		if err != nil {
-			fmt.Print(">>>>>>>>>>>>>>>>>>>>>>>>>>", user.Role, " ", err.Error())
+			fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>", user.Role, " ", err.Error())
 			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid role"})
 			return
 		}
 		for _, role := range roles {
 			if role == user.Role {
 				// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>", role, user.Role)
+
 				return
 			}
 		}
