@@ -1,14 +1,14 @@
 package controllers
 
-import (
-	// "fmt"
+import "github.com/gin-gonic/gin"
 
-	// "os/user"
+// "fmt"
 
-	"fmt"
+// "os/user"
 
-	"github.com/gin-gonic/gin"
-)
+// "fmt"
+
+// "github.com/gin-gonic/gin"
 
 // login contorller interface
 type LoginController interface {
@@ -46,13 +46,13 @@ func (controllers *loginController) Login(ctx *gin.Context) string {
 	// }
 	username := ctx.Param("username")
 	// role := ctx.Param("role")
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username:", username)
+	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username:", username)
 	// isUserAuthenticated := controllers.loginService.LoginUser(username)
 	// if isUserAuthenticated {
 	// 	// return controllers.jWtService.GenerateToken(username, role, true)
-	// 	return controllers.jWtService.GenerateToken(username, true)
+	return controllers.jWtService.GenerateToken(username, true)
 
 	// }
 	// return ""
-	return hash(username)
+	// return hash(username)
 }

@@ -71,6 +71,43 @@ func GetReviewsByTourId(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": reviews})
 }
 
+// GetAverageRatingByTourId godoc
+// @Summary Get average rating by tour id
+// @Description Get average rating by tour id
+// @tags reviews
+// @Produce  json
+// @Param id path int true "Tour ID"
+// @Success 200 {number} float64
+// @Router /reviews/averageRating/{id} [get]
+func GetAverageRatingByTourId(c *gin.Context) {
+	tourId, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	reviews, err := database.GetReviewsByTourId(uint(tourId), database.MainDB)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	if len(reviews) == 0 {
+		c.JSON(http.StatusOK, gin.H{"success": false, "error": "No reviews found"})
+		return
+	}
+
+	averageRating := 0.0
+	for _, review := range reviews {
+		averageRating += float64(review.RatingScore)
+	}
+	averageRating = averageRating / float64(len(reviews))
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": averageRating})
+
+}
+
 // GetReviewsByTouristUsername godoc
 // @Summary Get reviews by tourist username
 // @Description Get reviews by tourist username
