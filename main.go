@@ -54,13 +54,13 @@ func main() {
 
 	v1 := router.Group("/api/v1")
 	{
-
 		v1.GET("/hello", controllers.HelloWorld)
 		v1.GET("/users", controllers.GetAllUsers)
 		v1.GET("/users/:username", controllers.GetUserByUsername)
 		v1.POST("/users", controllers.CreateUser)
 		v1.DELETE("/users/:username", controllers.DeleteUserByUsername)
 		v1.PUT("/users/:username", controllers.UpdateUserByUsername)
+		v1.GET("/getMe", controllers.GetMe)
 
 		v1.GET("/tours", controllers.GetAllTours)
 		v1.GET("/tours/:id", controllers.GetTourByID)

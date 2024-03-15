@@ -177,7 +177,7 @@ func HandleGoogleLogout(c *gin.Context) {
 // FirstContact godoc
 // @Summary First Contact
 // @Description First Contact
-// @Tags oauth
+// @Tags auth
 // @Accept  json
 // @Produce  json
 // @Param firstContact body models.FirstContactModel true "First Contact"
