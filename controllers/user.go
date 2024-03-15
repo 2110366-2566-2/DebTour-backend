@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
@@ -153,4 +154,74 @@ func UpdateUserByUsername(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User updated successfully"})
+}
+
+// GetMe godoc
+// @Summary Get user info
+// @Description Get user info
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.TouristWithUser
+// @Success 200 {object} models.AgencyWithUser
+// @Router /getMe [get]
+func GetMe(c *gin.Context) {
+	//decode token and get username
+	//token will be passed in header
+	tokenString := c.GetHeader("Authorization")
+	token, err := JWTAuthService().ValidateToken(tokenString)
+	if !token.Valid {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	username := claims["username"].(string)
+	user, err := database.GetUserByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	if user.Role == "Tourist" {
+		var data models.TouristWithUser
+		tourist, err := database.GetTouristByUsername(username, database.MainDB)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		data.Username = user.Username
+		data.Phone = user.Phone
+		data.Email = user.Email
+		data.Image = user.Image
+		data.Role = user.Role
+		data.CitizenId = tourist.CitizenId
+		data.FirstName = tourist.FirstName
+		data.LastName = tourist.LastName
+		data.Address = tourist.Address
+		data.BirthDate = tourist.BirthDate
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	}
+
+	if user.Role == "Agency" {
+		var data models.AgencyWithUser
+		agency, err := database.GetAgencyByUsername(username, database.MainDB)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		data.Username = user.Username
+		data.Phone = user.Phone
+		data.Email = user.Email
+		data.Image = user.Image
+		data.Role = user.Role
+		data.AgencyName = agency.AgencyName
+		data.LicenseNo = agency.LicenseNo
+		data.BankAccount = agency.BankAccount
+		data.AuthorizeAdminId = agency.AuthorizeAdminId
+		data.AuthorizeStatus = agency.AuthorizeStatus
+		data.ApproveTime = agency.ApproveTime
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	}
+	c.JSON(http.StatusOK, gin.H{"success": false, "error": "record not found"})
 }
