@@ -8,6 +8,7 @@ import (
 	"DebTour/database"
 	"DebTour/models"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -16,10 +17,14 @@ import (
 
 func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
 	usernameCheck := 0
+	tourOwnerCheck := 0
 	if len(arg) > 0 {
-		usernameCheck = arg[0]
+		usernameCheck = ((arg[0] >> 0) & 1)
+		tourOwnerCheck = ((arg[0] >> 1) & 1)
 	}
+
 	return func(c *gin.Context) {
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> check ", usernameCheck, " ", tourOwnerCheck)
 		const BEARER_SCHEMA = "Bearer "
 
 		authHeader := c.GetHeader("Authorization")
@@ -47,11 +52,21 @@ func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
 		claims := token.Claims.(jwt.MapClaims)
 		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username :", claims["username"].(string))
 		var user models.User
+		var tour models.Tour
 		user, err = database.GetUserByUsername(claims["username"].(string), database.MainDB)
 		// check role
 		if usernameCheck == 1 && user.Role != "Admin" {
 			if user.Username != c.Param("username") {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "mismatch username"})
+				return
+			}
+		}
+		if tourOwnerCheck == 1 && user.Role != "Admin" {
+			tourStr := c.Param("id")
+			tourID, _ := strconv.Atoi(tourStr)
+			tour, err = database.GetTourByTourId(tourID, database.MainDB)
+			if tour.AgencyUsername != user.Username {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "mismatch tour owner"})
 				return
 			}
 		}

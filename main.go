@@ -64,19 +64,19 @@ func main() {
 		v1.GET("/users", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllUsers)                 // admin
 		v1.GET("/users/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetUserByUsername) // admin
 
-		v1.GET("/tours", controllers.GetAllTours)                                                                               // all
-		v1.GET("/tours/:id", controllers.GetTourByID)                                                                           // all
-		v1.GET("/tours/tourists/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}), controllers.GetTouristByTourId)     // admin, agency owner
-		v1.POST("/tours", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTour)                                  // agency
-		v1.PUT("/tours/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}), controllers.UpdateTour)                      // admin, agency owner
-		v1.DELETE("/tours/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}), controllers.DeleteTour)                   // admin, agency owner
-		v1.GET("/tours/filter", controllers.FilterTours)                                                                        // all
-		v1.PUT("/tours/activities/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}), controllers.UpdateTourActivities) // admin, agency owner
-		v1.POST("/tours/activities/:id", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTourActivities)         // agency owner
+		v1.GET("/tours", controllers.GetAllTours)                                                                                  // all
+		v1.GET("/tours/:id", controllers.GetTourByID)                                                                              // all
+		v1.GET("/tours/tourists/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.GetTouristByTourId)     // admin, agency owner
+		v1.POST("/tours", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTour)                                     // agency
+		v1.PUT("/tours/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.UpdateTour)                      // admin, agency owner
+		v1.DELETE("/tours/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.DeleteTour)                   // admin, agency owner
+		v1.GET("/tours/filter", controllers.FilterTours)                                                                           // all
+		v1.PUT("/tours/activities/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.UpdateTourActivities) // admin, agency owner
+		v1.POST("/tours/activities/:id", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTourActivities)            // agency owner
 
-		v1.GET("/tours/images/:id", controllers.GetTourImages)                                                                     // all
-		v1.POST("/tours/images/:id", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTourImagesByTourId)            // agency owner
-		v1.DELETE("/tours/images/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}), controllers.DeleteTourImagesByTourId) // admin, agency owner
+		v1.GET("/tours/images/:id", controllers.GetTourImages)                                                                        // all
+		v1.POST("/tours/images/:id", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTourImagesByTourId)               // agency owner
+		v1.DELETE("/tours/images/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.DeleteTourImagesByTourId) // admin, agency owner
 
 		//admin
 		v1.GET("/agencies", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgencies)
