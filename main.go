@@ -55,76 +55,61 @@ func main() {
 	v1 := router.Group("/api/v1")
 	{
 
-		v1.GET("/hello", controllers.HelloWorld)
-		v1.GET("/users", controllers.GetAllUsers)
-		v1.GET("/users/:username", controllers.GetUserByUsername)
-		v1.POST("/users", controllers.CreateUser)
-		v1.DELETE("/users/:username", controllers.DeleteUserByUsername)
-		v1.PUT("/users/:username", controllers.UpdateUserByUsername)
+		v1.GET("/hello", controllers.HelloWorld)                  // all
+		v1.GET("/users", controllers.GetAllUsers)                 // admin
+		v1.GET("/users/:username", controllers.GetUserByUsername) // admin
 
-		v1.GET("/tours", controllers.GetAllTours)
-		v1.GET("/tours/:id", controllers.GetTourByID)
-		v1.GET("/tours/tourists/:id", controllers.GetTouristByTourId)
-		v1.POST("/tours", controllers.CreateTour)
-		v1.PUT("/tours/:id", controllers.UpdateTour)
-		v1.DELETE("/tours/:id", controllers.DeleteTour)
-		v1.GET("/tours/filter", controllers.FilterTours)
-		v1.PUT("/tours/activities/:id", controllers.UpdateTourActivities)
-		v1.POST("/tours/activities/:id", controllers.CreateTourActivities)
+		v1.GET("/tours", controllers.GetAllTours)                          // all
+		v1.GET("/tours/:id", controllers.GetTourByID)                      // all
+		v1.GET("/tours/tourists/:id", controllers.GetTouristByTourId)      // admin, agency owner
+		v1.POST("/tours", controllers.CreateTour)                          // agency
+		v1.PUT("/tours/:id", controllers.UpdateTour)                       // admin, agency owner
+		v1.DELETE("/tours/:id", controllers.DeleteTour)                    // admin, agency owner
+		v1.GET("/tours/filter", controllers.FilterTours)                   // all
+		v1.PUT("/tours/activities/:id", controllers.UpdateTourActivities)  // admin, agency owner
+		v1.POST("/tours/activities/:id", controllers.CreateTourActivities) // agency owner
 
-		v1.GET("/tours/images/:id", controllers.GetTourImages)
-		v1.POST("/tours/images/:id", controllers.CreateTourImagesByTourId)
-		v1.DELETE("/tours/images/:id", controllers.DeleteTourImagesByTourId)
+		v1.GET("/tours/images/:id", controllers.GetTourImages)               // all
+		v1.POST("/tours/images/:id", controllers.CreateTourImagesByTourId)   // agency owner
+		v1.DELETE("/tours/images/:id", controllers.DeleteTourImagesByTourId) // admin, agency owner
 
+		//admin
 		v1.GET("/agencies", controllers.GetAllAgencies)
 		v1.GET("/agencies/:username", controllers.GetAgencyByUsername)
-		v1.POST("/agencies", controllers.RegisterAgency)
-		v1.PUT("/agencies/:username", controllers.UpdateAgency)
+		v1.PUT("/agencies/:username", controllers.UpdateAgency) // + agency themselves
 		v1.DELETE("/agencies/:username", controllers.DeleteAgency)
+		//end admin
+		// getme() // logged in
 
-		v1.GET("/tourists", controllers.GetAllTourists)
-		v1.GET("/tourists/:username", controllers.GetTouristByUsername)
-		v1.POST("/tourists", controllers.RegisterTourist)
-		//v1.POST("/tourists", controllers.CreateTourist)
-		v1.PUT("/tourists/:username", controllers.UpdateTouristByUsername)
-		v1.DELETE("/tourists/:username", controllers.DeleteTouristByUsername)
+		v1.GET("/tourists", controllers.GetAllTourists)                       // admin
+		v1.GET("/tourists/:username", controllers.GetTouristByUsername)       // all + login
+		v1.PUT("/tourists/:username", controllers.UpdateTouristByUsername)    // admin, tourist themselves
+		v1.DELETE("/tourists/:username", controllers.DeleteTouristByUsername) //admin
 
-		v1.GET("/activities", controllers.GetAllActivities)
+		v1.GET("/activities", controllers.GetAllActivities) //admin
 
-		v1.POST("/joinings", controllers.JoinTour)
-		v1.GET("/joinings", controllers.GetAllJoinings)
+		v1.POST("/joinings", controllers.JoinTour)      // tourist
+		v1.GET("/joinings", controllers.GetAllJoinings) // admin
 
-		v1.GET("/reviews", controllers.GetAllReviews)
-		v1.GET("/reviews/:id", controllers.GetReviewById)
-		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)
-		v1.POST("/reviews/tour/:id", controllers.CreateReview)
+		v1.GET("/reviews", controllers.GetAllReviews)               // admin
+		v1.GET("/reviews/:id", controllers.GetReviewById)           // all
+		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId) // all
+		v1.POST("/reviews/tour/:id", controllers.CreateReview)      // tourist
 		v1.GET("/reviews/tourist/:username", controllers.GetReviewsByTouristUsername)
-		v1.DELETE("/reviews/:id", controllers.DeleteReview)
-		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
-		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername)
-		v1.GET("/reviews/averageRating/:id", controllers.GetAverageRatingByTourId)
+		v1.DELETE("/reviews/:id", controllers.DeleteReview)                                 // admin
+		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)                   // admin, agency
+		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername) // admin, tourist
+		v1.GET("/reviews/averageRating/:id", controllers.GetAverageRatingByTourId)          // all
 
-		v1.GET("/google/login", controllers.HandleGoogleLogin)
-		v1.GET("/google/callback", controllers.HandleGoogleCallback)
-		v1.GET("/google/logout", controllers.HandleGoogleLogout)
-		v1.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler)
-		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)
-
+		// auth
 		v1.POST("/auth/registerTourist", controllers.RegisterTourist)
 		v1.POST("/auth/registerAgency", controllers.RegisterAgency)
 		v1.POST("/auth/firstContact", controllers.FirstContact)
+		//end auth
 
-		v1.GET("/issues", controllers.GetIssues)
-		v1.POST("/issues", controllers.CreateIssueReport)
-		v1.PUT("/issues/:issue_id", controllers.UpdateIssueReport)
-		v1.GET("/testdir3", controllers.TestRedir)
-		v1.GET("/testdir2", controllers.TestDir)
-		v1.GET("/google/testlogin/login", controllers.TestLogin)
-		v1.GET("/google/testlogin/register", controllers.TestRegister)
-
+		v1.GET("/issues", controllers.GetIssues)                   // all + logged in and only allowed (addmin = all, tourist+agency = only their own)
+		v1.POST("/issues", controllers.CreateIssueReport)          // all + logged in
+		v1.PUT("/issues/:issue_id", controllers.UpdateIssueReport) // admin
 	}
 
 	v2 := router.Group("/api/v2")
