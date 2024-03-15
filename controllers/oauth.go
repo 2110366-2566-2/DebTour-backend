@@ -161,6 +161,18 @@ func GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"username": username})
 }
 
+//create godoc for HandleGoogleLogout
+
+// HandleGoogleLogout godoc
+// @Summary Handle Logout
+// @Description Handle Logout
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
+// @Success 200 {object} string
+// @Router /auth/logout [get]
 func HandleGoogleLogout(c *gin.Context) {
 	const BEARER_SCHEMA = "Bearer "
 	authHeader := c.GetHeader("Authorization")
@@ -175,16 +187,15 @@ func HandleGoogleLogout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
-// FirstContact godoc
-// @Summary First Contact
-// @Description First Contact
+// @Summary First contact
+// @Description First contact of user when login to the system
 // @Tags auth
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param firstContact body models.FirstContactModel true "First Contact"
 // @Success 200 {object} models.FirstContactModel
-// @Router /auth/firstContact [post]
-func FirstContact(c *gin.Context) {
+// @Router /auth/login [post]
+func Login(c *gin.Context) {
 	// receive FirstContactModel
 
 	var firstContact models.FirstContactModel

@@ -16,6 +16,8 @@ import (
 // @tags users
 // @id GetAllUsers
 // @produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @response 200 {array} models.User
 // @router /users [get]
 func GetAllUsers(c *gin.Context) {
@@ -34,6 +36,8 @@ func GetAllUsers(c *gin.Context) {
 // @id GetUserByUsername
 // @produce json
 // @param username path string true "Username"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @response 200 {object} models.User
 // @router /users/{username} [get]
 func GetUserByUsername(c *gin.Context) {
@@ -163,6 +167,7 @@ func UpdateUserByUsername(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.TouristWithUser
 // @Success 200 {object} models.AgencyWithUser
 // @Router /getMe [get]
@@ -201,6 +206,7 @@ func GetMe(c *gin.Context) {
 		data.Address = tourist.Address
 		data.BirthDate = tourist.BirthDate
 		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+		return
 	}
 
 	if user.Role == "Agency" {
@@ -222,6 +228,7 @@ func GetMe(c *gin.Context) {
 		data.AuthorizeStatus = agency.AuthorizeStatus
 		data.ApproveTime = agency.ApproveTime
 		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": false, "error": "record not found"})
 }

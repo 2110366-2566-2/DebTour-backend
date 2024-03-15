@@ -63,6 +63,8 @@ func GetTourByID(c *gin.Context) {
 // @id GetTouristByTourId
 // @produce json
 // @param id path int true "Tour ID"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @success 200 {array} models.JoinedMembers
 // @router /tours/tourists/{id} [get]
 func GetTouristByTourId(c *gin.Context) {
@@ -100,6 +102,8 @@ func GetTouristByTourId(c *gin.Context) {
 // @accept json
 // @produce json
 // @param tour body models.TourWithActivitiesWithLocationRequest true "Tour"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @success 200 {object} models.TourWithActivitiesWithLocation
 // @router /tours [post]
 func CreateTour(c *gin.Context) {
@@ -148,6 +152,8 @@ func CreateTour(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @param tour body models.Tour true "Tour"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @success 200 {object} string
 // @router /tours/{id} [put]
 func UpdateTour(c *gin.Context) {
@@ -195,6 +201,8 @@ func UpdateTour(c *gin.Context) {
 // @id DeleteTour
 // @produce json
 // @param id path int true "Tour ID"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @success 200 {string} string
 // @router /tours/{id} [delete]
 func DeleteTour(c *gin.Context) {
@@ -347,6 +355,8 @@ func FilterTours(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @param activitiesWithLocation body []models.ActivityWithLocation true "Activities with location"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @success 200 {string} string
 // @router /tours/activities/{id} [put]
 func UpdateTourActivities(c *gin.Context) {
@@ -389,6 +399,8 @@ func UpdateTourActivities(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @param activitiesWithLocationRequest body []models.ActivityWithLocationRequest true "Activities with location request"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer <token>"
 // @success 200 {object} models.TourWithActivitiesWithLocation
 // @router /tours/activities/{id} [post]
 func CreateTourActivities(c *gin.Context) {
