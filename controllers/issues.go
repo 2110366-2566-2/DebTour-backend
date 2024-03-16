@@ -16,7 +16,6 @@ import (
 // @ID GetIssues
 // @Produce json
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {array} models.Issue
 // @Router /issues [get]
 func GetIssues(c *gin.Context) {
@@ -50,7 +49,6 @@ func GetIssues(c *gin.Context) {
 // @Produce json
 // @Param Issue body models.Issue true "Issue object"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.Issue
 // @Router /issues [post]
 func CreateIssueReport(c *gin.Context) {
@@ -78,7 +76,6 @@ func CreateIssueReport(c *gin.Context) {
 // @Param issue_id path string true "Issue ID"
 // @Param issue body models.Issue true "Issue object"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.Issue
 // @Router /issues/{issue_id} [put]
 func UpdateIssueReport(c *gin.Context) {

@@ -51,7 +51,6 @@ func CreateAgency(c *gin.Context) {
 // @Tags agencies
 // @Produce json
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {array} models.Agency
 // @Router /agencies [get]
 func GetAllAgencies(c *gin.Context) {
@@ -72,7 +71,6 @@ func GetAllAgencies(c *gin.Context) {
 // @Produce json
 // @Param username path string true "Username"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.Agency
 // @Router /agencies/{username} [get]
 func GetAgencyByUsername(c *gin.Context) {
@@ -95,7 +93,6 @@ func GetAgencyByUsername(c *gin.Context) {
 // @Produce json
 // @Param agency body models.Agency true "Agency"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.Agency
 // @Router /agencies [put]
 func UpdateAgency(c *gin.Context) {
@@ -170,7 +167,6 @@ func UpdateAgency(c *gin.Context) {
 // @Produce json
 // @Param agency body models.Agency true "Agency"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.Agency
 // @Router /agencies [delete]
 func DeleteAgency(c *gin.Context) {

@@ -17,7 +17,6 @@ import (
 // @id GetAllUsers
 // @produce json
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @response 200 {array} models.User
 // @router /users [get]
 func GetAllUsers(c *gin.Context) {
@@ -37,7 +36,6 @@ func GetAllUsers(c *gin.Context) {
 // @produce json
 // @param username path string true "Username"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @response 200 {object} models.User
 // @router /users/{username} [get]
 func GetUserByUsername(c *gin.Context) {
@@ -167,14 +165,39 @@ func UpdateUserByUsername(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.TouristWithUser
 // @Success 200 {object} models.AgencyWithUser
 // @Router /getMe [get]
 func GetMe(c *gin.Context) {
-	//decode token and get username
-	//token will be passed in header
-	tokenString := c.GetHeader("Authorization")
+	//middleware + token validate section
+	//CheckToken is function for checking token whether it is valid or not
+	//call CheckToken
+	err := CheckToken(c)
+	if err != nil {
+		if err.Error() == "Authorization header is missing" {
+			c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Authorization header is missing"})
+			return
+		}
+		if err.Error() == "Invalid authorization format" {
+			c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Invalid authorization format"})
+			return
+		}
+		if err.Error() == "User is logged out" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "User is logged out"})
+			return
+		}
+		if err.Error() == "Invalid token" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
+			return
+		}
+	}
+	const BEARER_SCHEMA = "Bearer "
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
+		return
+	}
+	tokenString := authHeader[len(BEARER_SCHEMA):]
 	token, err := JWTAuthService().ValidateToken(tokenString)
 	if !token.Valid {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
@@ -182,6 +205,8 @@ func GetMe(c *gin.Context) {
 	}
 	claims := token.Claims.(jwt.MapClaims)
 	username := claims["username"].(string)
+	//middleware + token validate section
+
 	user, err := database.GetUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
