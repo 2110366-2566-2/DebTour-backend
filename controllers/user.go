@@ -172,25 +172,25 @@ func GetMe(c *gin.Context) {
 	//middleware + token validate section
 	//CheckToken is function for checking token whether it is valid or not
 	//call CheckToken
-	err := CheckToken(c)
-	if err != nil {
-		if err.Error() == "Authorization header is missing" {
-			c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Authorization header is missing"})
-			return
-		}
-		if err.Error() == "Invalid authorization format" {
-			c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Invalid authorization format"})
-			return
-		}
-		if err.Error() == "User is logged out" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "User is logged out"})
-			return
-		}
-		if err.Error() == "Invalid token" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
-			return
-		}
-	}
+	// err := CheckToken(c)
+	// if err != nil {
+	// 	if err.Error() == "Authorization header is missing" {
+	// 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Authorization header is missing"})
+	// 		return
+	// 	}
+	// 	if err.Error() == "Invalid authorization format" {
+	// 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Invalid authorization format"})
+	// 		return
+	// 	}
+	// 	if err.Error() == "User is logged out" {
+	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "User is logged out"})
+	// 		return
+	// 	}
+	// 	if err.Error() == "Invalid token" {
+	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
+	// 		return
+	// 	}
+	// }
 	const BEARER_SCHEMA = "Bearer "
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {

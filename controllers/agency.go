@@ -8,41 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for create agency
-// this is my createuser function , use this format to create
-// func CreateUser(c *gin.Context) {
-// 	var user models.User
-// 	var username CreateUserInput
-// 	c.ShouldBindJSON(&username)
-// 	fmt.Println(">>>>>>>>>>>>>>>> User: ", username.Username)
-// 	if err := c.ShouldBindJSON(&user); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	err := database.CreateUser(&user, database.MainDB)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
-// }
-
-//create function for create agency
-
-func CreateAgency(c *gin.Context) {
-	var agency models.Agency
-	if err := c.ShouldBindJSON(&agency); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err := database.CreateAgency(&agency, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agency})
-}
-
 //create function for get all agencies
 
 // GetAllAgencies godoc

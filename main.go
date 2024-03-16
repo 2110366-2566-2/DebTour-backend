@@ -5,7 +5,6 @@ import (
 	"DebTour/database"
 	"DebTour/docs"
 	"DebTour/middleware"
-	"net/http"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -62,12 +61,12 @@ func main() {
 	{
 		v1.GET("/givemetoken/:username", controllers.GetToken)
 		v1.GET("givemeusername/:token", controllers.GetUsername)
-		v1.GET("/logout", controllers.HandleGoogleLogout)
+		v1.GET("/logout", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.HandleGoogleLogout)
 
 		v1.GET("/hello", controllers.HelloWorld)                                                              // all
 		v1.GET("/users", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllUsers)                 // admin
 		v1.GET("/users/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetUserByUsername) // admin
-		v1.GET("/getMe", controllers.GetMe)                                                                   // logged in
+		v1.GET("/getMe", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.GetMe)           // logged in
 
 		v1.GET("/tours", controllers.GetAllTours)                                                                                  // all
 		v1.GET("/tours/:id", controllers.GetTourByID)                                                                              // all
@@ -121,47 +120,6 @@ func main() {
 		v1.POST("/issues", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.CreateIssueReport) // all + logged in
 		v1.PUT("/issues/:issue_id", middleware.AuthorizeJWT([]string{"Admin"}), controllers.UpdateIssueReport)             // admin
 
-	}
-
-	v2 := router.Group("/api/v2")
-	{
-		v2.Use(middleware.AuthorizeJWT([]string{"admin", "tourist"}))
-		v2.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-	}
-
-	// a: admin, g: agency, t: tourist
-	v2_a := router.Group("/api/v2/admin")
-	{
-		v2_a.Use(middleware.AuthorizeJWT([]string{"admin"}))
-		v2_a.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-	}
-
-	v2_ag := router.Group("/api/v2/agency")
-	{
-		v2_ag.Use(middleware.AuthorizeJWT([]string{"admin", "Agency"}))
-		v2_ag.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-	}
-
-	v2_at := router.Group("/api/v2/tourist")
-	{
-		v2_at.Use(middleware.AuthorizeJWT([]string{"admin", "tourist"}))
-		v2_at.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-	}
-
-	v2_agt := router.Group("/api/v2/all")
-	{
-		v2_agt.Use(middleware.AuthorizeJWT([]string{"admin", "agency", "tourist"}))
-		v2_agt.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
 	}
 
 	err := router.Run(":9000")
