@@ -166,7 +166,7 @@ func UpdateUserByUsername(c *gin.Context) {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Security ApiKeyAuth
+// @Security JWTAuth
 // @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.TouristWithUser
 // @Success 200 {object} models.AgencyWithUser
@@ -174,7 +174,9 @@ func UpdateUserByUsername(c *gin.Context) {
 func GetMe(c *gin.Context) {
 	//decode token and get username
 	//token will be passed in header
-	tokenString := c.GetHeader("Authorization")
+	const BEARER_SCHEMA = "Bearer "
+	authHeader := c.GetHeader("Authorization")
+	tokenString := authHeader[len(BEARER_SCHEMA):]
 	token, err := JWTAuthService().ValidateToken(tokenString)
 	if !token.Valid {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
@@ -182,6 +184,7 @@ func GetMe(c *gin.Context) {
 	}
 	claims := token.Claims.(jwt.MapClaims)
 	username := claims["username"].(string)
+
 	user, err := database.GetUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})

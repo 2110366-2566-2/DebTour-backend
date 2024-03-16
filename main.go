@@ -37,6 +37,9 @@ func SetupOauth() {
 
 var ()
 
+// @securityDefinitions.apiKey JWT
+// @in       header
+// @name      token
 func main() {
 	database.InitDB()
 
