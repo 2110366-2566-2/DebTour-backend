@@ -37,9 +37,10 @@ func SetupOauth() {
 
 var ()
 
-// @securityDefinitions.apiKey JWT
+// @securityDefinitions.apiKey ApiKeyAuth
 // @in       header
-// @name      token
+// @name     Authorization
+// @description Type "Bearer " followed by a space and then your token
 func main() {
 	database.InitDB()
 

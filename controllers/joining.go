@@ -17,7 +17,6 @@ import (
 // @Produce json
 // @Param joinTourRequest body models.JoinTourRequest true "Join tour request"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {object} models.Joining
 // @Router /joinings [post]
 func JoinTour(c *gin.Context) {
@@ -68,7 +67,6 @@ func JoinTour(c *gin.Context) {
 // @ID GetAllJoinings
 // @Produce json
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {array} models.Joining
 // @Router /joinings [get]
 func GetAllJoinings(c *gin.Context) {

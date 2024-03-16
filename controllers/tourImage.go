@@ -48,7 +48,6 @@ func GetTourImages(c *gin.Context) {
 // @Param id path int true "Tour ID"
 // @Param request body models.TourImagesRequest true "Tour images request"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 201 {string} string "Tour images created successfully"
 // @Router /tours/images/{id} [post]
 func CreateTourImagesByTourId(c *gin.Context) {
@@ -90,7 +89,6 @@ func CreateTourImagesByTourId(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Tour ID"
 // @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer <token>"
 // @Success 200 {string} string "Tour images deleted successfully"
 // @Router /tours/images/{id} [delete]
 func DeleteTourImagesByTourId(c *gin.Context) {
