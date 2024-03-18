@@ -103,7 +103,7 @@ func UpdateAgency(c *gin.Context) {
 	agency.LicenseNo = payload.LicenseNo
 	agency.BankAccount = payload.BankAccount
 	agency.BankName = payload.BankName
-	agency.AuthorizeAdminId = payload.AuthorizeAdminId
+	agency.AuthorizeAdminUsername = payload.AuthorizeAdminUsername
 	agency.AuthorizeStatus = payload.AuthorizeStatus
 	agency.ApproveTime = payload.ApproveTime
 
