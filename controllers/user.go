@@ -193,7 +193,7 @@ func GetMe(c *gin.Context) {
 		data.AgencyName = agency.AgencyName
 		data.LicenseNo = agency.LicenseNo
 		data.BankAccount = agency.BankAccount
-		data.AuthorizeAdminId = agency.AuthorizeAdminId
+		data.AuthorizeAdminUsername = agency.AuthorizeAdminUsername
 		data.AuthorizeStatus = agency.AuthorizeStatus
 		data.ApproveTime = agency.ApproveTime
 		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
