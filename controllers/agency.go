@@ -102,6 +102,7 @@ func UpdateAgency(c *gin.Context) {
 	agency.AgencyName = payload.AgencyName
 	agency.LicenseNo = payload.LicenseNo
 	agency.BankAccount = payload.BankAccount
+	agency.BankName = payload.BankName
 	agency.AuthorizeAdminId = payload.AuthorizeAdminId
 	agency.AuthorizeStatus = payload.AuthorizeStatus
 	agency.ApproveTime = payload.ApproveTime
@@ -122,21 +123,9 @@ func UpdateAgency(c *gin.Context) {
 	}
 
 	// Create combined data
-	data := gin.H{
-		"username":         user.Username,
-		"phone":            user.Phone,
-		"email":            user.Email,
-		"image":            user.Image,
-		"role":             user.Role,
-		"agencyName":       agency.AgencyName,
-		"licenseNo":        agency.LicenseNo,
-		"bankAccount":      agency.BankAccount,
-		"authorizeAdminId": agency.AuthorizeAdminId,
-		"authorizeStatus":  agency.AuthorizeStatus,
-		"approveTime":      agency.ApproveTime,
-	}
+	agencyWithUser := models.ToAgencyWithUser(agency, user)
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithUser})
 	tx.Commit()
 
 }

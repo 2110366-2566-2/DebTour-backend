@@ -2,6 +2,7 @@ package database
 
 import (
 	"DebTour/models"
+	"encoding/base64"
 
 	"gorm.io/gorm"
 )
@@ -13,9 +14,31 @@ func GetAgencyByUsername(username string, db *gorm.DB) (models.Agency, error) {
 	return agency, result.Error
 }
 
-func CreateAgency(agency *models.Agency, db *gorm.DB) error {
-	result := db.Model(&models.Agency{}).Create(agency)
-	return result.Error
+func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
+	tx := db.SavePoint("BeforeCreateAgency")
+
+	result := tx.Model(&models.Agency{}).Create(agency)
+	if result.Error != nil {
+		tx.RollbackTo("BeforeCreateAgency")
+		return result.Error
+	}
+
+	imageByte, err := base64.StdEncoding.DecodeString(image)
+	if err != nil {
+		tx.RollbackTo("BeforeCreateAgency")
+		return err
+	}
+
+	companyInformation := models.CompanyInformation{Username: agency.Username, Image: imageByte}
+
+	err = CreateCompanyInformation(&companyInformation, tx)
+	if err != nil {
+		tx.RollbackTo("BeforeCreateAgency")
+		return err
+	}
+
+	tx.Commit()
+	return nil
 }
 
 func GetAllAgencies(db *gorm.DB) ([]models.AgencyWithUser, error) {
