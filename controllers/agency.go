@@ -8,42 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for create agency
-// this is my createuser function , use this format to create
-// func CreateUser(c *gin.Context) {
-// 	var user models.User
-// 	var username CreateUserInput
-// 	c.ShouldBindJSON(&username)
-// 	fmt.Println(">>>>>>>>>>>>>>>> User: ", username.Username)
-// 	if err := c.ShouldBindJSON(&user); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	err := database.CreateUser(&user, database.MainDB)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
-// }
-
-//create function for create agency
-
-func CreateAgency(c *gin.Context) {
-	var agency models.Agency
-	if err := c.ShouldBindJSON(&agency); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err := database.CreateAgency(&agency, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agency})
-}
-
-//create function for get all agencies
+//create function for get all agencies and company information
 
 // GetAllAgencies godoc
 // @Summary Get all agencies
@@ -55,6 +20,25 @@ func CreateAgency(c *gin.Context) {
 // @Router /agencies [get]
 func GetAllAgencies(c *gin.Context) {
 	agencies, err := database.GetAllAgencies(database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(agencies), "data": agencies})
+}
+
+//create getallagencieswithcompanyinformation function
+
+// GetAllAgenciesWithCompanyInformation godoc
+// @Summary Get all agencies with company information
+// @Description Get all agencies with company information
+// @Tags agencies
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} models.AgencyWithCompanyInformation
+// @Router /agencies/companyInformation [get]
+func GetAllAgenciesWithCompanyInformation(c *gin.Context) {
+	agencies, err := database.GetAllAgenciesWithCompanyInformation(database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -118,6 +102,7 @@ func UpdateAgency(c *gin.Context) {
 	agency.AgencyName = payload.AgencyName
 	agency.LicenseNo = payload.LicenseNo
 	agency.BankAccount = payload.BankAccount
+	agency.BankName = payload.BankName
 	agency.AuthorizeAdminId = payload.AuthorizeAdminId
 	agency.AuthorizeStatus = payload.AuthorizeStatus
 	agency.ApproveTime = payload.ApproveTime
@@ -138,21 +123,9 @@ func UpdateAgency(c *gin.Context) {
 	}
 
 	// Create combined data
-	data := gin.H{
-		"username":         user.Username,
-		"phone":            user.Phone,
-		"email":            user.Email,
-		"image":            user.Image,
-		"role":             user.Role,
-		"agencyName":       agency.AgencyName,
-		"licenseNo":        agency.LicenseNo,
-		"bankAccount":      agency.BankAccount,
-		"authorizeAdminId": agency.AuthorizeAdminId,
-		"authorizeStatus":  agency.AuthorizeStatus,
-		"approveTime":      agency.ApproveTime,
-	}
+	agencyWithUser := models.ToAgencyWithUser(agency, user)
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithUser})
 	tx.Commit()
 
 }

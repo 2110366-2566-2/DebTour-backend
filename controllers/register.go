@@ -30,7 +30,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param tourist body models.TouristWithUser true "Tourist"
-// @Success 200 {object} models.TouristWithUser
+// @Success 200 {object} models.TouristWithUserAndToken
 // @Router /auth/registerTourist [post]
 func RegisterTourist(c *gin.Context) {
 	tx := database.MainDB.Begin()
@@ -89,23 +89,10 @@ func RegisterTourist(c *gin.Context) {
 		return
 	}
 
-	data := gin.H{
-		"username":       user.Username,
-		"phone":          user.Phone,
-		"email":          user.Email,
-		"image":          user.Image,
-		"role":           user.Role,
-		"created_time":   user.CreatedTime,
-		"citizenId":      tourist.CitizenId,
-		"firstName":      tourist.FirstName,
-		"lastName":       tourist.LastName,
-		"address":        tourist.Address,
-		"birthDate":      tourist.BirthDate,
-		"gender":         tourist.Gender,
-		"defaultPayment": tourist.DefaultPayment,
-		"token":          token_jwt,
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	touristWithUser := models.ToTouristWithUser(tourist, user)
+	touristWithUserAndToken := models.ToTouristWithUserAndToken(touristWithUser, token_jwt)
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristWithUserAndToken})
 	tx.Commit()
 }
 
@@ -116,14 +103,14 @@ func RegisterTourist(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param agency body models.AgencyWithUser true "Agency"
-// @Success 200 {object} models.AgencyWithUser
+// @Success 200 {object} models.AgencyWithCompanyInformationAndToken
 // @Router /auth/registerAgency [post]
 func RegisterAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	var loginService LoginService = StaticLoginService()
 	var jwtService JWTService = JWTAuthService()
 	var loginController LoginController = LoginHandler(loginService, jwtService)
-	var payload models.AgencyWithUser
+	var payload models.AgencyWithCompanyInformation
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
@@ -147,6 +134,8 @@ func RegisterAgency(c *gin.Context) {
 	agency.AuthorizeStatus = payload.AuthorizeStatus
 	agency.ApproveTime = payload.ApproveTime
 
+	image := payload.Image
+
 	// Now you can access agencyWithUser.User and agencyWithUser.Agency
 	err := database.CreateUser(&user, tx)
 	if err != nil {
@@ -155,7 +144,7 @@ func RegisterAgency(c *gin.Context) {
 		return
 	}
 
-	err = database.CreateAgency(&agency, tx)
+	err = database.CreateAgency(&agency, image, tx) //createAgency also create companyInformation inside too!
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -173,23 +162,10 @@ func RegisterAgency(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve username from context"})
 		return
 	}
+	agencyWithCompanyInformation := models.ToAgencyWithCompanyInformation(agency, user, string(image))
+	agencyWithCompanyInformationAndToken := models.ToAgencyWithCompanyInformationAndToken(agencyWithCompanyInformation, token_jwt)
 
-	data := gin.H{
-		"username":         user.Username,
-		"phone":            user.Phone,
-		"email":            user.Email,
-		"image":            user.Image,
-		"role":             user.Role,
-		"created_time":     user.CreatedTime,
-		"agencyName":       agency.AgencyName,
-		"licenseNo":        agency.LicenseNo,
-		"bankAccount":      agency.BankAccount,
-		"authorizeAdminId": agency.AuthorizeAdminId,
-		"authorizeStatus":  agency.AuthorizeStatus,
-		"approveTime":      agency.ApproveTime,
-		"token":            token_jwt,
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithCompanyInformationAndToken})
 	tx.Commit()
 
 }

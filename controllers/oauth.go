@@ -4,15 +4,14 @@ import (
 	"DebTour/database"
 	"DebTour/models"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
+
 	// "strconv"
 
 	"github.com/gin-gonic/gin"
@@ -173,25 +172,6 @@ func GetProfile(c *gin.Context) {
 // @Success 200 {object} string
 // @Router /auth/logout [get]
 func HandleGoogleLogout(c *gin.Context) {
-	err := CheckToken(c)
-	if err != nil {
-		if err.Error() == "Authorization header is missing" {
-			c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Authorization header is missing"})
-			return
-		}
-		if err.Error() == "Invalid authorization format" {
-			c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Invalid authorization format"})
-			return
-		}
-		if err.Error() == "User is logged out" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "User is logged out"})
-			return
-		}
-		if err.Error() == "Invalid token" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
-			return
-		}
-	}
 	const BEARER_SCHEMA = "Bearer "
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
@@ -279,30 +259,4 @@ func GetUsername(c *gin.Context) {
 	claims := token.Claims.(jwt.MapClaims)
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username :", claims["username"].(string))
 	c.JSON(http.StatusOK, gin.H{"success": true, "username": claims["username"].(string)})
-}
-
-func CheckToken(c *gin.Context) error {
-	const BEARER_SCHEMA = "Bearer "
-
-	authHeader := c.GetHeader("Authorization")
-	if authHeader == "" {
-		return errors.New("Authorization header is missing")
-	}
-
-	if !strings.HasPrefix(authHeader, BEARER_SCHEMA) {
-		return errors.New("Invalid authorization format")
-	}
-	tokenString := authHeader[len(BEARER_SCHEMA):]
-
-	if _, ok := Blacklist[tokenString]; ok {
-		return errors.New("User is logged out")
-	}
-
-	token, err := JWTAuthService().ValidateToken(tokenString)
-	if err != nil || !token.Valid {
-		return errors.New("Invalid token")
-	}
-
-	// Optionally, you can set the token in the context for later use
-	return nil
 }

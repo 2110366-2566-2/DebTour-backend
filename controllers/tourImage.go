@@ -33,7 +33,7 @@ func GetTourImages(c *gin.Context) {
 	imagesResponse := models.TourImagesResponse{}
 	imagesResponse.TourId = uint(tourId)
 	for _, image := range images {
-		imagesResponse.Images = append(imagesResponse.Images, base64.StdEncoding.EncodeToString(image.Image))
+		imagesResponse.Images = append(imagesResponse.Images, image)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": imagesResponse})

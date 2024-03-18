@@ -2,6 +2,7 @@ package database
 
 import (
 	"DebTour/models"
+	"encoding/base64"
 
 	"gorm.io/gorm"
 )
@@ -13,21 +14,23 @@ func GetAllTours(db *gorm.DB) (tours []models.Tour, err error) {
 	return tours, result.Error
 }
 
-func GetTourWithActivitiesWithLocationByTourId(tourId int, db *gorm.DB) (tourWithActivitiesWithLocation models.TourWithActivitiesWithLocation, err error) {
+func GetTourWithActivitiesWithLocationWithImagesByTourId(tourId int, db *gorm.DB) (tourWithActivitiesWithLocationWithImages models.TourWithActivitiesWithLocationWithImages, err error) {
 	var tour models.Tour
 	result := db.First(&tour, tourId)
 
 	if result.Error != nil {
-		return tourWithActivitiesWithLocation, result.Error
+		return tourWithActivitiesWithLocationWithImages, result.Error
 	}
 
 	activitiesWithLocation, err := GetAllActivitiesWithLocationByTourId(tour.TourId, db)
 
 	if err != nil {
-		return tourWithActivitiesWithLocation, err
+		return tourWithActivitiesWithLocationWithImages, err
 	}
 
-	return models.ToTourWithActivitiesWithLocation(tour, activitiesWithLocation)
+	images, err := GetTourImages(tour.TourId, db)
+
+	return models.ToTourWithActivitiesWithLocationWithImages(tour, activitiesWithLocation, images)
 }
 
 func GetTourByTourId(tourId int, db *gorm.DB) (tour models.Tour, err error) {
@@ -36,7 +39,7 @@ func GetTourByTourId(tourId int, db *gorm.DB) (tour models.Tour, err error) {
 	return tour, result.Error
 }
 
-func CreateTour(tour *models.Tour, activitiesWithLocationRequest []models.ActivityWithLocationRequest, db *gorm.DB) (err error) {
+func CreateTour(tour *models.Tour, activitiesWithLocationRequest []models.ActivityWithLocationRequest, images []string, db *gorm.DB) (err error) {
 	tx := db.SavePoint("BeforeCreateTour")
 
 	result := tx.Model(&models.Tour{}).Create(tour)
@@ -54,6 +57,25 @@ func CreateTour(tour *models.Tour, activitiesWithLocationRequest []models.Activi
 			tx.RollbackTo("BeforeCreateTour")
 			return err
 		}
+	}
+
+	for _, image := range images {
+		image, err := base64.StdEncoding.DecodeString(image)
+		if err != nil {
+			tx.RollbackTo("BeforeCreateTour")
+			return err
+		}
+		tourImage := models.TourImage{
+			TourId: tour.TourId,
+			Image:  image,
+		}
+		err = CreateTourImage(&tourImage, tx)
+
+		if err != nil {
+			tx.RollbackTo("BeforeCreateTour")
+			return err
+		}
+
 	}
 
 	return nil
@@ -90,6 +112,13 @@ func DeleteTour(tourId uint, db *gorm.DB) (err error) {
 
 	// Delete all joinings of the tour
 	err = DeleteAllJoiningsByTourId(tourId, tx)
+	if err != nil {
+		tx.RollbackTo("BeforeDeleteTour")
+		return err
+	}
+
+	// Delete all images of the tour
+	err = DeleteTourImages(tourId, tx)
 	if err != nil {
 		tx.RollbackTo("BeforeDeleteTour")
 		return err

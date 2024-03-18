@@ -20,7 +20,7 @@ type Tour struct {
 	CreatedTimestamp time.Time `gorm:"autoCreateTime" json:"createdTimestamp"`
 }
 
-type TourWithActivitiesWithLocationRequest struct {
+type TourWithActivitiesWithLocationWithImagesRequest struct {
 	Name             string                        `json:"name"`
 	StartDate        string                        `json:"startDate"`
 	EndDate          string                        `json:"endDate"`
@@ -30,9 +30,10 @@ type TourWithActivitiesWithLocationRequest struct {
 	RefundDueDate    string                        `json:"refundDueDate"`
 	MaxMemberCount   uint                          `json:"maxMemberCount"`
 	Activities       []ActivityWithLocationRequest `json:"activities"`
+	Images			 []string						`json:"images"`
 }
 
-func ToTour(tourRequest TourWithActivitiesWithLocationRequest, tourId uint, agencyUsername string) (Tour, error) {
+func ToTour(tourRequest TourWithActivitiesWithLocationWithImagesRequest, tourId uint, agencyUsername string) (Tour, error) {
 	return Tour{
 		TourId:           tourId,
 		Name:             tourRequest.Name,
@@ -49,7 +50,7 @@ func ToTour(tourRequest TourWithActivitiesWithLocationRequest, tourId uint, agen
 	}, nil
 }
 
-type TourWithActivitiesWithLocation struct {
+type TourWithActivitiesWithLocationWithImages struct {
 	TourId           uint                   `gorm:"primaryKey;autoIncrement" json:"tourId"`
 	Name             string                 `gorm:"not null" json:"name"`
 	StartDate        string                 `gorm:"not null" json:"startDate"`
@@ -63,10 +64,11 @@ type TourWithActivitiesWithLocation struct {
 	Status           string                 `gorm:"not null" json:"status"`
 	AgencyUsername   string                 `gorm:"foreignKey:UserRefer" json:"agencyUsername"`
 	Activities       []ActivityWithLocation `json:"activities"`
+	Images			 []string				 `json:"images"`
 }
 
-func ToTourWithActivitiesWithLocation(tour Tour, activities []ActivityWithLocation) (TourWithActivitiesWithLocation, error) {
-	return TourWithActivitiesWithLocation{
+func ToTourWithActivitiesWithLocationWithImages(tour Tour, activities []ActivityWithLocation, images []string) (TourWithActivitiesWithLocationWithImages, error) {
+	return TourWithActivitiesWithLocationWithImages{
 		TourId:           tour.TourId,
 		Name:             tour.Name,
 		StartDate:        tour.StartDate,
@@ -80,6 +82,7 @@ func ToTourWithActivitiesWithLocation(tour Tour, activities []ActivityWithLocati
 		Status:           tour.Status,
 		AgencyUsername:   tour.AgencyUsername,
 		Activities:       activities,
+		Images:			  images,
 	}, nil
 }
 
