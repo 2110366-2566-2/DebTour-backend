@@ -20,13 +20,13 @@ import (
 func GetTourImages(c *gin.Context) {
 	tourId, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success":false, "error": "Invalid tour id"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
 
 	images, err := database.GetTourImages(uint(tourId), database.MainDB)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success":false, "error": "Failed to get tour images"})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to get tour images"})
 		return
 	}
 
@@ -36,7 +36,7 @@ func GetTourImages(c *gin.Context) {
 		imagesResponse.Images = append(imagesResponse.Images, base64.StdEncoding.EncodeToString(image.Image))
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success":true, "data": imagesResponse})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": imagesResponse})
 }
 
 // CreateTourImagesByTourId godoc
@@ -47,19 +47,20 @@ func GetTourImages(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Tour ID"
 // @Param request body models.TourImagesRequest true "Tour images request"
+// @Security ApiKeyAuth
 // @Success 201 {string} string "Tour images created successfully"
 // @Router /tours/images/{id} [post]
 func CreateTourImagesByTourId(c *gin.Context) {
 	var tourImagesRequest models.TourImagesRequest
 
 	if err := c.ShouldBindJSON(&tourImagesRequest); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success":false, "error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
 	tourId, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success":false, "error": "Invalid tour id"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
 
@@ -71,14 +72,14 @@ func CreateTourImagesByTourId(c *gin.Context) {
 		tourImage := models.TourImage{TourId: uint(tourId), Image: image}
 		err = database.CreateTourImage(&tourImage, tx)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success":false, "error": err})
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err})
 			tx.Rollback()
 			return
 		}
 	}
 
 	tx.Commit()
-	c.JSON(http.StatusCreated, gin.H{"success":true, "data": "Tour images created successfully"})
+	c.JSON(http.StatusCreated, gin.H{"success": true, "data": "Tour images created successfully"})
 }
 
 // DeleteTourImagesByTourId godoc
@@ -87,20 +88,21 @@ func CreateTourImagesByTourId(c *gin.Context) {
 // @Tags tour-images
 // @Produce json
 // @Param id path int true "Tour ID"
+// @Security ApiKeyAuth
 // @Success 200 {string} string "Tour images deleted successfully"
 // @Router /tours/images/{id} [delete]
 func DeleteTourImagesByTourId(c *gin.Context) {
 	tourId, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success":false, "error": "Invalid tour id"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
 
 	err = database.DeleteTourImages(uint(tourId), database.MainDB)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success":false, "error": "Failed to delete tour images"})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to delete tour images"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success":true, "data": "Tour images deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Tour images deleted successfully"})
 }

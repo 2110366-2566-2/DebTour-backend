@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,6 +16,7 @@ import (
 // @tags users
 // @id GetAllUsers
 // @produce json
+// @Security ApiKeyAuth
 // @response 200 {array} models.User
 // @router /users [get]
 func GetAllUsers(c *gin.Context) {
@@ -33,6 +35,7 @@ func GetAllUsers(c *gin.Context) {
 // @id GetUserByUsername
 // @produce json
 // @param username path string true "Username"
+// @Security ApiKeyAuth
 // @response 200 {object} models.User
 // @router /users/{username} [get]
 func GetUserByUsername(c *gin.Context) {
@@ -153,4 +156,104 @@ func UpdateUserByUsername(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User updated successfully"})
+}
+
+// GetMe godoc
+// @Summary Get user info
+// @Description Get user info
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.TouristWithUser
+// @Success 200 {object} models.AgencyWithUser
+// @Router /getMe [get]
+func GetMe(c *gin.Context) {
+	//middleware + token validate section
+	//CheckToken is function for checking token whether it is valid or not
+	//call CheckToken
+	// err := CheckToken(c)
+	// if err != nil {
+	// 	if err.Error() == "Authorization header is missing" {
+	// 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Authorization header is missing"})
+	// 		return
+	// 	}
+	// 	if err.Error() == "Invalid authorization format" {
+	// 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Invalid authorization format"})
+	// 		return
+	// 	}
+	// 	if err.Error() == "User is logged out" {
+	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "User is logged out"})
+	// 		return
+	// 	}
+	// 	if err.Error() == "Invalid token" {
+	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
+	// 		return
+	// 	}
+	// }
+	const BEARER_SCHEMA = "Bearer "
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
+		return
+	}
+	tokenString := authHeader[len(BEARER_SCHEMA):]
+	token, err := JWTAuthService().ValidateToken(tokenString)
+	if !token.Valid {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	username := claims["username"].(string)
+	//middleware + token validate section
+
+	user, err := database.GetUserByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	if user.Role == "Tourist" {
+		var data models.TouristWithUser
+		tourist, err := database.GetTouristByUsername(username, database.MainDB)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		data.Username = user.Username
+		data.Phone = user.Phone
+		data.Email = user.Email
+		data.Image = user.Image
+		data.Role = user.Role
+		data.CitizenId = tourist.CitizenId
+		data.FirstName = tourist.FirstName
+		data.LastName = tourist.LastName
+		data.Address = tourist.Address
+		data.BirthDate = tourist.BirthDate
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+		return
+	}
+
+	if user.Role == "Agency" {
+		var data models.AgencyWithUser
+		agency, err := database.GetAgencyByUsername(username, database.MainDB)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		data.Username = user.Username
+		data.Phone = user.Phone
+		data.Email = user.Email
+		data.Image = user.Image
+		data.Role = user.Role
+		data.AgencyName = agency.AgencyName
+		data.LicenseNo = agency.LicenseNo
+		data.BankAccount = agency.BankAccount
+		data.AuthorizeAdminId = agency.AuthorizeAdminId
+		data.AuthorizeStatus = agency.AuthorizeStatus
+		data.ApproveTime = agency.ApproveTime
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": false, "error": "record not found"})
 }

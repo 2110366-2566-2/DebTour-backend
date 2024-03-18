@@ -13,6 +13,7 @@ import (
 // @Description Get all reviews
 // @tags reviews
 // @Produce  json
+// @Security ApiKeyAuth
 // @Success 200 {array} models.Review
 // @Router /reviews [get]
 func GetAllReviews(c *gin.Context) {
@@ -135,6 +136,7 @@ func GetReviewsByTouristUsername(c *gin.Context) {
 // @Produce  json
 // @Param id path int true "Tour ID"
 // @Param review body models.ReviewRequest true "Review"
+// @Security ApiKeyAuth
 // @Success 200 {object} models.Review
 // @Router /reviews/tour/{id} [post]
 func CreateReview(c *gin.Context) {
@@ -166,6 +168,7 @@ func CreateReview(c *gin.Context) {
 // @tags reviews
 // @Produce  json
 // @Param id path int true "Review ID"
+// @Security ApiKeyAuth
 // @Success 200
 // @Router /reviews/{id} [delete]
 func DeleteReview(c *gin.Context) {
@@ -190,6 +193,7 @@ func DeleteReview(c *gin.Context) {
 // @tags reviews
 // @Produce  json
 // @Param id path int true "Tour ID"
+// @Security ApiKeyAuth
 // @Success 200
 // @Router /reviews/tour/{id} [delete]
 func DeleteReviewsByTourId(c *gin.Context) {
@@ -214,6 +218,7 @@ func DeleteReviewsByTourId(c *gin.Context) {
 // @tags reviews
 // @Produce  json
 // @Param username path string true "Tourist Username"
+// @Security ApiKeyAuth
 // @Success 200
 // @Router /reviews/tourist/{username} [delete]
 func DeleteReviewsByTouristUsername(c *gin.Context) {

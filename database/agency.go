@@ -30,7 +30,7 @@ func DeleteAgencyByUsername(username string, db *gorm.DB) error {
 }
 
 func UpdateAgencyByUsername(username string, agency models.Agency, db *gorm.DB) error {
-	existingUser, err := GetAgencyByUsername(agency.Username, db)
+	existingUser, err := GetAgencyByUsername(username, db)
 	if err != nil {
 		return err
 	}
