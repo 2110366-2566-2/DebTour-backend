@@ -48,6 +48,7 @@ func GetAllAgencies(db *gorm.DB) ([]models.AgencyWithUser, error) {
 }
 
 // create getallagencieswithcompanyinformation function
+
 func GetAllAgenciesWithCompanyInformation(db *gorm.DB) (AgencyWithCompanyInformation []models.AgencyWithCompanyInformation, err error) {
 	var agencies []models.Agency
 	result := db.Model(&models.Agency{}).Find(&agencies)
@@ -67,7 +68,7 @@ func GetAllAgenciesWithCompanyInformation(db *gorm.DB) (AgencyWithCompanyInforma
 		if err != nil {
 			return AgencyWithCompanyInformation, err
 		}
-		agencyWithCompanyInformation := models.ToAgencyWithCompanyInformation(agency, user, string(companyInformation.Image))
+		agencyWithCompanyInformation := models.ToAgencyWithCompanyInformation(agency, user, *companyInformation)
 		agenciesWithCompanyInformation = append(agenciesWithCompanyInformation, agencyWithCompanyInformation)
 	}
 

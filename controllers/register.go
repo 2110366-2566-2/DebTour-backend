@@ -102,7 +102,7 @@ func RegisterTourist(c *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param agency body models.AgencyWithUser true "Agency"
+// @Param agency body models.AgencyWithCompanyInformation true "Agency"
 // @Success 200 {object} models.AgencyWithCompanyInformationAndToken
 // @Router /auth/registerAgency [post]
 func RegisterAgency(c *gin.Context) {

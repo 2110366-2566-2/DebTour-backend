@@ -90,6 +90,10 @@ func main() {
 		v1.GET("/agencies/companyInformation", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgenciesWithCompanyInformation)
 		//end admin
 
+		v1.GET("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.GetCompanyInformationByAgencyUsername)       // admin, agency themselves
+		v1.POST("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Agency"}, 1), controllers.CreateCompanyInformationByAgencyUsername)            // agency themselves
+		v1.DELETE("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.DeleteCompanyInformationByAgencyUsername) // admin, agency themselves
+
 		v1.GET("/tourists", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllTourists)                                      // admin
 		v1.GET("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.GetTouristByUsername) // all + login
 		v1.PUT("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1), controllers.UpdateTouristByUsername)     // admin, tourist themselves

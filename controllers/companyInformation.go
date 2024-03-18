@@ -11,17 +11,26 @@ import (
 
 //create function for get all company information
 
-func GetAllCompanyInformation(c *gin.Context) {
-	companyInformation, err := database.GetAllCompanyInformation(database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
+// func GetAllCompanyInformation(c *gin.Context) {
+// 	companyInformation, err := database.GetAllCompanyInformation(database.MainDB)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+// 		return
+// 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": companyInformation})
-}
+// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": companyInformation})
+// }
 
 //create function for get company information by agencyusername
+
+//GetCompanyInformationByAgencyUsername godoc
+//@Summary Get company information by agency username
+//@Description Get company information by agency username
+//@Tags company-information
+//@Produce json
+//@Param agencyusername path string true "Agency Username"
+//@Success 200 {object} models.CompanyInformationResponse "Company information"
+//@Router /agenc/{agencyusername} [get]
 
 func GetCompanyInformationByAgencyUsername(c *gin.Context) {
 	agencyUsername := c.Param("agencyusername")
@@ -30,6 +39,9 @@ func GetCompanyInformationByAgencyUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	companyInfoResponse := models.CompanyInformationResponse{}
+	companyInfoResponse.Username = agencyUsername
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": companyInformation})
 }
 

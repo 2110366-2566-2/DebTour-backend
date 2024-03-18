@@ -7,24 +7,26 @@ import (
 )
 
 // get all company information
-func GetAllCompanyInformation(db *gorm.DB) ([]models.CompanyInformation, error) {
-	var companyInformations []models.CompanyInformation
+// func GetAllCompanyInformation(db *gorm.DB) ([]models.CompanyInformation, error) {
+// 	var companyInformations []models.CompanyInformation
 
-	err := db.Model(&models.CompanyInformation{}).Find(&companyInformations).Error
-	if err != nil {
-		return nil, err
-	}
-	return companyInformations, nil
-}
+// 	err := db.Model(&models.CompanyInformation{}).Find(&companyInformations).Error
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return companyInformations, nil
+// }
 
 // get company information by agency username
-func GetCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (*models.CompanyInformation, error) {
+func GetCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (*string, error) {
 	var companyInformation models.CompanyInformation
 	err := db.Model(&models.CompanyInformation{}).Where("agency_username = ?", agencyUsername).First(&companyInformation).Error
 	if err != nil {
 		return nil, err
 	}
-	return &companyInformation, nil
+	var companyInfoImage string
+	companyInfoImage = string(companyInformation.Image)
+	return &companyInfoImage, nil
 }
 
 // create company information

@@ -9,7 +9,7 @@ type CompanyInformationRequest struct {
 	Image string `json:"image"`
 }
 
-// type CompanyInformationResponse struct {
-// 	Username string   `json:"username"`
-// 	Images   []string `json:"images"`
-// }
+type CompanyInformationResponse struct {
+	Username string `json:"username"`
+	Image    string `json:"image"`
+}
