@@ -8,50 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for create agency
-// this is my createuser function , use this format to create
-// func CreateUser(c *gin.Context) {
-// 	var user models.User
-// 	var username CreateUserInput
-// 	c.ShouldBindJSON(&username)
-// 	fmt.Println(">>>>>>>>>>>>>>>> User: ", username.Username)
-// 	if err := c.ShouldBindJSON(&user); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	err := database.CreateUser(&user, database.MainDB)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
-// }
-
-//create function for create agency
-
-// CreateAgency godoc
-// @Summary Create a agency
-// @Description Create a agency
-// @Tags agencies
-// @Accept json
-// @Produce json
-// @Param agency body models.Agency true "Agency"
-// @Success 200 {object} models.Agency
-// @Router /agencies [post]
-func CreateAgency(c *gin.Context) {
-	var agency models.Agency
-	if err := c.ShouldBindJSON(&agency); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err := database.CreateAgency(&agency, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agency})
-}
-
 //create function for get all agencies
 
 // GetAllAgencies godoc
@@ -59,6 +15,7 @@ func CreateAgency(c *gin.Context) {
 // @Description Get all agencies
 // @Tags agencies
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} models.Agency
 // @Router /agencies [get]
 func GetAllAgencies(c *gin.Context) {
@@ -78,6 +35,7 @@ func GetAllAgencies(c *gin.Context) {
 // @Tags agencies
 // @Produce json
 // @Param username path string true "Username"
+// @Security ApiKeyAuth
 // @Success 200 {object} models.Agency
 // @Router /agencies/{username} [get]
 func GetAgencyByUsername(c *gin.Context) {
@@ -99,6 +57,7 @@ func GetAgencyByUsername(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param agency body models.Agency true "Agency"
+// @Security ApiKeyAuth
 // @Success 200 {object} models.Agency
 // @Router /agencies [put]
 func UpdateAgency(c *gin.Context) {
@@ -172,6 +131,7 @@ func UpdateAgency(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param agency body models.Agency true "Agency"
+// @Security ApiKeyAuth
 // @Success 200 {object} models.Agency
 // @Router /agencies [delete]
 func DeleteAgency(c *gin.Context) {

@@ -8,31 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for create tourist
-
-// CreateTourist godoc
-// @Summary Create a tourist
-// @Description Create a tourist
-// @Tags tourists
-// @Accept json
-// @Produce json
-// @Param tourist body models.Tourist true "Tourist"
-// @Success 200 {object} models.Tourist
-// @Router /tourists [post]
-func CreateTourist(c *gin.Context) {
-	var tourist models.Tourist
-	if err := c.ShouldBindJSON(&tourist); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err := database.CreateTourist(&tourist, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourist})
-}
-
 //create function for get all tourists
 
 // GetAllTourists godoc
@@ -40,6 +15,7 @@ func CreateTourist(c *gin.Context) {
 // @Description Get all tourists
 // @Tags tourists
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} models.Tourist
 // @Router /tourists [get]
 func GetAllTourists(c *gin.Context) {
@@ -59,6 +35,7 @@ func GetAllTourists(c *gin.Context) {
 // @Tags tourists
 // @Produce json
 // @Param username path string true "Username"
+// @Security ApiKeyAuth
 // @Success 200 {object} models.Tourist
 // @Router /tourists/{username} [get]
 func GetTouristByUsername(c *gin.Context) {
@@ -79,6 +56,7 @@ func GetTouristByUsername(c *gin.Context) {
 // @Tags tourists
 // @Produce json
 // @Param username path string true "Username"
+// @Security ApiKeyAuth
 // @Success 200 {string} string	"Tourist deleted successfully"
 // @Router /tourists/{username} [delete]
 func DeleteTouristByUsername(c *gin.Context) {
@@ -117,6 +95,7 @@ func DeleteTouristByUsername(c *gin.Context) {
 // @Produce json
 // @Param username path string true "Username"
 // @Param tourist body models.TouristWithUser true "Tourist"
+// @Security ApiKeyAuth
 // @Success 200 {object} models.TouristWithUser
 // @Router /tourists/{username} [put]
 func UpdateTouristByUsername(c *gin.Context) {
