@@ -25,3 +25,20 @@ type TouristWithUser struct {
 	Gender         string `gorm:"not null" json:"Gender"`
 	DefaultPayment string `gorm:"not null" json:"defaultPayment"`
 }
+
+func ToTouristWithUser(tourist Tourist, user User) TouristWithUser {
+	return TouristWithUser{
+		Username:       user.Username,
+		Phone:          user.Phone,
+		Email:          user.Email,
+		Image:          user.Image,
+		Role:           user.Role,
+		CitizenId:      tourist.CitizenId,
+		FirstName:      tourist.FirstName,
+		LastName:       tourist.LastName,
+		Address:        tourist.Address,
+		BirthDate:      tourist.BirthDate,
+		Gender:         tourist.Gender,
+		DefaultPayment: tourist.DefaultPayment,
+	}
+}

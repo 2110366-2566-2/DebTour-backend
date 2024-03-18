@@ -79,15 +79,6 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 }
 
-// DeleteUser godoc
-// @summary Delete a user
-// @description Delete a user
-// @tags users
-// @id DeleteUser
-// @param username path string true "Username"
-// @produce json
-// @response 200 {string} string "User deleted"
-// @router /users/{username} [delete]
 func DeleteUserByUsername(c *gin.Context) {
 	// Extract the username from the URL path parameters
 	username := c.Param("username")
@@ -105,31 +96,6 @@ func DeleteUserByUsername(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User deleted successfully"})
 }
-
-// UpdateUser godoc
-// @summary Update a user
-// @description Update a user
-// @tags users
-// @id UpdateUser
-// @accept json
-// @produce json
-// @param username path string true "Username"
-// @param user body models.User true "User"
-// @response 200 {string} string "User updated"
-// @router /users/{username} [put]
-// func UpdateUser(c *gin.Context) {
-// 	var user models.User
-// 	if err := c.ShouldBindJSON(&user); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	err := database.UpdateUser(&user, database.MainDB)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
-// }
 
 func UpdateUserByUsername(c *gin.Context) {
 	// Extract the username from the URL path parameters
@@ -169,28 +135,6 @@ func UpdateUserByUsername(c *gin.Context) {
 // @Success 200 {object} models.AgencyWithUser
 // @Router /getMe [get]
 func GetMe(c *gin.Context) {
-	//middleware + token validate section
-	//CheckToken is function for checking token whether it is valid or not
-	//call CheckToken
-	// err := CheckToken(c)
-	// if err != nil {
-	// 	if err.Error() == "Authorization header is missing" {
-	// 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Authorization header is missing"})
-	// 		return
-	// 	}
-	// 	if err.Error() == "Invalid authorization format" {
-	// 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Invalid authorization format"})
-	// 		return
-	// 	}
-	// 	if err.Error() == "User is logged out" {
-	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "User is logged out"})
-	// 		return
-	// 	}
-	// 	if err.Error() == "Invalid token" {
-	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
-	// 		return
-	// 	}
-	// }
 	const BEARER_SCHEMA = "Bearer "
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {

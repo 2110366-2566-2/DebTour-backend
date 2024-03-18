@@ -27,6 +27,11 @@ func GetAllTourists(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tourists), "data": tourists})
 }
 
+//create getalltouristswithuser function
+
+func GetAllTouristsWithUser(c *gin.Context) {
+}
+
 //create function for get tourist by username
 
 // GetTouristByUsername godoc

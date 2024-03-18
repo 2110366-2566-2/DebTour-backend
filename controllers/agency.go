@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for get all agencies
+//create function for get all agencies and company information
 
 // GetAllAgencies godoc
 // @Summary Get all agencies
@@ -20,6 +20,25 @@ import (
 // @Router /agencies [get]
 func GetAllAgencies(c *gin.Context) {
 	agencies, err := database.GetAllAgencies(database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(agencies), "data": agencies})
+}
+
+//create getallagencieswithcompanyinformation function
+
+// GetAllAgenciesWithCompanyInformation godoc
+// @Summary Get all agencies with company information
+// @Description Get all agencies with company information
+// @Tags agencies
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} models.AgencyWithCompanyInformation
+// @Router /agencies/companyInformation [get]
+func GetAllAgenciesWithCompanyInformation(c *gin.Context) {
+	agencies, err := database.GetAllAgenciesWithCompanyInformation(database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

@@ -116,14 +116,14 @@ func RegisterTourist(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param agency body models.AgencyWithUser true "Agency"
-// @Success 200 {object} models.AgencyWithUser
+// @Success 200 {object} models.AgencyWithCompanyInformation
 // @Router /auth/registerAgency [post]
 func RegisterAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	var loginService LoginService = StaticLoginService()
 	var jwtService JWTService = JWTAuthService()
 	var loginController LoginController = LoginHandler(loginService, jwtService)
-	var payload models.AgencyWithUser
+	var payload models.AgencyWithCompanyInformation
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
