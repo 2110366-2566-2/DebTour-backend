@@ -2,6 +2,7 @@ package database
 
 import (
 	"DebTour/models"
+	"encoding/base64"
 
 	"gorm.io/gorm"
 )
@@ -13,21 +14,23 @@ func GetAllTours(db *gorm.DB) (tours []models.Tour, err error) {
 	return tours, result.Error
 }
 
-func GetTourWithActivitiesWithLocationByTourId(tourId int, db *gorm.DB) (tourWithActivitiesWithLocation models.TourWithActivitiesWithLocation, err error) {
+func GetTourWithActivitiesWithLocationWithImagesByTourId(tourId int, db *gorm.DB) (tourWithActivitiesWithLocationWithImages models.TourWithActivitiesWithLocationWithImages, err error) {
 	var tour models.Tour
 	result := db.First(&tour, tourId)
 
 	if result.Error != nil {
-		return tourWithActivitiesWithLocation, result.Error
+		return tourWithActivitiesWithLocationWithImages, result.Error
 	}
 
 	activitiesWithLocation, err := GetAllActivitiesWithLocationByTourId(tour.TourId, db)
 
 	if err != nil {
-		return tourWithActivitiesWithLocation, err
+		return tourWithActivitiesWithLocationWithImages, err
 	}
 
-	return models.ToTourWithActivitiesWithLocation(tour, activitiesWithLocation)
+	images, err := GetTourImages(tour.TourId, db)
+
+	return models.ToTourWithActivitiesWithLocationWithImages(tour, activitiesWithLocation, images)
 }
 
 func GetTourByTourId(tourId int, db *gorm.DB) (tour models.Tour, err error) {
@@ -36,7 +39,7 @@ func GetTourByTourId(tourId int, db *gorm.DB) (tour models.Tour, err error) {
 	return tour, result.Error
 }
 
-func CreateTour(tour *models.Tour, activitiesWithLocationRequest []models.ActivityWithLocationRequest, db *gorm.DB) (err error) {
+func CreateTour(tour *models.Tour, activitiesWithLocationRequest []models.ActivityWithLocationRequest, images []string, db *gorm.DB) (err error) {
 	tx := db.SavePoint("BeforeCreateTour")
 
 	result := tx.Model(&models.Tour{}).Create(tour)
@@ -54,6 +57,25 @@ func CreateTour(tour *models.Tour, activitiesWithLocationRequest []models.Activi
 			tx.RollbackTo("BeforeCreateTour")
 			return err
 		}
+	}
+
+	for _, image := range images {
+		image, err := base64.StdEncoding.DecodeString(image)
+		if err != nil {
+			tx.RollbackTo("BeforeCreateTour")
+			return err
+		}
+		tourImage := models.TourImage{
+			TourId: tour.TourId,
+			Image: image,
+		}
+		err = CreateTourImage(&tourImage, tx)
+
+		if err != nil {
+			tx.RollbackTo("BeforeCreateTour")
+			return err
+		}
+
 	}
 
 	return nil
@@ -95,6 +117,13 @@ func DeleteTour(tourId uint, db *gorm.DB) (err error) {
 		return err
 	}
 
+	// Delete all images of the tour
+	err = DeleteTourImages(tourId, tx)
+	if err != nil {
+		tx.RollbackTo("BeforeDeleteTour")
+		return err
+	}
+
 	// Delete the tour
 	result := tx.Model(&models.Tour{}).Where("tour_id = ?", tourId).Delete(&models.Tour{})
 	if result.Error != nil {
@@ -105,9 +134,9 @@ func DeleteTour(tourId uint, db *gorm.DB) (err error) {
 	return nil
 }
 
-func FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo string, offset, limit int, db *gorm.DB) ([]models.Tour, error) {
+func FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo string, offset, limit int, db *gorm.DB) ([]models.Tour, error) {
 	var tours []models.Tour
-	result := db.Model(&models.Tour{}).Select("tour_id, name, start_date, end_date, overview_location, member_count, max_member_count, price").Where("name LIKE ? AND start_date >= ? AND end_date <= ? AND overview_location LIKE ? AND member_count >= ? AND member_count <= ? AND price >= ? AND price <= ?", name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo).Limit(limit).Offset(offset).Find(&tours)
+	result := db.Model(&models.Tour{}).Select("tour_id, name, start_date, end_date, overview_location, member_count, max_member_count, price").Where("name LIKE ? AND start_date >= ? AND end_date <= ? AND overview_location LIKE ? AND member_count >= ? AND member_count <= ? AND max_member_count >= ? AND max_member_count <= ? AND max_member_count - member_count >= ? AND max_member_count - member_count <= ? AND price >= ? AND price <= ?", name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo).Limit(limit).Offset(offset).Find(&tours)
 	return tours, result.Error
 }
 

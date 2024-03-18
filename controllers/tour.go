@@ -3,7 +3,6 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -38,7 +37,7 @@ func GetAllTours(c *gin.Context) {
 // @ID GetTourByID
 // @Produce json
 // @Param id path int true "Tour ID"
-// @Success 200 {object} models.TourWithActivitiesWithLocation
+// @Success 200 {object} models.TourWithActivitiesWithLocationWithImages
 // @Router /tours/{id} [get]
 func GetTourByID(c *gin.Context) {
 	_id := c.Param("id")
@@ -47,7 +46,7 @@ func GetTourByID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
-	tourActivityLocation, err := database.GetTourWithActivitiesWithLocationByTourId(id, database.MainDB)
+	tourActivityLocation, err := database.GetTourWithActivitiesWithLocationWithImagesByTourId(id, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -100,28 +99,28 @@ func GetTouristByTourId(c *gin.Context) {
 // @id CreateTour
 // @accept json
 // @produce json
-// @param tour body models.TourWithActivitiesWithLocationRequest true "Tour"
+// @param tour body models.TourWithActivitiesWithLocationWithImagesRequest true "Tour"
+// @success 200 {object} models.TourWithActivitiesWithLocationWithImages
 // @Security ApiKeyAuth
-// @success 200 {object} models.TourWithActivitiesWithLocation
 // @router /tours [post]
 func CreateTour(c *gin.Context) {
 
 	tx := database.MainDB.Begin()
 
-	var tourWithActivitiesWithLocationRequest models.TourWithActivitiesWithLocationRequest
-	if err := c.ShouldBindJSON(&tourWithActivitiesWithLocationRequest); err != nil {
+	var tourWithActivitiesWithLocationWithImagesRequest models.TourWithActivitiesWithLocationWithImagesRequest
+	if err := c.ShouldBindJSON(&tourWithActivitiesWithLocationWithImagesRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		tx.Rollback()
 		return
 	}
 
-	tour, err := models.ToTour(tourWithActivitiesWithLocationRequest, 0, "dummyAgency")
+	tour, err := models.ToTour(tourWithActivitiesWithLocationWithImagesRequest, 0, "dummyAgency")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		tx.Rollback()
 		return
 	}
-	err = database.CreateTour(&tour, tourWithActivitiesWithLocationRequest.Activities, tx)
+	err = database.CreateTour(&tour, tourWithActivitiesWithLocationWithImagesRequest.Activities, tourWithActivitiesWithLocationWithImagesRequest.Images, tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -129,7 +128,7 @@ func CreateTour(c *gin.Context) {
 		return
 	}
 
-	tourWithActivitiesWithLocation, err := database.GetTourWithActivitiesWithLocationByTourId(int(tour.TourId), tx)
+	tourWithActivitiesWithLocation, err := database.GetTourWithActivitiesWithLocationWithImagesByTourId(int(tour.TourId), tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -246,6 +245,10 @@ func DeleteTour(c *gin.Context) {
 // @Param overviewLocation query string false "Overview location"
 // @Param memberCountFrom query string false "Member count from"
 // @Param memberCountTo query string false "Member count to"
+// @Param maxMemberCountFrom query string false "Max member count from"
+// @Param maxMemberCountTo query string false "Max member count to"
+// @Param availableMemberCountFrom query string false "Available member count from"
+// @Param availableMemberCountTo query string false "Available member count to"
 // @Param priceFrom query string false "Price from"
 // @Param priceTo query string false "Price to"
 // @Param limit query string false "Limit"
@@ -259,6 +262,10 @@ func FilterTours(c *gin.Context) {
 	overviewLocation := c.Query("overviewLocation")
 	memberCountFrom := c.Query("memberCountFrom")
 	memberCountTo := c.Query("memberCountTo")
+	availableMemberCountFrom := c.Query("availableMemberCountFrom")
+	availableMemberCountTo := c.Query("availableMemberCountTo")
+	maxMemberCountFrom := c.Query("maxMemberCountFrom")
+	maxMemberCountTo := c.Query("maxMemberCountTo")
 	priceFrom := c.Query("priceFrom")
 	priceTo := c.Query("priceTo")
 	limit := c.Query("limit")
@@ -285,6 +292,18 @@ func FilterTours(c *gin.Context) {
 	}
 	if memberCountTo == "" {
 		memberCountTo = strconv.Itoa(math.MaxInt)
+	}
+	if availableMemberCountFrom == "" {
+		availableMemberCountFrom = "0"
+	}
+	if availableMemberCountTo == "" {
+		availableMemberCountTo = strconv.Itoa(math.MaxInt)
+	}
+	if maxMemberCountFrom == "" {
+		maxMemberCountFrom = "0"
+	}
+	if maxMemberCountTo == "" {
+		maxMemberCountTo = strconv.Itoa(math.MaxInt)
 	}
 	if priceFrom == "" {
 		priceFrom = "0"
@@ -315,10 +334,9 @@ func FilterTours(c *gin.Context) {
 			return
 		}
 	}
+	//fmt.Println(maxMemberCountFrom, maxMemberCountTo)
 
-	fmt.Println(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, limitInt, offsetInt)
-
-	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
+	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
 
 	var filteredToursResponse []models.FilteredToursResponse
 	for _, tour := range tours {
@@ -394,8 +412,8 @@ func UpdateTourActivities(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @param activitiesWithLocationRequest body []models.ActivityWithLocationRequest true "Activities with location request"
+// @success 200 {object} models.TourWithActivitiesWithLocationWithImages
 // @Security ApiKeyAuth
-// @success 200 {object} models.TourWithActivitiesWithLocation
 // @router /tours/activities/{id} [post]
 func CreateTourActivities(c *gin.Context) {
 	tx := database.MainDB.Begin()
@@ -423,7 +441,7 @@ func CreateTourActivities(c *gin.Context) {
 		return
 	}
 
-	tourWithActivitiesWithLocation, err := database.GetTourWithActivitiesWithLocationByTourId(tourId, tx)
+	tourWithActivitiesWithLocationWithImages, err := database.GetTourWithActivitiesWithLocationWithImagesByTourId(tourId, tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -432,5 +450,5 @@ func CreateTourActivities(c *gin.Context) {
 	}
 
 	tx.Commit()
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourWithActivitiesWithLocation})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourWithActivitiesWithLocationWithImages})
 }
