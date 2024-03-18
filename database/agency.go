@@ -3,6 +3,7 @@ package database
 import (
 	"DebTour/models"
 	"encoding/base64"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -22,21 +23,22 @@ func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
 		tx.RollbackTo("BeforeCreateAgency")
 		return result.Error
 	}
-
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before decode")
 	imageByte, err := base64.StdEncoding.DecodeString(image)
 	if err != nil {
 		tx.RollbackTo("BeforeCreateAgency")
 		return err
 	}
-
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> After decode")
 	companyInformation := models.CompanyInformation{Username: agency.Username, Image: imageByte}
 
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before CreateCompanyInformation")
 	err = CreateCompanyInformation(&companyInformation, tx)
 	if err != nil {
 		tx.RollbackTo("BeforeCreateAgency")
 		return err
 	}
-
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> After CreateCompanyInformation")
 	tx.Commit()
 	return nil
 }
