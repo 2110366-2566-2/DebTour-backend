@@ -5,13 +5,18 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetTourImages(tourId uint, db *gorm.DB) ([]models.TourImage, error) {
+func GetTourImages(tourId uint, db *gorm.DB) ([]string, error) {
 	var images []models.TourImage
 	err := db.Model(&models.TourImage{}).Where("tour_id = ?", tourId).Find(&images).Error
 	if err != nil {
 		return nil, err
 	}
-	return images, nil
+
+	var imageStrings []string
+	for _, image := range images {
+		imageStrings = append(imageStrings, string(image.Image))
+	}
+	return imageStrings, nil
 }
 
 func CreateTourImage(tourImage *models.TourImage, db *gorm.DB) error {

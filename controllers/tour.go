@@ -38,7 +38,7 @@ func GetAllTours(c *gin.Context) {
 // @ID GetTourByID
 // @Produce json
 // @Param id path int true "Tour ID"
-// @Success 200 {object} models.TourWithActivitiesWithLocation
+// @Success 200 {object} models.TourWithActivitiesWithLocationWithImages
 // @Router /tours/{id} [get]
 func GetTourByID(c *gin.Context) {
 	_id := c.Param("id")
@@ -47,7 +47,7 @@ func GetTourByID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
-	tourActivityLocation, err := database.GetTourWithActivitiesWithLocationByTourId(id, database.MainDB)
+	tourActivityLocation, err := database.GetTourWithActivitiesWithLocationWithImagesByTourId(id, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -99,27 +99,27 @@ func GetTouristByTourId(c *gin.Context) {
 // @id CreateTour
 // @accept json
 // @produce json
-// @param tour body models.TourWithActivitiesWithLocationRequest true "Tour"
-// @success 200 {object} models.TourWithActivitiesWithLocation
+// @param tour body models.TourWithActivitiesWithLocationWithImagesRequest true "Tour"
+// @success 200 {object} models.TourWithActivitiesWithLocationWithImages
 // @router /tours [post]
 func CreateTour(c *gin.Context) {
 
 	tx := database.MainDB.Begin()
 
-	var tourWithActivitiesWithLocationRequest models.TourWithActivitiesWithLocationRequest
-	if err := c.ShouldBindJSON(&tourWithActivitiesWithLocationRequest); err != nil {
+	var tourWithActivitiesWithLocationWithImagesRequest models.TourWithActivitiesWithLocationWithImagesRequest
+	if err := c.ShouldBindJSON(&tourWithActivitiesWithLocationWithImagesRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		tx.Rollback()
 		return
 	}
 
-	tour, err := models.ToTour(tourWithActivitiesWithLocationRequest, 0, "dummyAgency")
+	tour, err := models.ToTour(tourWithActivitiesWithLocationWithImagesRequest, 0, "dummyAgency")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		tx.Rollback()
 		return
 	}
-	err = database.CreateTour(&tour, tourWithActivitiesWithLocationRequest.Activities, tx)
+	err = database.CreateTour(&tour, tourWithActivitiesWithLocationWithImagesRequest.Activities, tourWithActivitiesWithLocationWithImagesRequest.Images, tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -127,7 +127,7 @@ func CreateTour(c *gin.Context) {
 		return
 	}
 
-	tourWithActivitiesWithLocation, err := database.GetTourWithActivitiesWithLocationByTourId(int(tour.TourId), tx)
+	tourWithActivitiesWithLocation, err := database.GetTourWithActivitiesWithLocationWithImagesByTourId(int(tour.TourId), tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -389,7 +389,7 @@ func UpdateTourActivities(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @param activitiesWithLocationRequest body []models.ActivityWithLocationRequest true "Activities with location request"
-// @success 200 {object} models.TourWithActivitiesWithLocation
+// @success 200 {object} models.TourWithActivitiesWithLocationWithImages
 // @router /tours/activities/{id} [post]
 func CreateTourActivities(c *gin.Context) {
 	tx := database.MainDB.Begin()
@@ -417,7 +417,7 @@ func CreateTourActivities(c *gin.Context) {
 		return
 	}
 
-	tourWithActivitiesWithLocation, err := database.GetTourWithActivitiesWithLocationByTourId(tourId, tx)
+	tourWithActivitiesWithLocationWithImages, err := database.GetTourWithActivitiesWithLocationWithImagesByTourId(tourId, tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -426,5 +426,5 @@ func CreateTourActivities(c *gin.Context) {
 	}
 
 	tx.Commit()
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourWithActivitiesWithLocation})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourWithActivitiesWithLocationWithImages})
 }
