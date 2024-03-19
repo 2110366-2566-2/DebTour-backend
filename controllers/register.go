@@ -131,6 +131,7 @@ func RegisterAgency(c *gin.Context) {
 	agency.AgencyName = payload.AgencyName
 	agency.LicenseNo = payload.LicenseNo
 	agency.BankAccount = payload.BankAccount
+	agency.BankName = payload.BankName
 	agency.AuthorizeAdminUsername = payload.AuthorizeAdminUsername
 	agency.AuthorizeStatus = payload.AuthorizeStatus
 	agency.ApproveTime = payload.ApproveTime

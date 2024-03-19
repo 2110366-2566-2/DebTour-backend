@@ -17,7 +17,7 @@ func GetAgencyByUsername(username string, db *gorm.DB) (models.Agency, error) {
 
 func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
 	tx := db.SavePoint("BeforeCreateAgency")
-
+	fmt.Println(">>>>>>>>>>>>>", agency.BankName)
 	result := tx.Model(&models.Agency{}).Create(agency)
 	if result.Error != nil {
 		tx.RollbackTo("BeforeCreateAgency")
@@ -44,9 +44,22 @@ func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
 }
 
 func GetAllAgencies(db *gorm.DB) ([]models.AgencyWithUser, error) {
-	var agencies []models.AgencyWithUser
-	result := db.Model(&models.AgencyWithUser{}).Find(&agencies)
-	return agencies, result.Error
+	var agencies []models.Agency
+
+	result := db.Model(&models.Agency{}).Find(&agencies)
+
+	//loop get user by agency.Username
+	var agenciesWithUser []models.AgencyWithUser
+	for _, agency := range agencies {
+		user, err := GetUserByUsername(agency.Username, db)
+		if err != nil {
+
+		}
+		agencyWithUser := models.ToAgencyWithUser(agency, user)
+		agenciesWithUser = append(agenciesWithUser, agencyWithUser)
+	}
+
+	return agenciesWithUser, result.Error
 }
 
 // create getallagencieswithcompanyinformation function
@@ -70,7 +83,7 @@ func GetAllAgenciesWithCompanyInformation(db *gorm.DB) (AgencyWithCompanyInforma
 		if err != nil {
 			return AgencyWithCompanyInformation, err
 		}
-		agencyWithCompanyInformation := models.ToAgencyWithCompanyInformation(agency, user, *companyInformation)
+		agencyWithCompanyInformation := models.ToAgencyWithCompanyInformation(agency, user, companyInformation.Image)
 		agenciesWithCompanyInformation = append(agenciesWithCompanyInformation, agencyWithCompanyInformation)
 	}
 

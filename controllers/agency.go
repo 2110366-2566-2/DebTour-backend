@@ -29,22 +29,7 @@ func GetAllAgencies(c *gin.Context) {
 
 //create getallagencieswithcompanyinformation function
 
-// GetAllAgenciesWithCompanyInformation godoc
-// @Summary Get all agencies with company information
-// @Description Get all agencies with company information
-// @Tags agencies
-// @Produce json
-// @Security ApiKeyAuth
-// @Success 200 {array} models.AgencyWithCompanyInformation
-// @Router /agencies/companyInformation [get]
-func GetAllAgenciesWithCompanyInformation(c *gin.Context) {
-	agencies, err := database.GetAllAgenciesWithCompanyInformation(database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(agencies), "data": agencies})
-}
+
 
 //create function for get agency by username
 
@@ -136,12 +121,11 @@ func UpdateAgency(c *gin.Context) {
 // @Summary Delete a agency
 // @Description Delete a agency
 // @Tags agencies
-// @Accept json
 // @Produce json
-// @Param agency body models.Agency true "Agency"
+// @Param username path string true "Username"
 // @Security ApiKeyAuth
-// @Success 200 {object} models.Agency
-// @Router /agencies [delete]
+// @Success 200 {string} string "Agency deleted successfully"
+// @Router /agencies/{username} [delete]
 func DeleteAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	username := c.Param("username")

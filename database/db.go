@@ -32,6 +32,7 @@ func MigrateDB() {
 		&models.ActivityLocation{},
 		&models.Admin{},
 		&models.Agency{},
+		&models.CompanyInformation{},
 		&models.Issue{},
 		&models.Joining{},
 		&models.Location{},
