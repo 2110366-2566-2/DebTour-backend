@@ -8,93 +8,50 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for get all tourists
-
 // GetAllTourists godoc
 // @Summary Get all tourists
 // @Description Get all tourists
+// @description Role allowed: "Admin"
 // @Tags tourists
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} models.Tourist
+// @Success 200 {array} models.TouristWithUser
 // @Router /tourists [get]
-func GetAllTourists(c *gin.Context) {
-	tourists, err := database.GetAllTourists(database.MainDB)
+func GetAllTouristsWithUser(c *gin.Context) {
+	touristsWithUser, err := database.GetAllTourists(database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tourists), "data": tourists})
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(touristsWithUser), "data": touristsWithUser})
 }
-
-//create getalltouristswithuser function
-
-func GetAllTouristsWithUser(c *gin.Context) {
-}
-
-//create function for get tourist by username
 
 // GetTouristByUsername godoc
 // @Summary Get tourist by username
 // @Description Get tourist by username
+// @description Role allowed: "Admin", "Agency" and "Tourist"
 // @Tags tourists
 // @Produce json
 // @Param username path string true "Username"
 // @Security ApiKeyAuth
-// @Success 200 {object} models.Tourist
+// @Success 200 {object} models.TouristWithUser
 // @Router /tourists/{username} [get]
 func GetTouristByUsername(c *gin.Context) {
 	username := c.Param("username")
-	tourist, err := database.GetTouristByUsername(username, database.MainDB)
+	touristsWithUser, err := database.GetTouristByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourist})
-}
 
-//create function for delete tourist
-
-// DeleteTouristByUsername godoc
-// @Summary Delete tourist and user
-// @Description Delete tourist and user by username
-// @Tags tourists
-// @Produce json
-// @Param username path string true "Username"
-// @Security ApiKeyAuth
-// @Success 200 {string} string	"Tourist deleted successfully"
-// @Router /tourists/{username} [delete]
-func DeleteTouristByUsername(c *gin.Context) {
-	tx := database.MainDB.Begin()
-	username := c.Param("username")
-
-	//check is username exist
-	_, err := database.GetUserByUsername(username, database.MainDB)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err = database.DeleteUserByUsername(username, database.MainDB)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	err = database.DeleteTouristByUsername(username, database.MainDB)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Tourist deleted successfully"})
-	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristsWithUser})
 }
 
 // UpdateTouristByUsername godoc
 // @Summary Update a tourist
 // @Description Update a tourist and user also
+// @description Role allowed: "Admin" and "TouristThemselves"
 // @Tags tourists
 // @Accept json
 // @Produce json
@@ -113,22 +70,10 @@ func UpdateTouristByUsername(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	user.Username = payload.Username
-	user.Phone = payload.Phone
-	user.Email = payload.Email
-	user.Image = payload.Image
+	user := models.ToUserFromTouristWithUser(payload)
 	user.Role = "Tourist"
 
-	var tourist models.Tourist
-	tourist.Username = payload.Username
-	tourist.CitizenId = payload.CitizenId
-	tourist.FirstName = payload.FirstName
-	tourist.LastName = payload.LastName
-	tourist.Address = payload.Address
-	tourist.BirthDate = payload.BirthDate
-	tourist.Gender = payload.Gender
-	tourist.DefaultPayment = payload.DefaultPayment
+	tourist := models.ToTourist(payload)
 
 	err := database.UpdateUserByUsername(username, user, tx)
 	if err != nil {
@@ -143,7 +88,7 @@ func UpdateTouristByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	
+
 	touristWithUser := models.ToTouristWithUser(tourist, user)
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristWithUser})

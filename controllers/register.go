@@ -9,22 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// func RegisterHandler(c *gin.Context) {
-// 	role := c.Param("role")
-// 	if role == "tourist" {
-// 		RegisterTourist(c)
-// 		return
-// 	}
-// 	if role == "agency" {
-// 		RegisterAgency(c)
-// 		return
-// 	}
-// 	c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid role"})
-// }
-
 // RegisterTourist godoc
 // @Summary Register a tourist
 // @Description Register a tourist
+// @description Role allowed: everyone
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -43,23 +31,10 @@ func RegisterTourist(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	// Populate user fields from payload
-	user.Username = payload.Username
-	user.Phone = payload.Phone
-	user.Email = payload.Email
-	user.Image = payload.Image
+	user := models.ToUserFromTouristWithUser(payload)
 	user.Role = "Tourist"
 
-	var tourist models.Tourist
-	tourist.Username = payload.Username
-	tourist.CitizenId = payload.CitizenId
-	tourist.FirstName = payload.FirstName
-	tourist.LastName = payload.LastName
-	tourist.Address = payload.Address
-	tourist.BirthDate = payload.BirthDate
-	tourist.Gender = payload.Gender
-	tourist.DefaultPayment = payload.DefaultPayment
+	tourist := models.ToTourist(payload)
 
 	// Now you can access touristWithUser.User and touristWithUser.Tourist
 	err := database.CreateUser(&user, tx)
@@ -98,6 +73,7 @@ func RegisterTourist(c *gin.Context) {
 // RegisterAgency godoc
 // @Summary Register an agency
 // @Description Register an agency
+// @description Role allowed: everyone
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -116,23 +92,10 @@ func RegisterAgency(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	// Populate user fields from payload
-	user.Username = payload.Username
-	user.Phone = payload.Phone
-	user.Email = payload.Email
-	user.Image = payload.Image
-	user.Role = "Agency"
+	user := models.ToUserFromAgencyWithCompanyInformation(payload)
+	user.Role = "Agency" // Set role to Agency
 
-	var agency models.Agency
-	agency.Username = payload.Username
-	agency.AgencyName = payload.AgencyName
-	agency.LicenseNo = payload.LicenseNo
-	agency.BankAccount = payload.BankAccount
-	agency.BankName = payload.BankName
-	agency.AuthorizeAdminUsername = payload.AuthorizeAdminUsername
-	agency.AuthorizeStatus = payload.AuthorizeStatus
-	agency.ApproveTime = payload.ApproveTime
+	agency := models.ToAgency(payload)
 
 	image := payload.CompanyInformation
 

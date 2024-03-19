@@ -7,14 +7,25 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetAgencyByUsername(username string, db *gorm.DB) (models.Agency, error) {
-	var agency models.Agency
+func GetAgencyByUsername(username string, db *gorm.DB) (agency models.Agency, err error) {
 	result := db.Model(&models.Agency{}).Where("username = ?", username).First(&agency)
-
 	return agency, result.Error
 }
 
-func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
+func GetAgencyWithUserByUsername(username string, db *gorm.DB) (agencyWithUser models.AgencyWithUser, err error) {
+	var agency models.Agency
+	result := db.Model(&models.Agency{}).Where("username = ?", username).First(&agency)
+
+	user, err := GetUserByUsername(username, db)
+	if err != nil {
+		return agencyWithUser, err
+	}
+	agencyWithUser = models.ToAgencyWithUser(agency, user)
+
+	return agencyWithUser, result.Error
+}
+
+func CreateAgency(agency *models.Agency, image string, db *gorm.DB) (err error) {
 	tx := db.SavePoint("BeforeCreateAgency")
 
 	result := tx.Model(&models.Agency{}).Create(agency)
@@ -30,7 +41,6 @@ func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
 	}
 
 	companyInformation := models.CompanyInformation{Username: agency.Username, Image: imageByte}
-
 
 	err = CreateCompanyInformation(&companyInformation, tx)
 	if err != nil {
@@ -102,4 +112,21 @@ func UpdateAgencyByUsername(username string, agency models.Agency, db *gorm.DB) 
 	}
 	result := db.Model(&existingUser).Where("username = ?", username).Updates(agency)
 	return result.Error
+}
+
+func GetAgencyWithCompanyInformationByUsername(username string, db *gorm.DB) (agencyWithCompanyInformation models.AgencyWithCompanyInformation, err error) {
+	agency, err := GetAgencyByUsername(username, db)
+	if err != nil {
+		return agencyWithCompanyInformation, err
+	}
+	user, err := GetUserByUsername(username, db)
+	if err != nil {
+		return agencyWithCompanyInformation, err
+	}
+	companyInformation, err := GetCompanyInformationByAgencyUsername(username, db)
+	if err != nil {
+		return agencyWithCompanyInformation, err
+	}
+	agencyWithCompanyInformation = models.ToAgencyWithCompanyInformation(agency, user, companyInformation.Image)
+	return agencyWithCompanyInformation, nil
 }

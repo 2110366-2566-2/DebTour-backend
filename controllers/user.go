@@ -13,6 +13,7 @@ import (
 // GetAllUsers godoc
 // @summary Get all users
 // @description Get all users
+// @description Role allowed: "Admin"
 // @tags users
 // @id GetAllUsers
 // @produce json
@@ -31,6 +32,7 @@ func GetAllUsers(c *gin.Context) {
 // GetUserByUsername godoc
 // @summary Get user by username
 // @description Get user by username
+// @description Role allowed: "Admin"
 // @tags users
 // @id GetUserByUsername
 // @produce json
@@ -82,6 +84,7 @@ func CreateUser(c *gin.Context) {
 // DeleteUserByUsername godoc
 // @summary Delete user by username
 // @description Delete user by username
+// @description Role allowed: "Admin"
 // @tags users
 // @id DeleteUserByUsername
 // @param username path string true "Username"
@@ -119,36 +122,10 @@ func DeleteUserByUsername(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User deleted successfully"})
 }
 
-func UpdateUserByUsername(c *gin.Context) {
-	// Extract the username from the URL path parameters
-	username := c.Param("username")
-
-	// Bind the request body to a user struct
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	//get user by username check if username exists
-	_, err := database.GetUserByUsername(username, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
-		return
-	}
-
-	// Call the database function to update the user
-	err = database.UpdateUserByUsername(username, user, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User updated successfully"})
-}
-
 // GetMe godoc
 // @Summary Get user info
 // @Description Get user info
+// @description Role allowed: "Admin", "Agency" and "Tourist"
 // @Tags users
 // @Accept json
 // @Produce json

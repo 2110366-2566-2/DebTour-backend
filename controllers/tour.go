@@ -13,6 +13,7 @@ import (
 // GetAllTours godoc
 // @summary Get all tours
 // @description Get all tours
+// @description Role allowed: everyone
 // @tags tours
 // @id GetAllTours
 // @produce json
@@ -33,6 +34,7 @@ func GetAllTours(c *gin.Context) {
 // GetTourByID godoc
 // @Summary Get tour by id
 // @Description Get tour by id
+// @description Role allowed: everyone
 // @Tags tours
 // @ID GetTourByID
 // @Produce json
@@ -58,6 +60,7 @@ func GetTourByID(c *gin.Context) {
 // GetTouristByTourId godoc
 // @summary Get a tourist by tourId
 // @description Get a tourist by tourId
+// @description Role allowed: "Admin" and "AgencyOwner"
 // @tags tours
 // @id GetTouristByTourId
 // @produce json
@@ -95,6 +98,7 @@ func GetTouristByTourId(c *gin.Context) {
 // CreateTour godoc
 // @summary Create a tour
 // @description Create a tour with the input JSON data
+// @description Role allowed: "Agency"
 // @tags tours
 // @id CreateTour
 // @accept json
@@ -143,6 +147,7 @@ func CreateTour(c *gin.Context) {
 // UpdateTour godoc
 // @summary Update a tour
 // @description Update a tour with the input JSON data
+// @description Role allowed: "Admin" and "AgencyOwner"
 // @tags tours
 // @id UpdateTour
 // @accept json
@@ -193,6 +198,7 @@ func UpdateTour(c *gin.Context) {
 // DeleteTour godoc
 // @summary Delete a tour
 // @description Delete a tour
+// @description Role allowed: "Admin" and "AgencyOwner"
 // @tags tours
 // @id DeleteTour
 // @produce json
@@ -235,7 +241,7 @@ func DeleteTour(c *gin.Context) {
 
 // FilterTours godoc
 // @Summary Filter tours
-// @Description Filter tours
+// @Description Filter tours allow everyone
 // @Tags tours
 // @ID FilterTours
 // @Produce json
@@ -363,6 +369,7 @@ func FilterTours(c *gin.Context) {
 // UpdateTourActivities godoc
 // @summary Update activities by tourId
 // @description Update activities by tourId
+// @description Role allowed: "Admin" and "AgencyOwner"
 // @tags tour-activities
 // @id UpdateActivitiesByTourId
 // @accept json
@@ -406,6 +413,7 @@ func UpdateTourActivities(c *gin.Context) {
 // CreateTourActivities godoc
 // @summary Create activities for a tour
 // @description Create activities for a tour
+// @description Role allowed: "AgencyOwner"
 // @tags tour-activities
 // @id CreateTourActivities
 // @accept json

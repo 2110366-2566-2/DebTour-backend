@@ -11,14 +11,16 @@ import (
 // ApproveAgency godoc
 // @summary Approve agency
 // @description Approve agency
+// @description Role allowed: "Admin"
 // @tags admin
 // @id ApproveAgency
 // @param username path string true "Agency Username"
 // @Security ApiKeyAuth
 // @produce json
-// @success 200 {object} models.Agency
+// @success 200 {object} models.AgencyWithCompanyInformation
 // @router /agencies/verify/{username} [put]
 func ApproveAgency(c *gin.Context) {
+	tx := database.MainDB.Begin()
 	agencyUsername := c.Param("username")
 	tokenS := c.GetHeader("Authorization")
 	const BEARER_SCHEMA = "Bearer "
@@ -26,6 +28,7 @@ func ApproveAgency(c *gin.Context) {
 	adminUsername := GetUsernameByToken(tokenS)
 	agency, err := database.GetAgencyByUsername(agencyUsername, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Agency not found"})
 		return
 	}
@@ -35,8 +38,18 @@ func ApproveAgency(c *gin.Context) {
 	agency.ApproveTime = &tim
 	err = database.UpdateAgencyByUsername(agencyUsername, agency, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update agency"})
 		return
 	}
-	return
+
+	//create agencyWithCompanyInformation by agency username
+	agencyWithCompanyInformation, err := database.GetAgencyWithCompanyInformationByUsername(agencyUsername, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get company information"})
+		return
+	}
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithCompanyInformation})
 }

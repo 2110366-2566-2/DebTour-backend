@@ -165,6 +165,7 @@ func GetProfile(c *gin.Context) {
 // HandleGoogleLogout godoc
 // @Summary Handle Logout
 // @Description Handle Logout
+// @description Role allowed: "Admin", "Agency" and "Tourist"
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -189,8 +190,10 @@ func HandleGoogleLogout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
+// Login godoc
 // @Summary First contact
 // @Description First contact of user when login to the system
+// @description Role allowed: everyone
 // @Tags auth
 // @Accept json
 // @Produce json

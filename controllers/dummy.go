@@ -9,6 +9,7 @@ import (
 // HelloWorld godoc
 // @summary Hello World
 // @description Just reply Hello World!
+// @description Role allowed: "Admin"
 // @id HelloWorld
 // @produce json
 // @response 200 {string} string "Hello World!"
