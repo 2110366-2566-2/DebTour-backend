@@ -272,3 +272,13 @@ func GetUsernameByToken(tokenS string) string {
 	claims := token.Claims.(jwt.MapClaims)
 	return claims["username"].(string)
 }
+
+func GetUsernameByTokenWithBearer(tokenWithBearer string) string {
+	const BEARER_SCHEMA = "Bearer "
+	token, err := JWTAuthService().ValidateToken(tokenWithBearer[len(BEARER_SCHEMA):])
+	if !token.Valid {
+		return err.Error()
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	return claims["username"].(string)
+}
