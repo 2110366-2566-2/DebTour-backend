@@ -7,11 +7,22 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetAgencyByUsername(username string, db *gorm.DB) (models.Agency, error) {
+func GetAgencyByUsername(username string, db *gorm.DB) (agency models.Agency, err error) {
+	result := db.Model(&models.Agency{}).Where("username = ?", username).First(&agency)
+	return agency, result.Error
+}
+
+func GetAgencyWithUserByUsername(username string, db *gorm.DB) (agencyWithUser models.AgencyWithUser, err error) {
 	var agency models.Agency
 	result := db.Model(&models.Agency{}).Where("username = ?", username).First(&agency)
 
-	return agency, result.Error
+	user, err := GetUserByUsername(username, db)
+	if err != nil {
+		return agencyWithUser, err
+	}
+	agencyWithUser = models.ToAgencyWithUser(agency, user)
+
+	return agencyWithUser, result.Error
 }
 
 func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
@@ -30,7 +41,6 @@ func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
 	}
 
 	companyInformation := models.CompanyInformation{Username: agency.Username, Image: imageByte}
-
 
 	err = CreateCompanyInformation(&companyInformation, tx)
 	if err != nil {

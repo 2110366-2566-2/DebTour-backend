@@ -8,15 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for get all agencies and company information
-
 // GetAllAgencies godoc
 // @Summary Get all agencies
 // @Description Get all agencies
 // @Tags agencies
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} models.Agency
+// @Success 200 {array} models.AgencyWithUser
 // @Router /agencies [get]
 func GetAllAgencies(c *gin.Context) {
 	agencies, err := database.GetAllAgencies(database.MainDB)
@@ -24,35 +22,28 @@ func GetAllAgencies(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(agencies), "data": agencies})
 }
 
-//create getallagencieswithcompanyinformation function
-
-
-
-//create function for get agency by username
-
-// GetAgencyByUsername godoc
-// @Summary Get agency by username
-// @Description Get agency by username
+// GetAgencyWithUserByUsername godoc
+// @Summary Get agency with user by username
+// @Description Get agency with user by username
 // @Tags agencies
 // @Produce json
 // @Param username path string true "Username"
 // @Security ApiKeyAuth
-// @Success 200 {object} models.Agency
+// @Success 200 {object} models.AgencyWithUser
 // @Router /agencies/{username} [get]
-func GetAgencyByUsername(c *gin.Context) {
+func GetAgencyWithUserByUsername(c *gin.Context) {
 	username := c.Param("username")
-	agency, err := database.GetAgencyByUsername(username, database.MainDB)
+	agencyWithUser, err := database.GetAgencyWithUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agency})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithUser})
 }
-
-//create function for update agency
 
 // UpdateAgency godoc
 // @Summary Update a agency
@@ -114,8 +105,6 @@ func UpdateAgency(c *gin.Context) {
 	tx.Commit()
 
 }
-
-//create function for delete agency
 
 // DeleteAgency godoc
 // @Summary Delete a agency

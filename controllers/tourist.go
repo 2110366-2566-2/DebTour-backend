@@ -8,31 +8,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for get all tourists
-
 // GetAllTourists godoc
 // @Summary Get all tourists
 // @Description Get all tourists
 // @Tags tourists
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} models.Tourist
+// @Success 200 {array} models.TouristWithUser
 // @Router /tourists [get]
-func GetAllTourists(c *gin.Context) {
+func GetAllTouristsWithUser(c *gin.Context) {
 	tourists, err := database.GetAllTourists(database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tourists), "data": tourists})
+
+	var touristsWithUser []models.TouristWithUser
+	for _, tourist := range tourists {
+		user, err := database.GetUserByUsername(tourist.Username, database.MainDB)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		touristsWithUser = append(touristsWithUser, models.ToTouristWithUser(tourist, user))
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tourists), "data": touristsWithUser})
 }
-
-//create getalltouristswithuser function
-
-func GetAllTouristsWithUser(c *gin.Context) {
-}
-
-//create function for get tourist by username
 
 // GetTouristByUsername godoc
 // @Summary Get tourist by username
@@ -41,7 +42,7 @@ func GetAllTouristsWithUser(c *gin.Context) {
 // @Produce json
 // @Param username path string true "Username"
 // @Security ApiKeyAuth
-// @Success 200 {object} models.Tourist
+// @Success 200 {object} models.TouristWithUser
 // @Router /tourists/{username} [get]
 func GetTouristByUsername(c *gin.Context) {
 	username := c.Param("username")
@@ -50,10 +51,14 @@ func GetTouristByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourist})
+	user, err := database.GetUserByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	touristWithUser := models.ToTouristWithUser(tourist, user)
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristWithUser})
 }
-
-//create function for delete tourist
 
 // DeleteTouristByUsername godoc
 // @Summary Delete tourist and user
@@ -143,7 +148,7 @@ func UpdateTouristByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	
+
 	touristWithUser := models.ToTouristWithUser(tourist, user)
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristWithUser})
