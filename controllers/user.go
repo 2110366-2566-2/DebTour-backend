@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
@@ -133,6 +132,7 @@ func DeleteUserByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User deleted successfully"})
 }
 
@@ -148,21 +148,8 @@ func DeleteUserByUsername(c *gin.Context) {
 // @Success 200 {object} models.AgencyWithUser
 // @Router /getMe [get]
 func GetMe(c *gin.Context) {
-	const BEARER_SCHEMA = "Bearer "
 	authHeader := c.GetHeader("Authorization")
-	if authHeader == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
-		return
-	}
-	tokenString := authHeader[len(BEARER_SCHEMA):]
-	token, err := JWTAuthService().ValidateToken(tokenString)
-	if !token.Valid {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	claims := token.Claims.(jwt.MapClaims)
-	username := claims["username"].(string)
-	//middleware + token validate section
+	username := GetUsernameByTokenWithBearer(authHeader)
 
 	user, err := database.GetUserByUsername(username, database.MainDB)
 	if err != nil {
@@ -171,45 +158,23 @@ func GetMe(c *gin.Context) {
 	}
 
 	if user.Role == "Tourist" {
-		var data models.TouristWithUser
-		tourist, err := database.GetTouristByUsername(username, database.MainDB)
+		touristWithUser, err := database.GetTouristByUsername(username, database.MainDB)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 			return
 		}
-		data.Username = user.Username
-		data.Phone = user.Phone
-		data.Email = user.Email
-		data.Image = user.Image
-		data.Role = user.Role
-		data.CitizenId = tourist.CitizenId
-		data.FirstName = tourist.FirstName
-		data.LastName = tourist.LastName
-		data.Address = tourist.Address
-		data.BirthDate = tourist.BirthDate
-		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": touristWithUser})
 		return
 	}
 
 	if user.Role == "Agency" {
-		var data models.AgencyWithUser
-		agency, err := database.GetAgencyByUsername(username, database.MainDB)
+		agencyWithUser, err := database.GetAgencyWithUserByUsername(username, database.MainDB)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 			return
 		}
-		data.Username = user.Username
-		data.Phone = user.Phone
-		data.Email = user.Email
-		data.Image = user.Image
-		data.Role = user.Role
-		data.AgencyName = agency.AgencyName
-		data.LicenseNo = agency.LicenseNo
-		data.BankAccount = agency.BankAccount
-		data.AuthorizeAdminUsername = agency.AuthorizeAdminUsername
-		data.AuthorizeStatus = agency.AuthorizeStatus
-		data.ApproveTime = agency.ApproveTime
-		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithUser})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": false, "error": "record not found"})
