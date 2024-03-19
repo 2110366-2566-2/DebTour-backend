@@ -3,7 +3,6 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -63,6 +62,7 @@ func GetTourByID(c *gin.Context) {
 // @id GetTouristByTourId
 // @produce json
 // @param id path int true "Tour ID"
+// @Security ApiKeyAuth
 // @success 200 {array} models.JoinedMembers
 // @router /tours/tourists/{id} [get]
 func GetTouristByTourId(c *gin.Context) {
@@ -101,6 +101,7 @@ func GetTouristByTourId(c *gin.Context) {
 // @produce json
 // @param tour body models.TourWithActivitiesWithLocationWithImagesRequest true "Tour"
 // @success 200 {object} models.TourWithActivitiesWithLocationWithImages
+// @Security ApiKeyAuth
 // @router /tours [post]
 func CreateTour(c *gin.Context) {
 
@@ -148,6 +149,7 @@ func CreateTour(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @param tour body models.Tour true "Tour"
+// @Security ApiKeyAuth
 // @success 200 {object} string
 // @router /tours/{id} [put]
 func UpdateTour(c *gin.Context) {
@@ -195,6 +197,7 @@ func UpdateTour(c *gin.Context) {
 // @id DeleteTour
 // @produce json
 // @param id path int true "Tour ID"
+// @Security ApiKeyAuth
 // @success 200 {string} string
 // @router /tours/{id} [delete]
 func DeleteTour(c *gin.Context) {
@@ -242,6 +245,10 @@ func DeleteTour(c *gin.Context) {
 // @Param overviewLocation query string false "Overview location"
 // @Param memberCountFrom query string false "Member count from"
 // @Param memberCountTo query string false "Member count to"
+// @Param maxMemberCountFrom query string false "Max member count from"
+// @Param maxMemberCountTo query string false "Max member count to"
+// @Param availableMemberCountFrom query string false "Available member count from"
+// @Param availableMemberCountTo query string false "Available member count to"
 // @Param priceFrom query string false "Price from"
 // @Param priceTo query string false "Price to"
 // @Param limit query string false "Limit"
@@ -255,6 +262,10 @@ func FilterTours(c *gin.Context) {
 	overviewLocation := c.Query("overviewLocation")
 	memberCountFrom := c.Query("memberCountFrom")
 	memberCountTo := c.Query("memberCountTo")
+	availableMemberCountFrom := c.Query("availableMemberCountFrom")
+	availableMemberCountTo := c.Query("availableMemberCountTo")
+	maxMemberCountFrom := c.Query("maxMemberCountFrom")
+	maxMemberCountTo := c.Query("maxMemberCountTo")
 	priceFrom := c.Query("priceFrom")
 	priceTo := c.Query("priceTo")
 	limit := c.Query("limit")
@@ -281,6 +292,18 @@ func FilterTours(c *gin.Context) {
 	}
 	if memberCountTo == "" {
 		memberCountTo = strconv.Itoa(math.MaxInt)
+	}
+	if availableMemberCountFrom == "" {
+		availableMemberCountFrom = "0"
+	}
+	if availableMemberCountTo == "" {
+		availableMemberCountTo = strconv.Itoa(math.MaxInt)
+	}
+	if maxMemberCountFrom == "" {
+		maxMemberCountFrom = "0"
+	}
+	if maxMemberCountTo == "" {
+		maxMemberCountTo = strconv.Itoa(math.MaxInt)
 	}
 	if priceFrom == "" {
 		priceFrom = "0"
@@ -311,10 +334,9 @@ func FilterTours(c *gin.Context) {
 			return
 		}
 	}
+	//fmt.Println(maxMemberCountFrom, maxMemberCountTo)
 
-	fmt.Println(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, limitInt, offsetInt)
-
-	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
+	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
 
 	var filteredToursResponse []models.FilteredToursResponse
 	for _, tour := range tours {
@@ -347,6 +369,7 @@ func FilterTours(c *gin.Context) {
 // @produce json
 // @param id path int true "Tour ID"
 // @param activitiesWithLocation body []models.ActivityWithLocation true "Activities with location"
+// @Security ApiKeyAuth
 // @success 200 {string} string
 // @router /tours/activities/{id} [put]
 func UpdateTourActivities(c *gin.Context) {
@@ -390,6 +413,7 @@ func UpdateTourActivities(c *gin.Context) {
 // @param id path int true "Tour ID"
 // @param activitiesWithLocationRequest body []models.ActivityWithLocationRequest true "Activities with location request"
 // @success 200 {object} models.TourWithActivitiesWithLocationWithImages
+// @Security ApiKeyAuth
 // @router /tours/activities/{id} [post]
 func CreateTourActivities(c *gin.Context) {
 	tx := database.MainDB.Begin()

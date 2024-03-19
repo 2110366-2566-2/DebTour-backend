@@ -13,6 +13,7 @@ import (
 // @Tags activities
 // @ID GetAllActivities
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} models.Activity
 // @Router /activities [get]
 func GetAllActivities(c *gin.Context) {

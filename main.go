@@ -5,7 +5,6 @@ import (
 	"DebTour/database"
 	"DebTour/docs"
 	"DebTour/middleware"
-	"net/http"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -35,6 +34,12 @@ func SetupOauth() {
 	controllers.InitializeOauthenv()
 }
 
+var ()
+
+// @securityDefinitions.apiKey ApiKeyAuth
+// @in       header
+// @name     Authorization
+// @description Type "Bearer " followed by a space and then your token
 func main() {
 	database.InitDB()
 
@@ -54,117 +59,67 @@ func main() {
 
 	v1 := router.Group("/api/v1")
 	{
+		v1.GET("/givemetoken/:username", controllers.GetToken)
+		v1.GET("givemeusername/:token", controllers.GetUsername)
+		v1.GET("/logout", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.HandleGoogleLogout)
 
-		v1.GET("/hello", controllers.HelloWorld)
-		v1.GET("/users", controllers.GetAllUsers)
-		v1.GET("/users/:username", controllers.GetUserByUsername)
-		v1.POST("/users", controllers.CreateUser)
-		v1.DELETE("/users/:username", controllers.DeleteUserByUsername)
-		v1.PUT("/users/:username", controllers.UpdateUserByUsername)
+		v1.GET("/hello", controllers.HelloWorld)                                                              // all
+		v1.GET("/users", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllUsers)                 // admin
+		v1.GET("/users/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetUserByUsername) // admin
+		v1.GET("/getMe", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.GetMe)           // logged in
 
-		v1.GET("/tours", controllers.GetAllTours)
-		v1.GET("/tours/:id", controllers.GetTourByID)
-		v1.GET("/tours/tourists/:id", controllers.GetTouristByTourId)
-		v1.POST("/tours", controllers.CreateTour)
-		v1.PUT("/tours/:id", controllers.UpdateTour)
-		v1.DELETE("/tours/:id", controllers.DeleteTour)
-		v1.GET("/tours/filter", controllers.FilterTours)
-		v1.PUT("/tours/activities/:id", controllers.UpdateTourActivities)
-		v1.POST("/tours/activities/:id", controllers.CreateTourActivities)
+		v1.GET("/tours", controllers.GetAllTours)                                                                                  // all
+		v1.GET("/tours/:id", controllers.GetTourByID)                                                                              // all
+		v1.GET("/tours/tourists/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.GetTouristByTourId)     // admin, agency owner
+		v1.POST("/tours", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTour)                                     // agency
+		v1.PUT("/tours/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.UpdateTour)                      // admin, agency owner
+		v1.DELETE("/tours/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.DeleteTour)                   // admin, agency owner
+		v1.GET("/tours/filter", controllers.FilterTours)                                                                           // all
+		v1.PUT("/tours/activities/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.UpdateTourActivities) // admin, agency owner
+		v1.POST("/tours/activities/:id", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTourActivities)            // agency owner
 
-		v1.GET("/tours/images/:id", controllers.GetTourImages)
-		v1.POST("/tours/images/:id", controllers.CreateTourImagesByTourId)
-		v1.DELETE("/tours/images/:id", controllers.DeleteTourImagesByTourId)
+		v1.GET("/tours/images/:id", controllers.GetTourImages)                                                                        // all
+		v1.POST("/tours/images/:id", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTourImagesByTourId)               // agency owner
+		v1.DELETE("/tours/images/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.DeleteTourImagesByTourId) // admin, agency owner
 
-		v1.GET("/agencies", controllers.GetAllAgencies)
-		v1.GET("/agencies/:username", controllers.GetAgencyByUsername)
-		v1.POST("/agencies", controllers.RegisterAgency)
-		v1.PUT("/agencies/:username", controllers.UpdateAgency)
-		v1.DELETE("/agencies/:username", controllers.DeleteAgency)
+		//admin
+		v1.GET("/agencies", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgencies)
+		v1.GET("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAgencyByUsername)
+		v1.PUT("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.UpdateAgency) // + agency themselves
+		v1.DELETE("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteAgency)
+		//end admin
 
-		v1.GET("/tourists", controllers.GetAllTourists)
-		v1.GET("/tourists/:username", controllers.GetTouristByUsername)
-		v1.POST("/tourists", controllers.RegisterTourist)
-		//v1.POST("/tourists", controllers.CreateTourist)
-		v1.PUT("/tourists/:username", controllers.UpdateTouristByUsername)
-		v1.DELETE("/tourists/:username", controllers.DeleteTouristByUsername)
+		v1.GET("/tourists", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllTourists)                                      // admin
+		v1.GET("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.GetTouristByUsername) // all + login
+		v1.PUT("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1), controllers.UpdateTouristByUsername)     // admin, tourist themselves
+		v1.DELETE("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteTouristByUsername)                // admin
 
-		v1.GET("/activities", controllers.GetAllActivities)
+		v1.GET("/activities", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllActivities) //admin
 
-		v1.POST("/joinings", controllers.JoinTour)
-		v1.GET("/joinings", controllers.GetAllJoinings)
+		v1.POST("/joinings", middleware.AuthorizeJWT([]string{"Tourist"}), controllers.JoinTour)    // tourist
+		v1.GET("/joinings", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllJoinings) // admin
 
-		v1.GET("/reviews", controllers.GetAllReviews)
-		v1.GET("/reviews/:id", controllers.GetReviewById)
-		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)
-		v1.POST("/reviews/tour/:id", controllers.CreateReview)
-		v1.GET("/reviews/tourist/:username", controllers.GetReviewsByTouristUsername)
-		v1.DELETE("/reviews/:id", controllers.DeleteReview)
-		v1.DELETE("/reviews/tour/:id", controllers.DeleteReviewsByTourId)
-		v1.DELETE("/reviews/tourist/:username", controllers.DeleteReviewsByTouristUsername)
+		v1.GET("/reviews", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllReviews)                                                  // admin
+		v1.GET("/reviews/:id", controllers.GetReviewById)                                                                                          // all
+		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)                                                                                // all
+		v1.POST("/reviews/tour/:id", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.CreateReview)                    // tourist
+		v1.GET("/reviews/tourist/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1), controllers.GetReviewsByTouristUsername)    // admin, tourist themselves
+		v1.DELETE("/reviews/:id", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteReview)                                            // admin
+		v1.DELETE("/reviews/tour/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}), controllers.DeleteReviewsByTourId)                    // admin, agency
+		v1.DELETE("/reviews/tourist/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}), controllers.DeleteReviewsByTouristUsername) // admin, tourist
+		v1.GET("/reviews/averageRating/:id", controllers.GetAverageRatingByTourId)                                                                 // all
 
-		v1.GET("/google/login", controllers.HandleGoogleLogin)
-		v1.GET("/google/callback", controllers.HandleGoogleCallback)
-		v1.GET("/google/logout", controllers.HandleGoogleLogout)
-		v1.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-		v1.GET("/validatetoken/:token", controllers.ValidateTokenHandler)
-		v1.GET("/validaterole/:token", controllers.ValidateRoleHandler)
-
+		// auth
 		v1.POST("/auth/registerTourist", controllers.RegisterTourist)
 		v1.POST("/auth/registerAgency", controllers.RegisterAgency)
-		v1.POST("/auth/firstContact", controllers.FirstContact)
+		v1.POST("/auth/login", controllers.Login)
+		v1.GET("/auth/logout", controllers.HandleGoogleLogout)
+		//end auth
 
-		v1.GET("/issues", controllers.GetIssues)
-		v1.POST("/issues", controllers.CreateIssueReport)
-		v1.PUT("/issues/:issue_id", controllers.UpdateIssueReport)
-		v1.GET("/testdir3", controllers.TestRedir)
-		v1.GET("/testdir2", controllers.TestDir)
-		v1.GET("/google/testlogin/login", controllers.TestLogin)
-		v1.GET("/google/testlogin/register", controllers.TestRegister)
+		v1.GET("/issues", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.GetIssues)          // all + logged in and only allowed (addmin = all, tourist+agency = only their own)
+		v1.POST("/issues", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.CreateIssueReport) // all + logged in
+		v1.PUT("/issues/:issue_id", middleware.AuthorizeJWT([]string{"Admin"}), controllers.UpdateIssueReport)             // admin
 
-	}
-
-	v2 := router.Group("/api/v2")
-	{
-		v2.Use(middleware.AuthorizeJWT([]string{"admin", "tourist"}))
-		v2.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-	}
-
-	// a: admin, g: agency, t: tourist
-	v2_a := router.Group("/api/v2/admin")
-	{
-		v2_a.Use(middleware.AuthorizeJWT([]string{"admin"}))
-		v2_a.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-	}
-
-	v2_ag := router.Group("/api/v2/agency")
-	{
-		v2_ag.Use(middleware.AuthorizeJWT([]string{"admin", "agency"}))
-		v2_ag.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-	}
-
-	v2_at := router.Group("/api/v2/tourist")
-	{
-		v2_at.Use(middleware.AuthorizeJWT([]string{"admin", "tourist"}))
-		v2_at.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
-	}
-
-	v2_agt := router.Group("/api/v2/all")
-	{
-		v2_agt.Use(middleware.AuthorizeJWT([]string{"admin", "agency", "tourist"}))
-		v2_agt.GET("/test", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"message": "success"})
-		})
 	}
 
 	err := router.Run(":9000")

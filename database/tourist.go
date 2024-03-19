@@ -31,7 +31,7 @@ func DeleteTouristByUsername(username string, db *gorm.DB) error {
 }
 
 func UpdateTouristByUsername(username string, tourist models.Tourist, db *gorm.DB) error {
-	existingUser, err := GetTouristByUsername(tourist.Username, db)
+	existingUser, err := GetTouristByUsername(username, db)
 	if err != nil {
 		return err
 	}
