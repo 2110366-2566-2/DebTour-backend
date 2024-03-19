@@ -17,22 +17,13 @@ import (
 // @Success 200 {array} models.TouristWithUser
 // @Router /tourists [get]
 func GetAllTouristsWithUser(c *gin.Context) {
-	tourists, err := database.GetAllTourists(database.MainDB)
+	touristsWithUser, err := database.GetAllTourists(database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	var touristsWithUser []models.TouristWithUser
-	for _, tourist := range tourists {
-		user, err := database.GetUserByUsername(tourist.Username, database.MainDB)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-			return
-		}
-		touristsWithUser = append(touristsWithUser, models.ToTouristWithUser(tourist, user))
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tourists), "data": touristsWithUser})
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(touristsWithUser), "data": touristsWithUser})
 }
 
 // GetTouristByUsername godoc
@@ -46,18 +37,13 @@ func GetAllTouristsWithUser(c *gin.Context) {
 // @Router /tourists/{username} [get]
 func GetTouristByUsername(c *gin.Context) {
 	username := c.Param("username")
-	tourist, err := database.GetTouristByUsername(username, database.MainDB)
+	touristsWithUser, err := database.GetTouristByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	user, err := database.GetUserByUsername(username, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	touristWithUser := models.ToTouristWithUser(tourist, user)
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristWithUser})
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristsWithUser})
 }
 
 // DeleteTouristByUsername godoc
@@ -118,22 +104,10 @@ func UpdateTouristByUsername(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	user.Username = payload.Username
-	user.Phone = payload.Phone
-	user.Email = payload.Email
-	user.Image = payload.Image
+	user := models.ToUserFromTouristWithUser(payload)
 	user.Role = "Tourist"
 
-	var tourist models.Tourist
-	tourist.Username = payload.Username
-	tourist.CitizenId = payload.CitizenId
-	tourist.FirstName = payload.FirstName
-	tourist.LastName = payload.LastName
-	tourist.Address = payload.Address
-	tourist.BirthDate = payload.BirthDate
-	tourist.Gender = payload.Gender
-	tourist.DefaultPayment = payload.DefaultPayment
+	tourist := models.ToTourist(payload)
 
 	err := database.UpdateUserByUsername(username, user, tx)
 	if err != nil {

@@ -7,18 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// get all company information
-// func GetAllCompanyInformation(db *gorm.DB) ([]models.CompanyInformation, error) {
-// 	var companyInformations []models.CompanyInformation
-
-// 	err := db.Model(&models.CompanyInformation{}).Find(&companyInformations).Error
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return companyInformations, nil
-// }
-
-// get company information by agency username
 func GetCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (companyInformationResponse models.CompanyInformationResponse, err error) {
 	var companyInformation models.CompanyInformation
 	err = db.Model(&models.CompanyInformation{}).Where("username = ?", agencyUsername).First(&companyInformation).Error
@@ -31,7 +19,6 @@ func GetCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (
 	return companyInformationResponse, nil
 }
 
-// create company information
 func CreateCompanyInformation(companyInformation *models.CompanyInformation, db *gorm.DB) (err error) {
 	db.SavePoint("BeforeCreateCompanyInformation")
 	err = db.Model(&models.CompanyInformation{}).Create(&companyInformation).Error
@@ -43,9 +30,20 @@ func CreateCompanyInformation(companyInformation *models.CompanyInformation, db 
 	return nil
 }
 
-// delete company information by agency username
 func DeleteCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (err error) {
 	err = db.Where("username = ?", agencyUsername).Delete(&models.CompanyInformation{}).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateCompanyInformationByAgencyUsername(agencyUsername string, companyInformation models.CompanyInformation, db *gorm.DB) (err error) {
+	existingCompanyInformation, err := GetCompanyInformationByAgencyUsername(agencyUsername, db)
+	if err != nil {
+		return err
+	}
+	err = db.Model(&existingCompanyInformation).Where("username = ?", agencyUsername).Updates(companyInformation).Error
 	if err != nil {
 		return err
 	}

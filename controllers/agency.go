@@ -51,37 +51,26 @@ func GetAgencyWithUserByUsername(c *gin.Context) {
 // @Tags agencies
 // @Accept json
 // @Produce json
-// @Param agency body models.Agency true "Agency"
+// @Param agency body models.AgencyWithCompanyInformation true "Agency"
 // @Security ApiKeyAuth
-// @Success 200 {object} models.Agency
+// @Success 200 {object} models.AgencyWithCompanyInformation
 // @Router /agencies [put]
 func UpdateAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	username := c.Param("username")
-	var payload models.AgencyWithUser
+	var payload models.AgencyWithCompanyInformation
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	var user models.User
-	// Populate user fields from payload
-	user.Username = payload.Username
-	user.Phone = payload.Phone
-	user.Email = payload.Email
-	user.Image = payload.Image
+	user := models.ToUserFromAgencyWithCompanyInformation(payload)
 	user.Role = "Agency"
 
-	var agency models.Agency
-	agency.Username = payload.Username
-	agency.AgencyName = payload.AgencyName
-	agency.LicenseNo = payload.LicenseNo
-	agency.BankAccount = payload.BankAccount
-	agency.BankName = payload.BankName
-	agency.AuthorizeAdminUsername = payload.AuthorizeAdminUsername
-	agency.AuthorizeStatus = payload.AuthorizeStatus
-	agency.ApproveTime = payload.ApproveTime
+	agency := models.ToAgency(payload)
+
+	image := payload.CompanyInformation
 
 	// Now you can access agencyWithUser.User and agencyWithUser.Agency
 	err := database.UpdateUserByUsername(username, user, tx)
@@ -99,9 +88,9 @@ func UpdateAgency(c *gin.Context) {
 	}
 
 	// Create combined data
-	agencyWithUser := models.ToAgencyWithUser(agency, user)
+	agencyWithCompanyInformation := models.ToAgencyWithCompanyInformation(agency, user, image)
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithUser})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithCompanyInformation})
 	tx.Commit()
 
 }

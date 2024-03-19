@@ -74,3 +74,24 @@ func ToTouristWithUserAndToken(touristWithUser TouristWithUser, token string) To
 		Token:     token,
 	}
 }
+
+func ToTourist(touristWithUser TouristWithUser) Tourist {
+	return Tourist{
+		Username:  touristWithUser.Username,
+		CitizenId: touristWithUser.CitizenId,
+		FirstName: touristWithUser.FirstName,
+		LastName:  touristWithUser.LastName,
+		Address:   touristWithUser.Address,
+		BirthDate: touristWithUser.BirthDate,
+	}
+}
+
+func ToUserFromTouristWithUser(touristWithUser TouristWithUser) User {
+	return User{
+		Username: touristWithUser.Username,
+		Phone:    touristWithUser.Phone,
+		Email:    touristWithUser.Email,
+		Image:    touristWithUser.Image,
+		Role:     touristWithUser.Role,
+	}
+}

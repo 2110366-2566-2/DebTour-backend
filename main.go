@@ -65,7 +65,6 @@ func main() {
 
 		v1.GET("/hello", controllers.HelloWorld)                                              // all
 		v1.GET("/users", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllUsers) // admin
-		v1.GET("/users", controllers.GetAllUsers)                                             // admin
 
 		v1.GET("/users/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetUserByUsername) // admin
 		v1.GET("/getMe", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.GetMe)           // logged in

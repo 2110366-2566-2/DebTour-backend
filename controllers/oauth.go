@@ -189,6 +189,7 @@ func HandleGoogleLogout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
+// Login godoc
 // @Summary First contact
 // @Description First contact of user when login to the system
 // @Tags auth

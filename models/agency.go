@@ -114,3 +114,26 @@ func ToAgencyWithCompanyInformationAndToken(agencyWithCompanyInformation AgencyW
 		Token:                  token,
 	}
 }
+
+func ToAgency(agencyWithCompanyInformation AgencyWithCompanyInformation) Agency {
+	return Agency{
+		Username:               agencyWithCompanyInformation.Username,
+		AgencyName:             agencyWithCompanyInformation.AgencyName,
+		LicenseNo:              agencyWithCompanyInformation.LicenseNo,
+		BankAccount:            agencyWithCompanyInformation.BankAccount,
+		BankName:               agencyWithCompanyInformation.BankName,
+		AuthorizeAdminUsername: agencyWithCompanyInformation.AuthorizeAdminUsername,
+		AuthorizeStatus:        agencyWithCompanyInformation.AuthorizeStatus,
+		ApproveTime:            agencyWithCompanyInformation.ApproveTime,
+	}
+}
+
+func ToUserFromAgencyWithCompanyInformation(agencyWithCompanyInformation AgencyWithCompanyInformation) User {
+	return User{
+		Username: agencyWithCompanyInformation.Username,
+		Phone:    agencyWithCompanyInformation.Phone,
+		Email:    agencyWithCompanyInformation.Email,
+		Image:    agencyWithCompanyInformation.Image,
+		Role:     agencyWithCompanyInformation.Role,
+	}
+}
