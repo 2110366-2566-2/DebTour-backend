@@ -55,6 +55,26 @@ func GetTourByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourActivityLocation})
 }
 
+// GetToursByAgencyUsername godoc
+// @Summary Get tours by agency username
+// @Description Get tours by agency username
+// @Tags tours
+// @ID GetToursByAgencyUsername
+// @Produce json
+// @Param username path string true "Agency username"
+// @Success 200 {array} models.Tour
+// @Router /tours/agency/{username} [get]
+func GetToursByAgencyUsername(c *gin.Context) {
+	username := c.Param("username")
+	tours, err := database.GetToursByAgencyUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tours), "data": tours})
+
+}
+
 // GetTouristByTourId godoc
 // @summary Get a tourist by tourId
 // @description Get a tourist by tourId
@@ -417,7 +437,6 @@ func UpdateTourActivities(c *gin.Context) {
 // @router /tours/activities/{id} [post]
 func CreateTourActivities(c *gin.Context) {
 	tx := database.MainDB.Begin()
-
 	tourId, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
