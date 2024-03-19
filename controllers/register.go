@@ -3,8 +3,6 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
-	"fmt"
-
 	//"fmt"
 	"net/http"
 
@@ -146,14 +144,12 @@ func RegisterAgency(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Before CreateAgency")
 	err = database.CreateAgency(&agency, image, tx) //createAgency also create companyInformation inside too!
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Release from CreateAgency")
 	// Create combined data
 
 	c.Params = append(c.Params, gin.Param{Key: "username", Value: user.Username})

@@ -143,22 +143,9 @@ func UpdateTouristByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	data := gin.H{
-		"username":       user.Username,
-		"phone":          user.Phone,
-		"email":          user.Email,
-		"image":          user.Image,
-		"role":           user.Role,
-		"created_time":   user.CreatedTime,
-		"citizenId":      tourist.CitizenId,
-		"firstName":      tourist.FirstName,
-		"lastName":       tourist.LastName,
-		"address":        tourist.Address,
-		"birthDate":      tourist.BirthDate,
-		"gender":         tourist.Gender,
-		"defaultPayment": tourist.DefaultPayment,
-	}
+	
+	touristWithUser := models.ToTouristWithUser(tourist, user)
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristWithUser})
 	tx.Commit()
 }
