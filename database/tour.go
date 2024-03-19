@@ -39,6 +39,13 @@ func GetTourByTourId(tourId int, db *gorm.DB) (tour models.Tour, err error) {
 	return tour, result.Error
 }
 
+func GetToursByAgencyUsername(username string, db *gorm.DB) (tours []models.Tour, err error) {
+	result := db.Model(&models.Tour{}).Where("agency_username = ?", username).Find(&tours)
+
+	return tours, result.Error
+
+}
+
 func CreateTour(tour *models.Tour, activitiesWithLocationRequest []models.ActivityWithLocationRequest, images []string, db *gorm.DB) (err error) {
 	tx := db.SavePoint("BeforeCreateTour")
 
