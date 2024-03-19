@@ -74,6 +74,10 @@ func GetAllAgenciesWithCompanyInformation(db *gorm.DB) (AgencyWithCompanyInforma
 
 	for _, agency := range agencies {
 		companyInformation, err := GetCompanyInformationByAgencyUsername(agency.Username, db)
+		if err == gorm.ErrRecordNotFound {
+			//continue to next iteration
+			continue
+		}
 		if err != nil {
 			return AgencyWithCompanyInformation, err
 		}

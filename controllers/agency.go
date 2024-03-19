@@ -151,6 +151,13 @@ func DeleteAgency(c *gin.Context) {
 		return
 	}
 
+	err = database.DeleteCompanyInformationByAgencyUsername(username, tx)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Agency deleted successfully"})
 	tx.Commit()
 }
