@@ -22,6 +22,11 @@ func GetIssues(db *gorm.DB, filters ...interface{}) (issues []models.Issue, err 
 	return issues, result.Error
 }
 
+func GetIssueByIssueId(issueId int, db *gorm.DB) (issue models.Issue, err error) {
+	result := db.Model(&models.Issue{}).Where("issue_id = ?", issueId).First(&issue)
+	return issue, result.Error
+}
+
 func CreateIssue(db *gorm.DB, issue *models.Issue) error {
 	result := db.Create(issue)
 	return result.Error
