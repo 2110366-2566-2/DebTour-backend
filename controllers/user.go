@@ -98,7 +98,19 @@ func DeleteUserByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
 		return
 	}
-	// Delete the user by username
+	// Delete the user by username in Tourist table
+	err = database.DeleteTouristByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	// Delete the user by username in Agency table
+	err = database.DeleteAgencyByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	// Delete the user by username in User table
 	err = database.DeleteUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})

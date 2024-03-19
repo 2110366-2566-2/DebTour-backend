@@ -260,3 +260,12 @@ func GetUsername(c *gin.Context) {
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username :", claims["username"].(string))
 	c.JSON(http.StatusOK, gin.H{"success": true, "username": claims["username"].(string)})
 }
+
+func GetUsernameByToken(tokenS string) string {
+	token, err := JWTAuthService().ValidateToken(tokenS)
+	if !token.Valid {
+		return err.Error()
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	return claims["username"].(string)
+}
