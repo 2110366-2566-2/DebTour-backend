@@ -63,9 +63,9 @@ func main() {
 		v1.GET("givemeusername/:token", controllers.GetUsername)
 		v1.GET("/logout", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.HandleGoogleLogout)
 
-		v1.GET("/hello", controllers.HelloWorld)                                                              // all
-		//v1.GET("/users", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllUsers)                 // admin
-		v1.GET("/users", controllers.GetAllUsers)                 // admin
+		v1.GET("/hello", controllers.HelloWorld)                                              // all
+		v1.GET("/users", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllUsers) // admin
+		v1.GET("/users", controllers.GetAllUsers)                                             // admin
 
 		v1.GET("/users/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetUserByUsername) // admin
 		v1.GET("/getMe", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.GetMe)           // logged in
@@ -85,25 +85,15 @@ func main() {
 		v1.DELETE("/tours/images/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.DeleteTourImagesByTourId) // admin, agency owner
 
 		//admin
-		// v1.GET("/agencies", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgencies)
-		// v1.GET("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAgencyByUsername)
-		// v1.PUT("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.UpdateAgency) // + agency themselves
-		// v1.DELETE("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteAgency)
-		// v1.GET("/agencies/companyInformation", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgenciesWithCompanyInformation)
+		v1.GET("/agencies", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgencies)
+		v1.GET("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAgencyByUsername)
+		v1.PUT("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.UpdateAgency) // + agency themselves
+		v1.DELETE("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteAgency)
+		v1.GET("/agencies/companyInformation", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgenciesWithCompanyInformation)
 		//end admin
 
-		//dummy for test
-		v1.GET("/agencies", controllers.GetAllAgencies)
-		v1.GET("/agencies/:username", controllers.GetAgencyByUsername)
-		v1.PUT("/agencies/:username", controllers.UpdateAgency) // + agency themselves
-		v1.DELETE("/agencies/:username", controllers.DeleteAgency)
-		v1.GET("/agencies/companyInformation", controllers.GetAllAgenciesWithCompanyInformation)
-
-		v1.GET("/agencies/companyInformation/:username", controllers.GetCompanyInformationByAgencyUsername)       // admin, agency themselves
-		v1.DELETE("/agencies/companyInformation/:username", controllers.DeleteCompanyInformationByAgencyUsername) // admin, agency themselves
-
-		// v1.GET("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.GetCompanyInformationByAgencyUsername)       // admin, agency themselves
-		// v1.DELETE("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.DeleteCompanyInformationByAgencyUsername) // admin, agency themselves
+		v1.GET("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.GetCompanyInformationByAgencyUsername)       // admin, agency themselves
+		v1.DELETE("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.DeleteCompanyInformationByAgencyUsername) // admin, agency themselves
 
 		v1.GET("/tourists", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllTourists)                                      // admin
 		v1.GET("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.GetTouristByUsername) // all + login
