@@ -71,7 +71,6 @@ func main() {
 
 		v1.GET("/tours", controllers.GetAllTours)                                                                                  // all
 		v1.GET("/tours/:id", controllers.GetTourByID)                                                                              // all
-		v1.GET("/tours/agency/:username", controllers.GetToursByAgencyUsername) // admin, agency owner
 		v1.GET("/tours/tourists/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.GetTouristByTourId)     // admin, agency owner
 		v1.POST("/tours", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTour)                                     // agency
 		v1.PUT("/tours/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.UpdateTour)                      // admin, agency owner
