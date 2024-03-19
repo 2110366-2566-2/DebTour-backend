@@ -43,17 +43,15 @@ func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
 	return nil
 }
 
-func GetAllAgencies(db *gorm.DB) ([]models.AgencyWithUser, error) {
+func GetAllAgencies(db *gorm.DB) (agenciesWithUser []models.AgencyWithUser, err error) {
 	var agencies []models.Agency
-
 	result := db.Model(&models.Agency{}).Find(&agencies)
-
 	//loop get user by agency.Username
-	var agenciesWithUser []models.AgencyWithUser
+
 	for _, agency := range agencies {
 		user, err := GetUserByUsername(agency.Username, db)
 		if err != nil {
-
+			return agenciesWithUser, err
 		}
 		agencyWithUser := models.ToAgencyWithUser(agency, user)
 		agenciesWithUser = append(agenciesWithUser, agencyWithUser)

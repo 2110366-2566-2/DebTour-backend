@@ -25,17 +25,16 @@ func GetCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (
 	if err != nil {
 		return companyInformationResponse, err
 	}
-	var companyInfoImage string
 
-	companyInfoImage = base64.StdEncoding.EncodeToString(companyInformation.Image)
+	var companyInfoImage = base64.StdEncoding.EncodeToString(companyInformation.Image)
 	companyInformationResponse = models.CompanyInformationResponse{Username: agencyUsername, Image: companyInfoImage}
 	return companyInformationResponse, nil
 }
 
 // create company information
-func CreateCompanyInformation(companyInformation *models.CompanyInformation, db *gorm.DB) error {
+func CreateCompanyInformation(companyInformation *models.CompanyInformation, db *gorm.DB) (err error) {
 	db.SavePoint("BeforeCreateCompanyInformation")
-	err := db.Model(&models.CompanyInformation{}).Create(&companyInformation).Error
+	err = db.Model(&models.CompanyInformation{}).Create(&companyInformation).Error
 	if err != nil {
 		db.RollbackTo("BeforeCreateCompanyInformation")
 		return err
@@ -45,8 +44,8 @@ func CreateCompanyInformation(companyInformation *models.CompanyInformation, db 
 }
 
 // delete company information by agency username
-func DeleteCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) error {
-	err := db.Where("username = ?", agencyUsername).Delete(&models.CompanyInformation{}).Error
+func DeleteCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (err error) {
+	err = db.Where("username = ?", agencyUsername).Delete(&models.CompanyInformation{}).Error
 	if err != nil {
 		return err
 	}

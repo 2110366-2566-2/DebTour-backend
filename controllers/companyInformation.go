@@ -33,6 +33,9 @@ import (
 //@Router /agencies/companyInformation/{username} [get]
 func GetCompanyInformationByAgencyUsername(c *gin.Context) {
 	agencyUsername := c.Param("username")
+
+	
+
 	companyInformation, err := database.GetCompanyInformationByAgencyUsername(agencyUsername, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
