@@ -31,6 +31,12 @@ func CreateCompanyInformation(companyInformation *models.CompanyInformation, db 
 }
 
 func DeleteCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (err error) {
+	//check if agency exists
+	_, err = GetAgencyByUsername(agencyUsername, db)
+	if err != nil {
+		return err
+	}
+
 	err = db.Where("username = ?", agencyUsername).Delete(&models.CompanyInformation{}).Error
 	if err != nil {
 		return err

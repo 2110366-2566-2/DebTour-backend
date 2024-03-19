@@ -93,29 +93,43 @@ func CreateUser(c *gin.Context) {
 // @success 200 {string} string "User deleted successfully"
 // @router /users/{username} [delete]
 func DeleteUserByUsername(c *gin.Context) {
+	tx := database.MainDB.Begin()
 	// Extract the username from the URL path parameters
 	username := c.Param("username")
 	//check if user exist
 	_, err := database.GetUserByUsername(username, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
 		return
 	}
 	// Delete the user by username in Tourist table
 	err = database.DeleteTouristByUsername(username, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+
+	// Delete company information by username in CompanyInformation table
+	err = database.DeleteCompanyInformationByAgencyUsername(username, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
 	// Delete the user by username in Agency table
 	err = database.DeleteAgencyByUsername(username, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	// Delete the user by username in User table
 	err = database.DeleteUserByUsername(username, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
