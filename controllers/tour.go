@@ -55,26 +55,6 @@ func GetTourByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourActivityLocation})
 }
 
-// GetToursByAgencyUsername godoc
-// @Summary Get tours by agency username
-// @Description Get tours by agency username
-// @Tags tours
-// @ID GetToursByAgencyUsername
-// @Produce json
-// @Param username path string true "Agency username"
-// @Success 200 {array} models.Tour
-// @Router /tours/agency/{username} [get]
-func GetToursByAgencyUsername(c *gin.Context) {
-	username := c.Param("username")
-	tours, err := database.GetToursByAgencyUsername(username, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tours), "data": tours})
-
-}
-
 // GetTouristByTourId godoc
 // @summary Get a tourist by tourId
 // @description Get a tourist by tourId
@@ -260,6 +240,7 @@ func DeleteTour(c *gin.Context) {
 // @ID FilterTours
 // @Produce json
 // @Param name query string false "Name"
+// @Param agencyUsername query string false "Agency username"
 // @Param startDate query string false "Start date"
 // @Param endDate query string false "End date"
 // @Param overviewLocation query string false "Overview location"
@@ -277,6 +258,7 @@ func DeleteTour(c *gin.Context) {
 // @Router /tours/filter [get]
 func FilterTours(c *gin.Context) {
 	name := c.Query("name")
+	agencyUsername := c.Query("agencyUsername")
 	startDate := c.Query("startDate")
 	endDate := c.Query("endDate")
 	overviewLocation := c.Query("overviewLocation")
@@ -356,7 +338,11 @@ func FilterTours(c *gin.Context) {
 	}
 	//fmt.Println(maxMemberCountFrom, maxMemberCountTo)
 
-	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
+	tours, err := database.FilterTours(name, agencyUsername, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
 
 	var filteredToursResponse []models.FilteredToursResponse
 	for _, tour := range tours {
