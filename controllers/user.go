@@ -79,6 +79,16 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 }
 
+// DeleteUserByUsername godoc
+// @summary Delete user by username
+// @description Delete user by username
+// @tags users
+// @id DeleteUserByUsername
+// @param username path string true "Username"
+// @produce json
+// @Security ApiKeyAuth
+// @success 200 {string} string "User deleted successfully"
+// @router /users/{username} [delete]
 func DeleteUserByUsername(c *gin.Context) {
 	// Extract the username from the URL path parameters
 	username := c.Param("username")
