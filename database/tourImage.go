@@ -2,6 +2,7 @@ package database
 
 import (
 	"DebTour/models"
+	"encoding/base64"
 	"gorm.io/gorm"
 )
 
@@ -14,7 +15,8 @@ func GetTourImages(tourId uint, db *gorm.DB) ([]string, error) {
 
 	var imageStrings []string
 	for _, image := range images {
-		imageStrings = append(imageStrings, string(image.Image))
+		encodedImage := base64.StdEncoding.EncodeToString(image.Image)
+		imageStrings = append(imageStrings, encodedImage)
 	}
 	return imageStrings, nil
 }
