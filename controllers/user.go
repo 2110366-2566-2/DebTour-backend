@@ -133,6 +133,7 @@ func DeleteUserByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User deleted successfully"})
 }
 
