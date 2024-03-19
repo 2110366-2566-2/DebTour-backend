@@ -12,6 +12,7 @@ import (
 // GetCompanyInformationByAgencyUsername godoc
 // @Summary Get company information by agency username
 // @Description Get company information by agency username
+// @description Role allowed: "Admin" and "AgencyThemselves"
 // @Tags company-informations
 // @Produce json
 // @Param username path string true "Agency Username"
@@ -34,6 +35,7 @@ func GetCompanyInformationByAgencyUsername(c *gin.Context) {
 // GetAllAgenciesWithCompanyInformation godoc
 // @Summary Get all agencies with company information
 // @Description Get all agencies with company information
+// @description Role allowed: "Admin"
 // @Tags company-informations
 // @Produce json
 // @Security ApiKeyAuth
@@ -51,6 +53,7 @@ func GetAllAgenciesWithCompanyInformation(c *gin.Context) {
 // DeleteCompanyInformationByAgencyUsername godoc
 // @Summary Delete company information by agency username
 // @Description Delete company information by agency username
+// @description Role allowed: "Admin" and "AgencyThemselves"
 // @Tags company-informations
 // @Produce json
 // @Param username path string true "Agency Username"

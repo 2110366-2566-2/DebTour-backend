@@ -13,6 +13,7 @@ import (
 // GetAllUsers godoc
 // @summary Get all users
 // @description Get all users
+// @description Role allowed: "Admin"
 // @tags users
 // @id GetAllUsers
 // @produce json
@@ -31,6 +32,7 @@ func GetAllUsers(c *gin.Context) {
 // GetUserByUsername godoc
 // @summary Get user by username
 // @description Get user by username
+// @description Role allowed: "Admin"
 // @tags users
 // @id GetUserByUsername
 // @produce json
@@ -82,6 +84,7 @@ func CreateUser(c *gin.Context) {
 // DeleteUserByUsername godoc
 // @summary Delete user by username
 // @description Delete user by username
+// @description Role allowed: "Admin"
 // @tags users
 // @id DeleteUserByUsername
 // @param username path string true "Username"
@@ -98,7 +101,19 @@ func DeleteUserByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
 		return
 	}
-	// Delete the user by username
+	// Delete the user by username in Tourist table
+	err = database.DeleteTouristByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	// Delete the user by username in Agency table
+	err = database.DeleteAgencyByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	// Delete the user by username in User table
 	err = database.DeleteUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -110,6 +125,7 @@ func DeleteUserByUsername(c *gin.Context) {
 // GetMe godoc
 // @Summary Get user info
 // @Description Get user info
+// @description Role allowed: "Admin", "Agency" and "Tourist"
 // @Tags users
 // @Accept json
 // @Produce json

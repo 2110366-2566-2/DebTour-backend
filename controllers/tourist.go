@@ -11,6 +11,7 @@ import (
 // GetAllTourists godoc
 // @Summary Get all tourists
 // @Description Get all tourists
+// @description Role allowed: "Admin"
 // @Tags tourists
 // @Produce json
 // @Security ApiKeyAuth
@@ -29,6 +30,7 @@ func GetAllTouristsWithUser(c *gin.Context) {
 // GetTouristByUsername godoc
 // @Summary Get tourist by username
 // @Description Get tourist by username
+// @description Role allowed: "Admin", "Agency" and "Tourist"
 // @Tags tourists
 // @Produce json
 // @Param username path string true "Username"
@@ -46,46 +48,10 @@ func GetTouristByUsername(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": touristsWithUser})
 }
 
-// DeleteTouristByUsername godoc
-// @Summary Delete tourist and user
-// @Description Delete tourist and user by username
-// @Tags tourists
-// @Produce json
-// @Param username path string true "Username"
-// @Security ApiKeyAuth
-// @Success 200 {string} string	"Tourist deleted successfully"
-// @Router /tourists/{username} [delete]
-func DeleteTouristByUsername(c *gin.Context) {
-	tx := database.MainDB.Begin()
-	username := c.Param("username")
-
-	//check is username exist
-	_, err := database.GetUserByUsername(username, database.MainDB)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err = database.DeleteUserByUsername(username, database.MainDB)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	err = database.DeleteTouristByUsername(username, database.MainDB)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Tourist deleted successfully"})
-	tx.Commit()
-}
-
 // UpdateTouristByUsername godoc
 // @Summary Update a tourist
 // @Description Update a tourist and user also
+// @description Role allowed: "Admin" and "TouristThemselves"
 // @Tags tourists
 // @Accept json
 // @Produce json

@@ -11,6 +11,7 @@ import (
 // GetAllAgencies godoc
 // @Summary Get all agencies
 // @Description Get all agencies
+// @description Role allowed: "Admin"
 // @Tags agencies
 // @Produce json
 // @Security ApiKeyAuth
@@ -29,6 +30,7 @@ func GetAllAgencies(c *gin.Context) {
 // GetAgencyWithUserByUsername godoc
 // @Summary Get agency with user by username
 // @Description Get agency with user by username
+// @description Role allowed: "Admin"
 // @Tags agencies
 // @Produce json
 // @Param username path string true "Username"
@@ -48,6 +50,7 @@ func GetAgencyWithUserByUsername(c *gin.Context) {
 // UpdateAgency godoc
 // @Summary Update a agency
 // @Description Update a agency
+// @description Role allowed: "Admin" and "AgencyThemselves"
 // @Tags agencies
 // @Accept json
 // @Produce json
@@ -93,49 +96,4 @@ func UpdateAgency(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithCompanyInformation})
 	tx.Commit()
 
-}
-
-// DeleteAgency godoc
-// @Summary Delete a agency
-// @Description Delete a agency
-// @Tags agencies
-// @Produce json
-// @Param username path string true "Username"
-// @Security ApiKeyAuth
-// @Success 200 {string} string "Agency deleted successfully"
-// @Router /agencies/{username} [delete]
-func DeleteAgency(c *gin.Context) {
-	tx := database.MainDB.Begin()
-	username := c.Param("username")
-	//check if user exist
-	_, err := database.GetUserByUsername(username, tx)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	err = database.DeleteUserByUsername(username, tx)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	err = database.DeleteAgencyByUsername(username, tx)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	err = database.DeleteCompanyInformationByAgencyUsername(username, tx)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Agency deleted successfully"})
-	tx.Commit()
 }

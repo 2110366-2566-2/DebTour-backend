@@ -12,6 +12,7 @@ import (
 // GetIssues godoc
 // @Summary Get issues
 // @Description Get issues optionally filtered by username and/or status
+// @description Role allowed: "Admin", "AgencyOwner" and "TouristOwner"
 // @Tags issues
 // @ID GetIssues
 // @Produce json
@@ -44,6 +45,7 @@ func GetIssues(c *gin.Context) {
 // CreateIssueReport godoc
 // @Summary Create an issue report
 // @Description Create a new issue report
+// @description Role allowed: "Admin", "Agency" and "Tourist"
 // @Tags issues
 // @Accept json
 // @Produce json
@@ -70,6 +72,7 @@ func CreateIssueReport(c *gin.Context) {
 // UpdateIssueReport godoc
 // @Summary Update an issue report
 // @Description Update an existing issue report
+// @description Role allowed: "Admin"
 // @Tags issues
 // @Accept json
 // @Produce json

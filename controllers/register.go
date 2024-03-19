@@ -12,6 +12,7 @@ import (
 // RegisterTourist godoc
 // @Summary Register a tourist
 // @Description Register a tourist
+// @description Role allowed: everyone
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -72,6 +73,7 @@ func RegisterTourist(c *gin.Context) {
 // RegisterAgency godoc
 // @Summary Register an agency
 // @Description Register an agency
+// @description Role allowed: everyone
 // @Tags auth
 // @Accept json
 // @Produce json

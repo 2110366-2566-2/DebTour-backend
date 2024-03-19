@@ -25,7 +25,7 @@ func GetAgencyWithUserByUsername(username string, db *gorm.DB) (agencyWithUser m
 	return agencyWithUser, result.Error
 }
 
-func CreateAgency(agency *models.Agency, image string, db *gorm.DB) error {
+func CreateAgency(agency *models.Agency, image string, db *gorm.DB) (err error) {
 	tx := db.SavePoint("BeforeCreateAgency")
 
 	result := tx.Model(&models.Agency{}).Create(agency)
@@ -112,4 +112,21 @@ func UpdateAgencyByUsername(username string, agency models.Agency, db *gorm.DB) 
 	}
 	result := db.Model(&existingUser).Where("username = ?", username).Updates(agency)
 	return result.Error
+}
+
+func GetAgencyWithCompanyInformationByUsername(username string, db *gorm.DB) (agencyWithCompanyInformation models.AgencyWithCompanyInformation, err error) {
+	agency, err := GetAgencyByUsername(username, db)
+	if err != nil {
+		return agencyWithCompanyInformation, err
+	}
+	user, err := GetUserByUsername(username, db)
+	if err != nil {
+		return agencyWithCompanyInformation, err
+	}
+	companyInformation, err := GetCompanyInformationByAgencyUsername(username, db)
+	if err != nil {
+		return agencyWithCompanyInformation, err
+	}
+	agencyWithCompanyInformation = models.ToAgencyWithCompanyInformation(agency, user, companyInformation.Image)
+	return agencyWithCompanyInformation, nil
 }

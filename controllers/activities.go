@@ -10,6 +10,7 @@ import (
 // GetAllActivities godoc
 // @Summary Get all activities
 // @Description Get all activities
+// @description Role allowed: "Admin"
 // @Tags activities
 // @ID GetAllActivities
 // @Produce json

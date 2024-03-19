@@ -55,6 +55,9 @@ func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
 		var tour models.Tour
 		user, err = database.GetUserByUsername(claims["username"].(string), database.MainDB)
 		// check role
+		if user.Role == "sudo" {
+			return
+		}
 		if usernameCheck && user.Role != "Admin" {
 			if user.Username != c.Param("username") {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "mismatch username"})

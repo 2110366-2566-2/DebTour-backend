@@ -61,13 +61,13 @@ func main() {
 	{
 		v1.GET("/givemetoken/:username", controllers.GetToken)
 		v1.GET("givemeusername/:token", controllers.GetUsername)
-		v1.GET("/logout", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.HandleGoogleLogout)
 
-		v1.GET("/hello", controllers.HelloWorld)                                              // all
-		v1.GET("/users", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllUsers) // admin
+		v1.GET("/hello", controllers.HelloWorld)                                                                    // all
+		v1.GET("/users", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllUsers)                       // admin                                                                  // admin
+		v1.DELETE("/users/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteUserByUsername) // admin
 
 		v1.GET("/users/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetUserByUsername) // admin
-		v1.GET("/getMe", middleware.AuthorizeJWT([]string{"Agency", "Tourist"}), controllers.GetMe)           // logged in
+		v1.GET("/getMe", middleware.AuthorizeJWT([]string{"Admin", "Agency", "Tourist"}), controllers.GetMe)  // logged in
 
 		v1.GET("/tours", controllers.GetAllTours)                                                                                  // all
 		v1.GET("/tours/:id", controllers.GetTourByID)                                                                              // all
@@ -83,42 +83,39 @@ func main() {
 		v1.POST("/tours/images/:id", middleware.AuthorizeJWT([]string{"Agency"}), controllers.CreateTourImagesByTourId)               // agency owner
 		v1.DELETE("/tours/images/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.DeleteTourImagesByTourId) // admin, agency owner
 
-		//admin
-		v1.GET("/agencies", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgencies)
-		v1.GET("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAgencyWithUserByUsername)
-		v1.PUT("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.UpdateAgency) // + agency themselves
-		v1.DELETE("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteAgency)
-		v1.GET("/agencies/companyInformation", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgenciesWithCompanyInformation)
-		//end admin
+		v1.GET("/agencies", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgencies)                                          // admin
+		v1.GET("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAgencyWithUserByUsername)                   // admin
+		v1.PUT("/agencies/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.UpdateAgency)                     // admin + agency themselves
+		v1.GET("/agencies/companyInformation", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllAgenciesWithCompanyInformation) // admin
 
 		v1.GET("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.GetCompanyInformationByAgencyUsername)       // admin, agency themselves
 		v1.DELETE("/agencies/companyInformation/:username", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 1), controllers.DeleteCompanyInformationByAgencyUsername) // admin, agency themselves
+		v1.PUT("agencies/verify/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.ApproveAgency)                                                         // admin
 
 		v1.GET("/tourists", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllTouristsWithUser)                              // admin
 		v1.GET("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.GetTouristByUsername) // all + login
 		v1.PUT("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1), controllers.UpdateTouristByUsername)     // admin, tourist themselves
-		v1.DELETE("/tourists/:username", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteTouristByUsername)                // admin
 
 		v1.GET("/activities", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllActivities) //admin
 
 		v1.POST("/joinings", middleware.AuthorizeJWT([]string{"Tourist"}), controllers.JoinTour)    // tourist
 		v1.GET("/joinings", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllJoinings) // admin
 
-		v1.GET("/reviews", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllReviews)                                                  // admin
-		v1.GET("/reviews/:id", controllers.GetReviewById)                                                                                          // all
-		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)                                                                                // all
-		v1.POST("/reviews/tour/:id", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.CreateReview)                    // tourist
-		v1.GET("/reviews/tourist/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1), controllers.GetReviewsByTouristUsername)    // admin, tourist themselves
-		v1.DELETE("/reviews/:id", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteReview)                                            // admin
-		v1.DELETE("/reviews/tour/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}), controllers.DeleteReviewsByTourId)                    // admin, agency
-		v1.DELETE("/reviews/tourist/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}), controllers.DeleteReviewsByTouristUsername) // admin, tourist
-		v1.GET("/reviews/averageRating/:id", controllers.GetAverageRatingByTourId)                                                                 // all
+		v1.GET("/reviews", middleware.AuthorizeJWT([]string{"Admin"}), controllers.GetAllReviews)                                                     // admin
+		v1.GET("/reviews/:id", controllers.GetReviewById)                                                                                             // all
+		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)                                                                                   // all
+		v1.POST("/reviews/tour/:id", middleware.AuthorizeJWT([]string{"Tourist"}), controllers.CreateReview)                                          // tourist
+		v1.GET("/reviews/tourist/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1), controllers.GetReviewsByTouristUsername)       // admin, tourist themselves
+		v1.DELETE("/reviews/:id", middleware.AuthorizeJWT([]string{"Admin"}), controllers.DeleteReview)                                               // admin
+		v1.DELETE("/reviews/tour/:id", middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2), controllers.DeleteReviewsByTourId)                    // admin, agency themselves
+		v1.DELETE("/reviews/tourist/:username", middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1), controllers.DeleteReviewsByTouristUsername) // admin, tourist themselves
+		v1.GET("/reviews/averageRating/:id", controllers.GetAverageRatingByTourId)                                                                    // all
 
 		// auth
 		v1.POST("/auth/registerTourist", controllers.RegisterTourist)
 		v1.POST("/auth/registerAgency", controllers.RegisterAgency)
 		v1.POST("/auth/login", controllers.Login)
-		v1.GET("/auth/logout", controllers.HandleGoogleLogout)
+		v1.GET("/auth/logout", middleware.AuthorizeJWT([]string{"Admin", "Agency", "Tourist"}), controllers.HandleGoogleLogout)
 		//end auth
 
 		v1.GET("/issues", middleware.AuthorizeJWT([]string{"Admin", "Tourist", "Agency"}), controllers.GetIssues)          // all + logged in and only allowed (addmin = all, tourist+agency = only their own)
