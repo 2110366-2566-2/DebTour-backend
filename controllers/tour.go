@@ -3,7 +3,6 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -344,7 +343,6 @@ func FilterTours(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	fmt.Println(tours)
 
 	var filteredToursResponse []models.FilteredToursResponse
 	for _, tour := range tours {
