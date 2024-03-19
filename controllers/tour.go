@@ -278,6 +278,9 @@ func FilterTours(c *gin.Context) {
 	} else {
 		name = "%" + name + "%"
 	}
+	if agencyUsername == "" {
+		agencyUsername = "%"
+	}
 	if overviewLocation == "" {
 		overviewLocation = "%"
 	} else {
