@@ -19,7 +19,7 @@ import (
 // @produce json
 // @param verifyagency body models.VerifyAgency true "VerifyAgency"
 // @success 200 {object} string "Approved/Unapprved by Admin : adminusername"
-// @router /agencies/verify/{username} [put]
+// @router /agencies/verify [put]
 func VerifyAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	//get username from token with bearer
