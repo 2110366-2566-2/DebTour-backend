@@ -61,6 +61,11 @@ type AgencyWithCompanyInformationAndToken struct {
 	Token                  string     `json:"token"`
 }
 
+type VerifyAgency struct {
+	Username string `json:"username"`
+	Status   string `json:"status"`
+}
+
 func ToAgencyWithUser(agency Agency, user User) AgencyWithUser {
 	return AgencyWithUser{
 		Username:               user.Username,
