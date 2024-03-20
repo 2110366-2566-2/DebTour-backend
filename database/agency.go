@@ -110,7 +110,8 @@ func UpdateAgencyByUsername(username string, agency models.Agency, db *gorm.DB) 
 	if err != nil {
 		return err
 	}
-	result := db.Model(&existingUser).Where("username = ?", username).Updates(agency)
+
+	result := db.Model(&existingUser).Updates(agency)
 	return result.Error
 }
 

@@ -75,6 +75,7 @@ func UpdateTouristByUsername(c *gin.Context) {
 	user.Role = "Tourist"
 
 	tourist := models.ToTourist(payload)
+	tourist.Username = username
 
 	err := database.UpdateUserByUsername(username, user, tx)
 	if err != nil {

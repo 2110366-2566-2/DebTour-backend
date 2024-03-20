@@ -61,28 +61,32 @@ func ToTouristWithUser(tourist Tourist, user User) TouristWithUser {
 
 func ToTouristWithUserAndToken(touristWithUser TouristWithUser, token string) TouristWithUserAndToken {
 	return TouristWithUserAndToken{
-		Username:  touristWithUser.Username,
-		Phone:     touristWithUser.Phone,
-		Email:     touristWithUser.Email,
-		Image:     touristWithUser.Image,
-		Role:      touristWithUser.Role,
-		CitizenId: touristWithUser.CitizenId,
-		FirstName: touristWithUser.FirstName,
-		LastName:  touristWithUser.LastName,
-		Address:   touristWithUser.Address,
-		BirthDate: touristWithUser.BirthDate,
-		Token:     token,
+		Username:       touristWithUser.Username,
+		Phone:          touristWithUser.Phone,
+		Email:          touristWithUser.Email,
+		Image:          touristWithUser.Image,
+		Role:           touristWithUser.Role,
+		CitizenId:      touristWithUser.CitizenId,
+		FirstName:      touristWithUser.FirstName,
+		LastName:       touristWithUser.LastName,
+		Address:        touristWithUser.Address,
+		BirthDate:      touristWithUser.BirthDate,
+		Gender:         touristWithUser.Gender,
+		DefaultPayment: touristWithUser.DefaultPayment,
+		Token:          token,
 	}
 }
 
 func ToTourist(touristWithUser TouristWithUser) Tourist {
 	return Tourist{
-		Username:  touristWithUser.Username,
-		CitizenId: touristWithUser.CitizenId,
-		FirstName: touristWithUser.FirstName,
-		LastName:  touristWithUser.LastName,
-		Address:   touristWithUser.Address,
-		BirthDate: touristWithUser.BirthDate,
+		Username:       touristWithUser.Username,
+		CitizenId:      touristWithUser.CitizenId,
+		FirstName:      touristWithUser.FirstName,
+		LastName:       touristWithUser.LastName,
+		Address:        touristWithUser.Address,
+		BirthDate:      touristWithUser.BirthDate,
+		Gender:         touristWithUser.Gender,
+		DefaultPayment: touristWithUser.DefaultPayment,
 	}
 }
 
