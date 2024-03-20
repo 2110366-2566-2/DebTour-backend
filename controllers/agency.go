@@ -54,10 +54,11 @@ func GetAgencyWithUserByUsername(c *gin.Context) {
 // @Tags agencies
 // @Accept json
 // @Produce json
+// @Param username path string true "Username"
 // @Param agency body models.AgencyWithCompanyInformation true "Agency"
 // @Security ApiKeyAuth
 // @Success 200 {object} models.AgencyWithCompanyInformation
-// @Router /agencies [put]
+// @Router /agencies/{username} [put]
 func UpdateAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	username := c.Param("username")
@@ -73,11 +74,23 @@ func UpdateAgency(c *gin.Context) {
 	user.Role = "Agency"
 
 	agency := models.ToAgency(payload)
+	agency.Username = username
+	//get agency by username
+	agencyByUsername, err := database.GetAgencyByUsername(username, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	agency.AuthorizeStatus = agencyByUsername.AuthorizeStatus
+	agency.AuthorizeAdminUsername = agencyByUsername.AuthorizeAdminUsername
+	agency.ApproveTime = agencyByUsername.ApproveTime
 
 	image := payload.CompanyInformation
 
 	// Now you can access agencyWithUser.User and agencyWithUser.Agency
-	err := database.UpdateUserByUsername(username, user, tx)
+	err = database.UpdateUserByUsername(username, user, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})

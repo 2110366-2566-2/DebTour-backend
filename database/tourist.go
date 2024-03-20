@@ -52,6 +52,8 @@ func UpdateTouristByUsername(username string, tourist models.Tourist, db *gorm.D
 	if err != nil {
 		return err
 	}
-	result := db.Model(&existingUser).Where("username = ?", username).Updates(tourist)
+	existingTourist := models.ToTourist(existingUser)
+	//update tourist
+	result := db.Model(&existingTourist).Updates(tourist)
 	return result.Error
 }
