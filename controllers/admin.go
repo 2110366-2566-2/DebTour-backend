@@ -37,19 +37,27 @@ func VerifyAgency(c *gin.Context) {
 	agency, err := database.GetAgencyByUsername(verifyAgency.Username, database.MainDB)
 	if err != nil {
 		tx.Rollback()
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get agency"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to get agency"})
 		return
 	}
 
 	agency.AuthorizeAdminUsername = adminUsername
-	agency.AuthorizeStatus = verifyAgency.AuthorizeStatus
+	agency.AuthorizeStatus = verifyAgency.Status
+
+	//check if authorizestatus is "Approved" and "Unapproved" , else reject invalid format
+	if agency.AuthorizeStatus != "Approved" && agency.AuthorizeStatus != "Unapproved" {
+		tx.Rollback()
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid AuthorizeStatus"})
+		return
+	}
+
 	tim := time.Now()
 	agency.ApproveTime = &tim
 
 	err = database.UpdateAgencyByUsername(agencyUsername, agency, database.MainDB)
 	if err != nil {
 		tx.Rollback()
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update agency"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to update agency"})
 		return
 	}
 
