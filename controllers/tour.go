@@ -118,7 +118,9 @@ func CreateTour(c *gin.Context) {
 		return
 	}
 
-	tour, err := models.ToTour(tourWithActivitiesWithLocationWithImagesRequest, 0, "dummyAgency")
+	agencyUsername := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
+
+	tour, err := models.ToTour(tourWithActivitiesWithLocationWithImagesRequest, 0, agencyUsername)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		tx.Rollback()
@@ -246,6 +248,7 @@ func DeleteTour(c *gin.Context) {
 // @ID FilterTours
 // @Produce json
 // @Param name query string false "Name"
+// @Param agencyUsername query string false "Agency username"
 // @Param startDate query string false "Start date"
 // @Param endDate query string false "End date"
 // @Param overviewLocation query string false "Overview location"
@@ -263,6 +266,7 @@ func DeleteTour(c *gin.Context) {
 // @Router /tours/filter [get]
 func FilterTours(c *gin.Context) {
 	name := c.Query("name")
+	agencyUsername := c.Query("agencyUsername")
 	startDate := c.Query("startDate")
 	endDate := c.Query("endDate")
 	overviewLocation := c.Query("overviewLocation")
@@ -281,6 +285,9 @@ func FilterTours(c *gin.Context) {
 		name = "%"
 	} else {
 		name = "%" + name + "%"
+	}
+	if agencyUsername == "" {
+		agencyUsername = "%"
 	}
 	if overviewLocation == "" {
 		overviewLocation = "%"
@@ -342,7 +349,11 @@ func FilterTours(c *gin.Context) {
 	}
 	//fmt.Println(maxMemberCountFrom, maxMemberCountTo)
 
-	tours, err := database.FilterTours(name, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
+	tours, err := database.FilterTours(name, agencyUsername, startDate, endDate, overviewLocation, memberCountFrom, memberCountTo, maxMemberCountFrom, maxMemberCountTo, availableMemberCountFrom, availableMemberCountTo, priceFrom, priceTo, offsetInt, limitInt, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
 
 	var filteredToursResponse []models.FilteredToursResponse
 	for _, tour := range tours {
@@ -425,7 +436,6 @@ func UpdateTourActivities(c *gin.Context) {
 // @router /tours/activities/{id} [post]
 func CreateTourActivities(c *gin.Context) {
 	tx := database.MainDB.Begin()
-
 	tourId, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {

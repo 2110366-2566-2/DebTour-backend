@@ -37,7 +37,9 @@ func GetTourImages(c *gin.Context) {
 		imagesResponse.Images = append(imagesResponse.Images, image)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": imagesResponse})
+	imagesCount := len(imagesResponse.Images)
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": imagesResponse, "count": imagesCount})
 }
 
 // CreateTourImagesByTourId godoc
