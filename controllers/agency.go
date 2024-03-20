@@ -69,6 +69,7 @@ func UpdateAgency(c *gin.Context) {
 	}
 
 	user := models.ToUserFromAgencyWithCompanyInformation(payload)
+	user.Username = username
 	user.Role = "Agency"
 
 	agency := models.ToAgency(payload)
