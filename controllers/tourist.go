@@ -71,6 +71,7 @@ func UpdateTouristByUsername(c *gin.Context) {
 	}
 
 	user := models.ToUserFromTouristWithUser(payload)
+	user.Username = username
 	user.Role = "Tourist"
 
 	tourist := models.ToTourist(payload)
