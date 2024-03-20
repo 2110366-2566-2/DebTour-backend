@@ -8,15 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//create function for get all agencies
-
 // GetAllAgencies godoc
 // @Summary Get all agencies
 // @Description Get all agencies
+// @description Role allowed: "Admin"
 // @Tags agencies
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} models.Agency
+// @Success 200 {array} models.AgencyWithUser
 // @Router /agencies [get]
 func GetAllAgencies(c *gin.Context) {
 	agencies, err := database.GetAllAgencies(database.MainDB)
@@ -24,68 +23,57 @@ func GetAllAgencies(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(agencies), "data": agencies})
 }
 
-//create function for get agency by username
-
-// GetAgencyByUsername godoc
-// @Summary Get agency by username
-// @Description Get agency by username
+// GetAgencyWithUserByUsername godoc
+// @Summary Get agency with user by username
+// @Description Get agency with user by username
+// @description Role allowed: "Admin"
 // @Tags agencies
 // @Produce json
 // @Param username path string true "Username"
 // @Security ApiKeyAuth
-// @Success 200 {object} models.Agency
+// @Success 200 {object} models.AgencyWithUser
 // @Router /agencies/{username} [get]
-func GetAgencyByUsername(c *gin.Context) {
+func GetAgencyWithUserByUsername(c *gin.Context) {
 	username := c.Param("username")
-	agency, err := database.GetAgencyByUsername(username, database.MainDB)
+	agencyWithUser, err := database.GetAgencyWithUserByUsername(username, database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agency})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithUser})
 }
-
-//create function for update agency
 
 // UpdateAgency godoc
 // @Summary Update a agency
 // @Description Update a agency
+// @description Role allowed: "Admin" and "AgencyThemselves"
 // @Tags agencies
 // @Accept json
 // @Produce json
-// @Param agency body models.Agency true "Agency"
+// @Param agency body models.AgencyWithCompanyInformation true "Agency"
 // @Security ApiKeyAuth
-// @Success 200 {object} models.Agency
+// @Success 200 {object} models.AgencyWithCompanyInformation
 // @Router /agencies [put]
 func UpdateAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	username := c.Param("username")
-	var payload models.AgencyWithUser
+	var payload models.AgencyWithCompanyInformation
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	var user models.User
-	// Populate user fields from payload
-	user.Username = payload.Username
-	user.Phone = payload.Phone
-	user.Email = payload.Email
-	user.Image = payload.Image
+	user := models.ToUserFromAgencyWithCompanyInformation(payload)
 	user.Role = "Agency"
 
-	var agency models.Agency
-	agency.Username = payload.Username
-	agency.AgencyName = payload.AgencyName
-	agency.LicenseNo = payload.LicenseNo
-	agency.BankAccount = payload.BankAccount
-	agency.AuthorizeAdminId = payload.AuthorizeAdminId
-	agency.AuthorizeStatus = payload.AuthorizeStatus
-	agency.ApproveTime = payload.ApproveTime
+	agency := models.ToAgency(payload)
+
+	image := payload.CompanyInformation
 
 	// Now you can access agencyWithUser.User and agencyWithUser.Agency
 	err := database.UpdateUserByUsername(username, user, tx)
@@ -103,62 +91,9 @@ func UpdateAgency(c *gin.Context) {
 	}
 
 	// Create combined data
-	data := gin.H{
-		"username":         user.Username,
-		"phone":            user.Phone,
-		"email":            user.Email,
-		"image":            user.Image,
-		"role":             user.Role,
-		"agencyName":       agency.AgencyName,
-		"licenseNo":        agency.LicenseNo,
-		"bankAccount":      agency.BankAccount,
-		"authorizeAdminId": agency.AuthorizeAdminId,
-		"authorizeStatus":  agency.AuthorizeStatus,
-		"approveTime":      agency.ApproveTime,
-	}
+	agencyWithCompanyInformation := models.ToAgencyWithCompanyInformation(agency, user, image)
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithCompanyInformation})
 	tx.Commit()
 
-}
-
-//create function for delete agency
-
-// DeleteAgency godoc
-// @Summary Delete a agency
-// @Description Delete a agency
-// @Tags agencies
-// @Accept json
-// @Produce json
-// @Param agency body models.Agency true "Agency"
-// @Security ApiKeyAuth
-// @Success 200 {object} models.Agency
-// @Router /agencies [delete]
-func DeleteAgency(c *gin.Context) {
-	tx := database.MainDB.Begin()
-	username := c.Param("username")
-	//check if user exist
-	_, err := database.GetUserByUsername(username, tx)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	err = database.DeleteUserByUsername(username, tx)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	err = database.DeleteAgencyByUsername(username, tx)
-	if err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Agency deleted successfully"})
-	tx.Commit()
 }

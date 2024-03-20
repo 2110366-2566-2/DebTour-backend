@@ -165,6 +165,7 @@ func GetProfile(c *gin.Context) {
 // HandleGoogleLogout godoc
 // @Summary Handle Logout
 // @Description Handle Logout
+// @description Role allowed: "Admin", "Agency" and "Tourist"
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -189,8 +190,10 @@ func HandleGoogleLogout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
+// Login godoc
 // @Summary First contact
 // @Description First contact of user when login to the system
+// @description Role allowed: everyone
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -259,4 +262,23 @@ func GetUsername(c *gin.Context) {
 	claims := token.Claims.(jwt.MapClaims)
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username :", claims["username"].(string))
 	c.JSON(http.StatusOK, gin.H{"success": true, "username": claims["username"].(string)})
+}
+
+func GetUsernameByToken(tokenS string) string {
+	token, err := JWTAuthService().ValidateToken(tokenS)
+	if !token.Valid {
+		return err.Error()
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	return claims["username"].(string)
+}
+
+func GetUsernameByTokenWithBearer(tokenWithBearer string) string {
+	const BEARER_SCHEMA = "Bearer "
+	token, err := JWTAuthService().ValidateToken(tokenWithBearer[len(BEARER_SCHEMA):])
+	if !token.Valid {
+		return err.Error()
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	return claims["username"].(string)
 }

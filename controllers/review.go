@@ -11,6 +11,7 @@ import (
 // GetAllReviews godoc
 // @Summary Get all reviews
 // @Description Get all reviews
+// @description Role allowed: "Admin"
 // @tags reviews
 // @Produce  json
 // @Security ApiKeyAuth
@@ -29,6 +30,7 @@ func GetAllReviews(c *gin.Context) {
 // GetReviewById godoc
 // @Summary Get review by id
 // @Description Get review by id
+// @description Role allowed: everyone
 // @tags reviews
 // @Produce  json
 // @Param id path int true "Review ID"
@@ -52,6 +54,7 @@ func GetReviewById(c *gin.Context) {
 // GetReviewsByTourId godoc
 // @Summary Get reviews by tour id
 // @Description Get reviews by tour id
+// @description Role allowed: everyone
 // @tags reviews
 // @Produce  json
 // @Param id path int true "Tour ID"
@@ -75,6 +78,7 @@ func GetReviewsByTourId(c *gin.Context) {
 // GetAverageRatingByTourId godoc
 // @Summary Get average rating by tour id
 // @Description Get average rating by tour id
+// @description Role allowed: everyone
 // @tags reviews
 // @Produce  json
 // @Param id path int true "Tour ID"
@@ -112,6 +116,7 @@ func GetAverageRatingByTourId(c *gin.Context) {
 // GetReviewsByTouristUsername godoc
 // @Summary Get reviews by tourist username
 // @Description Get reviews by tourist username
+// @description Role allowed: "Admin" and "TouristThemselves"
 // @tags reviews
 // @Produce  json
 // @Param username path string true "Tourist Username"
@@ -131,6 +136,7 @@ func GetReviewsByTouristUsername(c *gin.Context) {
 // CreateReview godoc
 // @Summary Create a review
 // @Description Create a review
+// @description Role allowed: "Tourist"
 // @tags reviews
 // @Accept  json
 // @Produce  json
@@ -165,6 +171,7 @@ func CreateReview(c *gin.Context) {
 // DeleteReview godoc
 // @Summary Delete a review
 // @Description Delete a review
+// @description Role allowed: "Admin"
 // @tags reviews
 // @Produce  json
 // @Param id path int true "Review ID"
@@ -190,6 +197,7 @@ func DeleteReview(c *gin.Context) {
 // DeleteReviewsByTourId godoc
 // @Summary Delete reviews by tour id
 // @Description Delete reviews by tour id
+// @description Role allowed: "Admin" and "AgencyOwner"
 // @tags reviews
 // @Produce  json
 // @Param id path int true "Tour ID"
@@ -215,6 +223,7 @@ func DeleteReviewsByTourId(c *gin.Context) {
 // DeleteReviewsByTouristUsername godoc
 // @Summary Delete reviews by tourist username
 // @Description Delete reviews by tourist username
+// @description Role allowed: "Admin" and "TouristThemselves"
 // @tags reviews
 // @Produce  json
 // @Param username path string true "Tourist Username"

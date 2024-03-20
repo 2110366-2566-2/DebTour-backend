@@ -20,10 +20,10 @@ type LocationRequest struct {
 func ToLocation(locationRequest LocationRequest, locationId uint) Location {
 	return Location{
 		LocationId: locationId,
-		Name:      locationRequest.Name,
-		Latitude:  locationRequest.Latitude,
-		Longitude: locationRequest.Longitude,
-		Type:      locationRequest.Type,
-		Address:   locationRequest.Address,
+		Name:       locationRequest.Name,
+		Latitude:   locationRequest.Latitude,
+		Longitude:  locationRequest.Longitude,
+		Type:       locationRequest.Type,
+		Address:    locationRequest.Address,
 	}
 }

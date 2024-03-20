@@ -2,7 +2,7 @@ package models
 
 type TourImage struct {
 	TourId uint   `gorm:"foreignKey;not null" json:"tourId"`
-	Image	[]byte `gorm:"type:bytea;not null" json:"image"`
+	Image  []byte `gorm:"type:bytea;not null" json:"image"`
 }
 
 type TourImagesRequest struct {

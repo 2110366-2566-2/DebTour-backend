@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
 // GetAllUsers godoc
 // @summary Get all users
 // @description Get all users
+// @description Role allowed: "Admin"
 // @tags users
 // @id GetAllUsers
 // @produce json
@@ -31,6 +31,7 @@ func GetAllUsers(c *gin.Context) {
 // GetUserByUsername godoc
 // @summary Get user by username
 // @description Get user by username
+// @description Role allowed: "Admin"
 // @tags users
 // @id GetUserByUsername
 // @produce json
@@ -79,88 +80,66 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 }
 
-// DeleteUser godoc
-// @summary Delete a user
-// @description Delete a user
+// DeleteUserByUsername godoc
+// @summary Delete user by username
+// @description Delete user by username
+// @description Role allowed: "Admin"
 // @tags users
-// @id DeleteUser
+// @id DeleteUserByUsername
 // @param username path string true "Username"
 // @produce json
-// @response 200 {string} string "User deleted"
+// @Security ApiKeyAuth
+// @success 200 {string} string "User deleted successfully"
 // @router /users/{username} [delete]
 func DeleteUserByUsername(c *gin.Context) {
+	tx := database.MainDB.Begin()
 	// Extract the username from the URL path parameters
 	username := c.Param("username")
 	//check if user exist
 	_, err := database.GetUserByUsername(username, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
 		return
 	}
-	// Delete the user by username
+	// Delete the user by username in Tourist table
+	err = database.DeleteTouristByUsername(username, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	// Delete company information by username in CompanyInformation table
+	err = database.DeleteCompanyInformationByAgencyUsername(username, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	// Delete the user by username in Agency table
+	err = database.DeleteAgencyByUsername(username, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	// Delete the user by username in User table
 	err = database.DeleteUserByUsername(username, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User deleted successfully"})
-}
-
-// UpdateUser godoc
-// @summary Update a user
-// @description Update a user
-// @tags users
-// @id UpdateUser
-// @accept json
-// @produce json
-// @param username path string true "Username"
-// @param user body models.User true "User"
-// @response 200 {string} string "User updated"
-// @router /users/{username} [put]
-// func UpdateUser(c *gin.Context) {
-// 	var user models.User
-// 	if err := c.ShouldBindJSON(&user); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	err := database.UpdateUser(&user, database.MainDB)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
-// }
-
-func UpdateUserByUsername(c *gin.Context) {
-	// Extract the username from the URL path parameters
-	username := c.Param("username")
-
-	// Bind the request body to a user struct
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	//get user by username check if username exists
-	_, err := database.GetUserByUsername(username, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
-		return
-	}
-
-	// Call the database function to update the user
-	err = database.UpdateUserByUsername(username, user, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User updated successfully"})
 }
 
 // GetMe godoc
 // @Summary Get user info
 // @Description Get user info
+// @description Role allowed: "Admin", "Agency" and "Tourist"
 // @Tags users
 // @Accept json
 // @Produce json
@@ -169,43 +148,8 @@ func UpdateUserByUsername(c *gin.Context) {
 // @Success 200 {object} models.AgencyWithUser
 // @Router /getMe [get]
 func GetMe(c *gin.Context) {
-	//middleware + token validate section
-	//CheckToken is function for checking token whether it is valid or not
-	//call CheckToken
-	// err := CheckToken(c)
-	// if err != nil {
-	// 	if err.Error() == "Authorization header is missing" {
-	// 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Authorization header is missing"})
-	// 		return
-	// 	}
-	// 	if err.Error() == "Invalid authorization format" {
-	// 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"success": false, "error": "Invalid authorization format"})
-	// 		return
-	// 	}
-	// 	if err.Error() == "User is logged out" {
-	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "User is logged out"})
-	// 		return
-	// 	}
-	// 	if err.Error() == "Invalid token" {
-	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid token"})
-	// 		return
-	// 	}
-	// }
-	const BEARER_SCHEMA = "Bearer "
 	authHeader := c.GetHeader("Authorization")
-	if authHeader == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
-		return
-	}
-	tokenString := authHeader[len(BEARER_SCHEMA):]
-	token, err := JWTAuthService().ValidateToken(tokenString)
-	if !token.Valid {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	claims := token.Claims.(jwt.MapClaims)
-	username := claims["username"].(string)
-	//middleware + token validate section
+	username := GetUsernameByTokenWithBearer(authHeader)
 
 	user, err := database.GetUserByUsername(username, database.MainDB)
 	if err != nil {
@@ -214,45 +158,23 @@ func GetMe(c *gin.Context) {
 	}
 
 	if user.Role == "Tourist" {
-		var data models.TouristWithUser
-		tourist, err := database.GetTouristByUsername(username, database.MainDB)
+		touristWithUser, err := database.GetTouristByUsername(username, database.MainDB)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 			return
 		}
-		data.Username = user.Username
-		data.Phone = user.Phone
-		data.Email = user.Email
-		data.Image = user.Image
-		data.Role = user.Role
-		data.CitizenId = tourist.CitizenId
-		data.FirstName = tourist.FirstName
-		data.LastName = tourist.LastName
-		data.Address = tourist.Address
-		data.BirthDate = tourist.BirthDate
-		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": touristWithUser})
 		return
 	}
 
 	if user.Role == "Agency" {
-		var data models.AgencyWithUser
-		agency, err := database.GetAgencyByUsername(username, database.MainDB)
+		agencyWithUser, err := database.GetAgencyWithUserByUsername(username, database.MainDB)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 			return
 		}
-		data.Username = user.Username
-		data.Phone = user.Phone
-		data.Email = user.Email
-		data.Image = user.Image
-		data.Role = user.Role
-		data.AgencyName = agency.AgencyName
-		data.LicenseNo = agency.LicenseNo
-		data.BankAccount = agency.BankAccount
-		data.AuthorizeAdminId = agency.AuthorizeAdminId
-		data.AuthorizeStatus = agency.AuthorizeStatus
-		data.ApproveTime = agency.ApproveTime
-		c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
+
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithUser})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": false, "error": "record not found"})

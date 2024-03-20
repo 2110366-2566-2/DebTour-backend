@@ -67,7 +67,7 @@ func CreateTour(tour *models.Tour, activitiesWithLocationRequest []models.Activi
 		}
 		tourImage := models.TourImage{
 			TourId: tour.TourId,
-			Image: image,
+			Image:  image,
 		}
 		err = CreateTourImage(&tourImage, tx)
 

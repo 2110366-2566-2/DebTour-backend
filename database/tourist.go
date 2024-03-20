@@ -6,31 +6,48 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetTouristByUsername(username string, db *gorm.DB) (models.Tourist, error) {
+func GetTouristByUsername(username string, db *gorm.DB) (touristWithUser models.TouristWithUser, err error) {
 	var tourist models.Tourist
 	result := db.Model(&models.Tourist{}).Where("username = ?", username).First(&tourist)
 
-	return tourist, result.Error
+	user, err := GetUserByUsername(username, db)
+
+	if err != nil {
+		return touristWithUser, err
+	}
+
+	touristWithUser = models.ToTouristWithUser(tourist, user)
+
+	return touristWithUser, result.Error
 }
 
-func CreateTourist(tourist *models.Tourist, db *gorm.DB) error {
+func CreateTourist(tourist *models.Tourist, db *gorm.DB) (err error) {
 	result := db.Model(&models.Tourist{}).Create(tourist)
 	return result.Error
 }
 
-func GetAllTourists(db *gorm.DB) ([]models.Tourist, error) {
+func GetAllTourists(db *gorm.DB) (touristsWithUser []models.TouristWithUser, err error) {
 	var tourists []models.Tourist
 	result := db.Model(&models.Tourist{}).Find(&tourists)
-	return tourists, result.Error
+
+	for _, tourist := range tourists {
+		user, err := GetUserByUsername(tourist.Username, db)
+		if err != nil {
+			return touristsWithUser, err
+		}
+		touristsWithUser = append(touristsWithUser, models.ToTouristWithUser(tourist, user))
+	}
+
+	return touristsWithUser, result.Error
 }
 
 // func delete tourist by username and db
-func DeleteTouristByUsername(username string, db *gorm.DB) error {
+func DeleteTouristByUsername(username string, db *gorm.DB) (err error) {
 	result := db.Model(&models.Tourist{}).Where("username = ?", username).Delete(&models.Tourist{})
 	return result.Error
 }
 
-func UpdateTouristByUsername(username string, tourist models.Tourist, db *gorm.DB) error {
+func UpdateTouristByUsername(username string, tourist models.Tourist, db *gorm.DB) (err error) {
 	existingUser, err := GetTouristByUsername(username, db)
 	if err != nil {
 		return err

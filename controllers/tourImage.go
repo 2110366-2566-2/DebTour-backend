@@ -12,6 +12,7 @@ import (
 // GetTourImages godoc
 // @Summary Get tour images
 // @Description Get tour images
+// @description Role allowed: everyone
 // @Tags tour-images
 // @Produce json
 // @Param id path int true "Tour ID"
@@ -44,6 +45,7 @@ func GetTourImages(c *gin.Context) {
 // CreateTourImagesByTourId godoc
 // @Summary Create tour images
 // @Description Create tour images
+// @description Role allowed: "AgencyOwner"
 // @Tags tour-images
 // @Accept json
 // @Produce json
@@ -87,6 +89,7 @@ func CreateTourImagesByTourId(c *gin.Context) {
 // DeleteTourImagesByTourId godoc
 // @Summary Delete tour image
 // @Description Delete tour images
+// @description Role allowed: "Admin" and "AgencyOwner"
 // @Tags tour-images
 // @Produce json
 // @Param id path int true "Tour ID"
