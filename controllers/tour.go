@@ -118,7 +118,9 @@ func CreateTour(c *gin.Context) {
 		return
 	}
 
-	tour, err := models.ToTour(tourWithActivitiesWithLocationWithImagesRequest, 0, "dummyAgency")
+	agencyUsername := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
+
+	tour, err := models.ToTour(tourWithActivitiesWithLocationWithImagesRequest, 0, agencyUsername)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		tx.Rollback()

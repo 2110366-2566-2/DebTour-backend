@@ -27,6 +27,9 @@ func JoinTour(c *gin.Context) {
 		return
 	}
 
+	touristUsername := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
+	joinTourRequest.TouristUsername = touristUsername;
+
 	tour, err := database.GetTourByTourId(int(joinTourRequest.TourId), database.MainDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})

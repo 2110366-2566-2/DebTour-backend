@@ -158,6 +158,9 @@ func CreateReview(c *gin.Context) {
 		return
 	}
 
+	touristUsername := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
+	reviewRequest.TouristUsername = touristUsername
+
 	review := reviewRequest.ToReview(uint(tourId))
 	err = database.CreateReview(review, database.MainDB)
 	if err != nil {
