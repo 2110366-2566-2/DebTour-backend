@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"DebTour/database"
+	"DebTour/models"
 	"net/http"
 	"time"
 
@@ -14,28 +15,37 @@ import (
 // @description Role allowed: "Admin"
 // @tags admin
 // @id ApproveAgency
-// @param username path string true "Agency Username"
 // @Security ApiKeyAuth
 // @produce json
-// @success 200 {object} models.AgencyWithCompanyInformation
+// @param verifyagency body models.VerifyAgency true "VerifyAgency"
+// @success 200 {object} string "Approved/Unapprved by Admin : adminusername"
 // @router /agencies/verify/{username} [put]
-func ApproveAgency(c *gin.Context) {
+func VerifyAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
-	agencyUsername := c.Param("username")
-	tokenS := c.GetHeader("Authorization")
-	const BEARER_SCHEMA = "Bearer "
-	tokenS = tokenS[len(BEARER_SCHEMA):]
-	adminUsername := GetUsernameByToken(tokenS)
-	agency, err := database.GetAgencyByUsername(agencyUsername, database.MainDB)
-	if err != nil {
+	//get username from token with bearer
+	authHeader := c.GetHeader("Authorization")
+	adminUsername := GetUsernameByTokenWithBearer(authHeader)
+	verifyAgency := models.VerifyAgency{}
+	if err := c.ShouldBindJSON(&verifyAgency); err != nil {
 		tx.Rollback()
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Agency not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	agency.AuthorizeStatus = "Approved"
+
+	agencyUsername := verifyAgency.Username
+
+	agency, err := database.GetAgencyByUsername(verifyAgency.Username, database.MainDB)
+	if err != nil {
+		tx.Rollback()
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get agency"})
+		return
+	}
+
 	agency.AuthorizeAdminUsername = adminUsername
+	agency.AuthorizeStatus = verifyAgency.AuthorizeStatus
 	tim := time.Now()
 	agency.ApproveTime = &tim
+
 	err = database.UpdateAgencyByUsername(agencyUsername, agency, database.MainDB)
 	if err != nil {
 		tx.Rollback()
@@ -43,13 +53,6 @@ func ApproveAgency(c *gin.Context) {
 		return
 	}
 
-	//create agencyWithCompanyInformation by agency username
-	agencyWithCompanyInformation, err := database.GetAgencyWithCompanyInformationByUsername(agencyUsername, database.MainDB)
-	if err != nil {
-		tx.Rollback()
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get company information"})
-		return
-	}
 	tx.Commit()
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithCompanyInformation})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": agency.AuthorizeStatus + " by Admin : " + adminUsername})
 }

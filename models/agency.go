@@ -61,6 +61,18 @@ type AgencyWithCompanyInformationAndToken struct {
 	Token                  string     `json:"token"`
 }
 
+type AuthorizeStatus string
+
+const (
+	Approved   AuthorizeStatus = "Approved"
+	Unapproved AuthorizeStatus = "Unapproved"
+)
+
+type VerifyAgency struct {
+	Username        string `json:"username"`
+	AuthorizeStatus string `json:"authorizeStatus"`
+}
+
 func ToAgencyWithUser(agency Agency, user User) AgencyWithUser {
 	return AgencyWithUser{
 		Username:               user.Username,
