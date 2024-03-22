@@ -155,45 +155,54 @@ func CreateTour(c *gin.Context) {
 // @accept json
 // @produce json
 // @param id path int true "Tour ID"
-// @param tour body models.Tour true "Tour"
+// @param tour body models.TourWithImagesRequest true "Tour"
 // @Security ApiKeyAuth
 // @success 200 {object} string
 // @router /tours/{id} [put]
 func UpdateTour(c *gin.Context) {
-
+	tx := database.MainDB.Begin()
 	tourId, err := strconv.Atoi(c.Param("id"))
 
 	// check if tour exists
-	if _, err := database.GetTourByTourId(tourId, database.MainDB); err != nil {
+	tour, err := database.GetTourByTourId(tourId, tx)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
 		return
 	}
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+	// Bind the input JSON data to the tourWithImagesRequest struct
+	var tourWithImagesRequest models.TourWithImagesRequest
+	if err := c.ShouldBindJSON(&tourWithImagesRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	tour, err := database.GetTourByTourId(tourId, database.MainDB)
-
+	// Update the tour with the input JSON data
+	tour, err = models.ToTourFromTourWithImagesRequest(tourWithImagesRequest, uint(tourId), tour.AgencyUsername)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
-	if err := c.ShouldBindJSON(&tour); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+	err = database.UpdateTour(&tour, tx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
-	tour.TourId = uint(tourId)
 
-	err = database.UpdateTour(&tour, database.MainDB)
+	// Update Images
+	err = database.UpdateTourImagesByTourId(uint(tourId), tourWithImagesRequest.Images, tx)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		tx.Rollback()
 		return
 	}
 
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Tour updated successfully"})
 }
 
