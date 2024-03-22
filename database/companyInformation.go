@@ -31,26 +31,11 @@ func CreateCompanyInformation(companyInformation *models.CompanyInformation, db 
 }
 
 func DeleteCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (err error) {
-	//check if agency exists
-	_, err = GetAgencyByUsername(agencyUsername, db)
-	if err != nil {
-		return err
-	}
+	db.SavePoint("BeforeDeleteCompanyInformation")
 
 	err = db.Where("username = ?", agencyUsername).Delete(&models.CompanyInformation{}).Error
 	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func UpdateCompanyInformationByAgencyUsername(agencyUsername string, companyInformation models.CompanyInformation, db *gorm.DB) (err error) {
-	existingCompanyInformation, err := GetCompanyInformationByAgencyUsername(agencyUsername, db)
-	if err != nil {
-		return err
-	}
-	err = db.Model(&existingCompanyInformation).Where("username = ?", agencyUsername).Updates(companyInformation).Error
-	if err != nil {
+		db.RollbackTo("BeforeDeleteCompanyInformation")
 		return err
 	}
 	return nil

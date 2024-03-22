@@ -96,22 +96,24 @@ func DeleteUserByUsername(c *gin.Context) {
 	// Extract the username from the URL path parameters
 	username := c.Param("username")
 	//check if user exist
-	_, err := database.GetUserByUsername(username, database.MainDB)
+	_, err := database.GetUserByUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
 		return
 	}
 	// Delete the user by username in Tourist table
-	err = database.DeleteTouristByUsername(username, database.MainDB)
+	fmt.Println("Before delete tourist")
+	err = database.DeleteTouristByUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	fmt.Println("After delete tourist")
 
 	// Delete company information by username in CompanyInformation table
-	err = database.DeleteCompanyInformationByAgencyUsername(username, database.MainDB)
+	err = database.DeleteCompanyInformationByAgencyUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -119,14 +121,18 @@ func DeleteUserByUsername(c *gin.Context) {
 	}
 
 	// Delete the user by username in Agency table
-	err = database.DeleteAgencyByUsername(username, database.MainDB)
+	fmt.Println("Before delete Agency")
+
+	err = database.DeleteAgencyByUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+	fmt.Println("After delete Agency")
+
 	// Delete the user by username in User table
-	err = database.DeleteUserByUsername(username, database.MainDB)
+	err = database.DeleteUserByUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})

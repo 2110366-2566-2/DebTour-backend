@@ -59,7 +59,8 @@ func GetAgencyWithUserByUsername(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Success 200 {object} models.AgencyWithCompanyInformation
 // @Router /agencies/{username} [put]
-func UpdateAgency(c *gin.Context) {
+func UpdateAgencyByUsername(c *gin.Context) {
+	//this function updates user, agency and company information
 	tx := database.MainDB.Begin()
 	username := c.Param("username")
 	var payload models.AgencyWithCompanyInformation
@@ -76,7 +77,7 @@ func UpdateAgency(c *gin.Context) {
 	agency := models.ToAgency(payload)
 	agency.Username = username
 	//get agency by username
-	agencyByUsername, err := database.GetAgencyByUsername(username, database.MainDB)
+	agencyByUsername, err := database.GetAgencyByUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})

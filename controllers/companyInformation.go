@@ -2,8 +2,7 @@ package controllers
 
 import (
 	"DebTour/database"
-	"DebTour/models"
-	//"encoding/base64"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +14,7 @@ import (
 // @description Role allowed: "Admin" and "AgencyThemselves"
 // @Tags company-informations
 // @Produce json
+// @Security ApiKeyAuth
 // @Param username path string true "Agency Username"
 // @Success 200 {object} models.CompanyInformationResponse "Company information"
 // @Router /agencies/companyInformation/{username} [get]
@@ -26,8 +26,6 @@ func GetCompanyInformationByAgencyUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	companyInfoResponse := models.CompanyInformationResponse{}
-	companyInfoResponse.Username = agencyUsername
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": companyInformation})
 }
@@ -56,17 +54,21 @@ func GetAllAgenciesWithCompanyInformation(c *gin.Context) {
 // @description Role allowed: "Admin" and "AgencyThemselves"
 // @Tags company-informations
 // @Produce json
+// @Security ApiKeyAuth
 // @Param username path string true "Agency Username"
 // @Success 200 {string} string "Company information deleted successfully"
 // @Router /agencies/companyInformation/{username} [delete]
 func DeleteCompanyInformationByAgencyUsername(c *gin.Context) {
+	tx := database.MainDB.Begin()
 	agencyUsername := c.Param("username")
 
-	err := database.DeleteCompanyInformationByAgencyUsername(agencyUsername, database.MainDB)
+	err := database.DeleteCompanyInformationByAgencyUsername(agencyUsername, tx)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Company information deleted successfully"})
 }

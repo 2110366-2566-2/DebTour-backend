@@ -22,7 +22,12 @@ func GetTouristByUsername(username string, db *gorm.DB) (touristWithUser models.
 }
 
 func CreateTourist(tourist *models.Tourist, db *gorm.DB) (err error) {
+	db.SavePoint("BeforeCreateTourist")
 	result := db.Model(&models.Tourist{}).Create(tourist)
+	if result.Error != nil {
+		db.RollbackTo("BeforeCreateTourist")
+		return result.Error
+	}
 	return result.Error
 }
 

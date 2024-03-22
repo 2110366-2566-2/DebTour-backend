@@ -13,7 +13,12 @@ func GetUserByUsername(username string, db *gorm.DB) (models.User, error) {
 }
 
 func CreateUser(user *models.User, db *gorm.DB) error {
+	db.SavePoint("BeforeCreateUser")
 	result := db.Model(&models.User{}).Create(user)
+	if result.Error != nil {
+		db.RollbackTo("BeforeCreateUser")
+		return result.Error
+	}
 	return result.Error
 }
 
@@ -29,13 +34,6 @@ func DeleteUserByUsername(username string, db *gorm.DB) error {
 }
 
 func UpdateUserByUsername(username string, user models.User, db *gorm.DB) error {
-	// Check if the user record exists
-	existingUser, err := GetUserByUsername(username, db)
-	if err != nil {
-		return err
-	}
-
-	// Update the fields of the existing user record with the values from the provided user struct
-	result := db.Model(&existingUser).Updates(user)
+	result := db.Model(&models.User{}).Where("username = ?", username).Updates(user)
 	return result.Error
 }
