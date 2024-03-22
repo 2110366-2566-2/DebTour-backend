@@ -20,18 +20,20 @@ func GetCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (
 }
 
 func CreateCompanyInformation(companyInformation *models.CompanyInformation, db *gorm.DB) (err error) {
-	db.SavePoint("BeforeCreateCompanyInformation")
+	tx := db.SavePoint("BeforeCreateCompanyInformation")
 	err = db.Model(&models.CompanyInformation{}).Create(&companyInformation).Error
 	if err != nil {
-		db.RollbackTo("BeforeCreateCompanyInformation")
+		tx.RollbackTo("BeforeCreateCompanyInformation")
 		return err
 	}
 
+	tx.Commit()
 	return nil
 }
 
 func DeleteCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB) (err error) {
 	//check if agency exists
+	tx := db.SavePoint("BeforeDeleteCompanyInformation")
 	_, err = GetAgencyByUsername(agencyUsername, db)
 	if err != nil {
 		return err
@@ -39,19 +41,24 @@ func DeleteCompanyInformationByAgencyUsername(agencyUsername string, db *gorm.DB
 
 	err = db.Where("username = ?", agencyUsername).Delete(&models.CompanyInformation{}).Error
 	if err != nil {
+		tx.RollbackTo("BeforeDeleteCompanyInformation")
 		return err
 	}
+	tx.Commit()
 	return nil
 }
 
 func UpdateCompanyInformationByAgencyUsername(agencyUsername string, companyInformation models.CompanyInformation, db *gorm.DB) (err error) {
+	tx := db.SavePoint("BeforeUpdateCompanyInformation")
 	existingCompanyInformation, err := GetCompanyInformationByAgencyUsername(agencyUsername, db)
 	if err != nil {
 		return err
 	}
 	err = db.Model(&existingCompanyInformation).Where("username = ?", agencyUsername).Updates(companyInformation).Error
 	if err != nil {
+		tx.RollbackTo("BeforeUpdateCompanyInformation")
 		return err
 	}
+	tx.Commit()
 	return nil
 }

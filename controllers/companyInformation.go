@@ -2,8 +2,7 @@ package controllers
 
 import (
 	"DebTour/database"
-	"DebTour/models"
-	//"encoding/base64"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -26,8 +25,6 @@ func GetCompanyInformationByAgencyUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	companyInfoResponse := models.CompanyInformationResponse{}
-	companyInfoResponse.Username = agencyUsername
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": companyInformation})
 }
@@ -60,13 +57,16 @@ func GetAllAgenciesWithCompanyInformation(c *gin.Context) {
 // @Success 200 {string} string "Company information deleted successfully"
 // @Router /agencies/companyInformation/{username} [delete]
 func DeleteCompanyInformationByAgencyUsername(c *gin.Context) {
+	tx := database.MainDB.Begin()
 	agencyUsername := c.Param("username")
 
 	err := database.DeleteCompanyInformationByAgencyUsername(agencyUsername, database.MainDB)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "Company information deleted successfully"})
 }
