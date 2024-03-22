@@ -20,6 +20,18 @@ type Tour struct {
 	CreatedTimestamp time.Time `gorm:"autoCreateTime" json:"createdTimestamp"`
 }
 
+type TourWithImagesRequest struct {
+	Name             string                        `json:"name"`
+	StartDate        string                        `json:"startDate"`
+	EndDate          string                        `json:"endDate"`
+	Description      string                        `json:"description"`
+	OverviewLocation string                        `json:"overviewLocation"`
+	Price            float64                       `json:"price"`
+	RefundDueDate    string                        `json:"refundDueDate"`
+	MaxMemberCount   uint                          `json:"maxMemberCount"`
+	Images			 []string						`json:"images"`
+}
+
 type TourWithActivitiesWithLocationWithImagesRequest struct {
 	Name             string                        `json:"name"`
 	StartDate        string                        `json:"startDate"`
@@ -31,6 +43,23 @@ type TourWithActivitiesWithLocationWithImagesRequest struct {
 	MaxMemberCount   uint                          `json:"maxMemberCount"`
 	Activities       []ActivityWithLocationRequest `json:"activities"`
 	Images			 []string						`json:"images"`
+}
+
+func ToTourFromTourWithImagesRequest(tourRequest TourWithImagesRequest, tourId uint, agencyUsername string) (Tour, error) {
+	return Tour{
+		TourId:           tourId,
+		Name:             tourRequest.Name,
+		StartDate:        tourRequest.StartDate,
+		EndDate:          tourRequest.EndDate,
+		Description:      tourRequest.Description,
+		OverviewLocation: tourRequest.OverviewLocation,
+		Price:            tourRequest.Price,
+		RefundDueDate:    tourRequest.RefundDueDate,
+		MaxMemberCount:   tourRequest.MaxMemberCount,
+		MemberCount:      0,
+		Status:           "Available",
+		AgencyUsername:   agencyUsername,
+	}, nil
 }
 
 func ToTour(tourRequest TourWithActivitiesWithLocationWithImagesRequest, tourId uint, agencyUsername string) (Tour, error) {

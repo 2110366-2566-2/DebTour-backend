@@ -33,6 +33,37 @@ func CreateTourImage(tourImage *models.TourImage, db *gorm.DB) error {
 	return nil
 }
 
+func UpdateTourImagesByTourId(tourId uint, images []string, db *gorm.DB) error {
+	db.SavePoint("BeforeUpdateTourImagesByTourId")
+
+	err := DeleteTourImages(tourId, db)
+	if err != nil {
+		db.RollbackTo("BeforeUpdateTourImagesByTourId")
+		return err
+	}
+
+	for _, image := range images {
+		decodedImage, err := base64.StdEncoding.DecodeString(image)
+		if err != nil {
+			db.RollbackTo("BeforeUpdateTourImagesByTourId")
+			return err
+		}
+
+		tourImage := models.TourImage{
+			TourId: tourId,
+			Image:  decodedImage,
+		}
+
+		err = CreateTourImage(&tourImage, db)
+		if err != nil {
+			db.RollbackTo("BeforeUpdateTourImagesByTourId")
+			return err
+		}
+	}
+
+	return nil
+}
+
 func DeleteTourImage(tourId uint, image string, db *gorm.DB) error {
 	err := db.Where("tour_id = ? AND image = ?", tourId, image).Delete(&models.TourImage{}).Error
 	if err != nil {
