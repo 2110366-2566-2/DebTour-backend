@@ -34,7 +34,7 @@ func VerifyAgency(c *gin.Context) {
 
 	agencyUsername := verifyAgency.Username
 
-	agency, err := database.GetAgencyByUsername(verifyAgency.Username, database.MainDB)
+	agency, err := database.GetAgencyByUsername(verifyAgency.Username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to get agency"})
@@ -54,7 +54,7 @@ func VerifyAgency(c *gin.Context) {
 	tim := time.Now()
 	agency.ApproveTime = &tim
 
-	err = database.UpdateAgencyByUsername(agencyUsername, agency, database.MainDB)
+	err = database.UpdateAgencyByUsername(agencyUsername, agency, tx)
 	if err != nil {
 		tx.Rollback()
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to update agency"})

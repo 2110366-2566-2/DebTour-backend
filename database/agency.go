@@ -26,29 +26,28 @@ func GetAgencyWithUserByUsername(username string, db *gorm.DB) (agencyWithUser m
 }
 
 func CreateAgency(agency *models.Agency, image string, db *gorm.DB) (err error) {
-	tx := db.SavePoint("BeforeCreateAgency")
+	db.SavePoint("BeforeCreateAgency")
 
-	result := tx.Model(&models.Agency{}).Create(agency)
+	result := db.Model(&models.Agency{}).Create(agency)
 	if result.Error != nil {
-		tx.RollbackTo("BeforeCreateAgency")
+		db.RollbackTo("BeforeCreateAgency")
 		return result.Error
 	}
 
 	imageByte, err := base64.StdEncoding.DecodeString(image)
 	if err != nil {
-		tx.RollbackTo("BeforeCreateAgency")
+		db.RollbackTo("BeforeCreateAgency")
 		return err
 	}
 
 	companyInformation := models.CompanyInformation{Username: agency.Username, Image: imageByte}
 
-	err = CreateCompanyInformation(&companyInformation, tx)
+	err = CreateCompanyInformation(&companyInformation, db)
 	if err != nil {
-		tx.RollbackTo("BeforeCreateAgency")
+		db.RollbackTo("BeforeCreateAgency")
 		return err
 	}
 
-	tx.Commit()
 	return nil
 }
 
@@ -100,19 +99,34 @@ func GetAllAgenciesWithCompanyInformation(db *gorm.DB) (AgencyWithCompanyInforma
 
 	return agenciesWithCompanyInformation, nil
 }
-func DeleteAgencyByUsername(username string, db *gorm.DB) error {
-	result := db.Model(&models.Agency{}).Where("username = ?", username).Delete(&models.Agency{})
-	return result.Error
-}
+func DeleteAgencyByUsername(username string, db *gorm.DB) (err error) {
+	//cascade delete company information
+	db.SavePoint("BeforeDeleteAgency")
 
-func UpdateAgencyByUsername(username string, agency models.Agency, db *gorm.DB) error {
-	existingUser, err := GetAgencyByUsername(username, db)
+	err = DeleteCompanyInformationByAgencyUsername(username, db)
 	if err != nil {
+		db.RollbackTo("BeforeDeleteAgency")
 		return err
 	}
 
-	result := db.Model(&existingUser).Updates(agency)
-	return result.Error
+	err = db.Where("username = ?", username).Delete(&models.Agency{}).Error
+	if err != nil {
+		db.RollbackTo("BeforeDeleteAgency")
+		return err
+	}
+
+	return err
+}
+
+func UpdateAgencyByUsername(username string, agency models.Agency, db *gorm.DB) (err error) {
+	db.SavePoint("BeforeUpdateAgency")
+	err = db.Model(&models.Agency{}).Where("username = ?", username).Updates(agency).Error
+	if err != nil {
+		db.RollbackTo("BeforeUpdateAgency")
+		return err
+	}
+	db.Commit()
+	return err
 }
 
 func GetAgencyWithCompanyInformationByUsername(username string, db *gorm.DB) (agencyWithCompanyInformation models.AgencyWithCompanyInformation, err error) {

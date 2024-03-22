@@ -14,6 +14,7 @@ import (
 // @description Role allowed: "Admin" and "AgencyThemselves"
 // @Tags company-informations
 // @Produce json
+// @Security ApiKeyAuth
 // @Param username path string true "Agency Username"
 // @Success 200 {object} models.CompanyInformationResponse "Company information"
 // @Router /agencies/companyInformation/{username} [get]
@@ -53,6 +54,7 @@ func GetAllAgenciesWithCompanyInformation(c *gin.Context) {
 // @description Role allowed: "Admin" and "AgencyThemselves"
 // @Tags company-informations
 // @Produce json
+// @Security ApiKeyAuth
 // @Param username path string true "Agency Username"
 // @Success 200 {string} string "Company information deleted successfully"
 // @Router /agencies/companyInformation/{username} [delete]
@@ -60,7 +62,7 @@ func DeleteCompanyInformationByAgencyUsername(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	agencyUsername := c.Param("username")
 
-	err := database.DeleteCompanyInformationByAgencyUsername(agencyUsername, database.MainDB)
+	err := database.DeleteCompanyInformationByAgencyUsername(agencyUsername, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
