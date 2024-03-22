@@ -125,7 +125,7 @@ func UpdateAgencyByUsername(username string, agency models.Agency, db *gorm.DB) 
 		db.RollbackTo("BeforeUpdateAgency")
 		return err
 	}
-	db.Commit()
+
 	return err
 }
 
