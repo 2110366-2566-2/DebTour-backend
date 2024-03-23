@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetAllTourists godoc
+// GetAllTouristsWithUser godoc
 // @Summary Get all tourists
 // @Description Get all tourists
 // @description Role allowed: "Admin"
