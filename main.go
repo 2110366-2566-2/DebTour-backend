@@ -30,10 +30,6 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
-func SetupOauth() {
-	controllers.InitializeOauthenv()
-}
-
 var ()
 
 // @securityDefinitions.apiKey ApiKeyAuth
@@ -54,9 +50,6 @@ func main() {
 
 	SetUpSwagger()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	//Set up Oauth
-	SetupOauth()
 
 	v1 := router.Group("/api/v1")
 	{
