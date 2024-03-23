@@ -45,17 +45,6 @@ func GetReviewsByTouristUsername(username string, db *gorm.DB) ([]models.Review,
 	return reviews, nil
 }
 
-func GetReviewByTourIdAndTouristUsername(tourId uint, username string, db *gorm.DB) (models.Review, error) {
-	var review models.Review
-	err := db.Where("tour_id = ? AND tourist_username = ?", tourId, username).First(&review).Error
-	if err != nil {
-		return models.Review{}, err
-	}
-
-	return review, nil
-
-}
-
 func CreateReview(review models.Review, db *gorm.DB) error {
 	return db.Create(&review).Error
 }
