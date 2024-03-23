@@ -5,14 +5,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetAllLocations(db *gorm.DB) (locations []models.Location, err error) {
-
-	// find all locations in the database
-	result := db.Model(&models.Location{}).Find(&locations)
-
-	return locations, result.Error
-}
-
 func GetLocationById(locationId uint, db *gorm.DB) (location models.Location, err error) {
 
 	// find location by id in the database
