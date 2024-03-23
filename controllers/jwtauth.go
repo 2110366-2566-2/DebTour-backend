@@ -1,26 +1,19 @@
 package controllers
 
 import (
-	// "DebTour/database"
 	"DebTour/database"
 	"DebTour/models"
 	"fmt"
-	"os"
-
-	// "strings"
-
-	// "strings"
-	"time"
-
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-// jwt service
+// JWTService interface
 type JWTService interface {
-	// GenerateToken(username string, role string, isUser bool) string
 	GenerateToken(username string, isUser bool) string
 	ValidateToken(token string) (*jwt.Token, error)
 }
@@ -29,13 +22,6 @@ type authCustomClaims struct {
 	IsUser   bool   `json:"isuser"`
 	jwt.StandardClaims
 }
-
-// type authCustomClaims struct {
-// 	Username string `json:"username"`
-// 	Role     string `json:"role"`
-// 	IsUser   bool   `json:"isuser"`
-// 	jwt.StandardClaims
-// }
 
 type jwtServices struct {
 	secretKey string
@@ -46,7 +32,7 @@ type RoleInput struct {
 	Roles string `json:"roles"`
 }
 
-// auth-jwt
+// JWTAuthService variable
 func JWTAuthService() JWTService {
 	return &jwtServices{
 		secretKey: getSecretKey(),
@@ -62,12 +48,9 @@ func getSecretKey() string {
 	return secret
 }
 
-// func (controllers *jwtServices) GenerateToken(username string, role string, isUser bool) string {
 func (controllers *jwtServices) GenerateToken(username string, isUser bool) string {
-	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>> username:", username)
 	claims := &authCustomClaims{
 		username,
-		// role,
 		isUser,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
@@ -87,8 +70,8 @@ func (controllers *jwtServices) GenerateToken(username string, isUser bool) stri
 
 func (controllers *jwtServices) ValidateToken(encodedToken string) (*jwt.Token, error) {
 	return jwt.Parse(encodedToken, func(token *jwt.Token) (interface{}, error) {
-		if _, isvalid := token.Method.(*jwt.SigningMethodHMAC); !isvalid {
-			return nil, fmt.Errorf("Invalid token", token.Header["alg"])
+		if _, isValid := token.Method.(*jwt.SigningMethodHMAC); !isValid {
+			return nil, fmt.Errorf("invalid token", token.Header["alg"])
 
 		}
 		return []byte(controllers.secretKey), nil
@@ -101,8 +84,6 @@ func ValidateTokenHandler(c *gin.Context) {
 	token, err := JWTAuthService().ValidateToken(encodedToken)
 
 	if !token.Valid {
-		fmt.Println("testing")
-		fmt.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": err.Error()})
 	} else {
 		claims := token.Claims.(jwt.MapClaims)
@@ -130,22 +111,10 @@ func ValidateRoleHandler(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid role"})
 		return
 	}
-	// var roles []string
-	// if c.ShouldBindJSON(&roles) != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid roles type"})
-	// 	return
-	// }
 	roles := []string{"admin", "user"}
-	// Roles := strings.Split(roles.Roles, ", ")
-	// for _, role := range Roles {
-	// 	if role == user.Role {
-	// 		c.JSON(http.StatusOK, gin.H{"success": true})
-	// 		return
-	// 	}
-	// }
+
 	for _, role := range roles {
 		if role == user.Role {
-			fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>", role, user.Role)
 			c.JSON(http.StatusOK, gin.H{"success": true})
 			return
 		}
