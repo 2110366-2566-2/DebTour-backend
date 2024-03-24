@@ -9,19 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ApproveAgency godoc
-// @summary Approve agency
-// @description Approve agency
+// VerifyAgency godoc
+// @summary Verify agency
+// @description Verify agency by admin by specify the status
 // @description Role allowed: "Admin"
 // @tags admin
-// @id ApproveAgency
+// @id VerifyAgency
 // @Security ApiKeyAuth
 // @produce json
-// @param verifyagency body models.VerifyAgency true "VerifyAgency"
-// @success 200 {object} string "Approved/Unapprved by Admin : adminusername"
+// @param VerifyAgency body models.VerifyAgency true "VerifyAgency"
+// @success 200 {object} string "Approved/Unapproved by Admin : adminUsername"
 // @router /agencies/verify [put]
 func VerifyAgency(c *gin.Context) {
 	tx := database.MainDB.Begin()
+
 	//get username from token with bearer
 	authHeader := c.GetHeader("Authorization")
 	adminUsername := GetUsernameByTokenWithBearer(authHeader)
@@ -33,7 +34,6 @@ func VerifyAgency(c *gin.Context) {
 	}
 
 	agencyUsername := verifyAgency.Username
-
 	agency, err := database.GetAgencyByUsername(verifyAgency.Username, tx)
 	if err != nil {
 		tx.Rollback()
@@ -44,7 +44,7 @@ func VerifyAgency(c *gin.Context) {
 	agency.AuthorizeAdminUsername = adminUsername
 	agency.AuthorizeStatus = verifyAgency.Status
 
-	//check if authorizestatus is "Approved" and "Unapproved" , else reject invalid format
+	//check if AuthorizeStatus is "Approved" and "Unapproved" , else reject invalid format
 	if agency.AuthorizeStatus != "Approved" && agency.AuthorizeStatus != "Unapproved" {
 		tx.Rollback()
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid AuthorizeStatus"})

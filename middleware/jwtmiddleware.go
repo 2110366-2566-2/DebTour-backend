@@ -2,8 +2,6 @@ package middleware
 
 import (
 	"DebTour/controllers"
-	"fmt"
-
 	// "fmt"
 	"DebTour/database"
 	"DebTour/models"
@@ -24,7 +22,6 @@ func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>> check ", usernameCheck, " ", tourOwnerCheck)
 		const BEARER_SCHEMA = "Bearer "
 
 		authHeader := c.GetHeader("Authorization")
@@ -50,10 +47,10 @@ func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
 			return
 		}
 		claims := token.Claims.(jwt.MapClaims)
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> username :", claims["username"].(string))
 		var user models.User
 		var tour models.Tour
 		user, err = database.GetUserByUsername(claims["username"].(string), database.MainDB)
+
 		// check role
 		if user.Role == "sudo" {
 			return
@@ -73,15 +70,8 @@ func AuthorizeJWT(roles []string, arg ...int) gin.HandlerFunc {
 				return
 			}
 		}
-		if err != nil {
-			fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>", user.Role, " ", err.Error())
-			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Invalid role"})
-			return
-		}
 		for _, role := range roles {
 			if role == user.Role {
-				// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>", role, user.Role)
-
 				return
 			}
 		}

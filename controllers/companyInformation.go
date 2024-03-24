@@ -12,7 +12,7 @@ import (
 // @Summary Get company information by agency username
 // @Description Get company information by agency username
 // @description Role allowed: "Admin" and "AgencyThemselves"
-// @Tags company-informations
+// @Tags company-information
 // @Produce json
 // @Security ApiKeyAuth
 // @Param username path string true "Agency Username"
@@ -34,7 +34,7 @@ func GetCompanyInformationByAgencyUsername(c *gin.Context) {
 // @Summary Get all agencies with company information
 // @Description Get all agencies with company information
 // @description Role allowed: "Admin"
-// @Tags company-informations
+// @Tags company-information
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {array} models.AgencyWithCompanyInformation
@@ -52,7 +52,7 @@ func GetAllAgenciesWithCompanyInformation(c *gin.Context) {
 // @Summary Delete company information by agency username
 // @Description Delete company information by agency username
 // @description Role allowed: "Admin" and "AgencyThemselves"
-// @Tags company-informations
+// @Tags company-information
 // @Produce json
 // @Security ApiKeyAuth
 // @Param username path string true "Agency Username"

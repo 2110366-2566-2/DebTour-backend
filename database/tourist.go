@@ -46,7 +46,6 @@ func GetAllTourists(db *gorm.DB) (touristsWithUser []models.TouristWithUser, err
 	return touristsWithUser, result.Error
 }
 
-// func delete tourist by username and db
 func DeleteTouristByUsername(username string, db *gorm.DB) (err error) {
 	result := db.Model(&models.Tourist{}).Where("username = ?", username).Delete(&models.Tourist{})
 	return result.Error

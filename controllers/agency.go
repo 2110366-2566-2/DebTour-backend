@@ -47,10 +47,10 @@ func GetAgencyWithUserByUsername(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithUser})
 }
 
-// UpdateAgency godoc
-// @Summary Update a agency
-// @Description Update a agency
-// @description Role allowed: "Admin" and "AgencyThemselves"
+// UpdateAgencyByUsername godoc
+// @Summary Update an agency
+// @Description Update an agency by username
+// @description Role allowed: "Admin" and "Agency Owner"
 // @Tags agencies
 // @Accept json
 // @Produce json
@@ -60,8 +60,8 @@ func GetAgencyWithUserByUsername(c *gin.Context) {
 // @Success 200 {object} models.AgencyWithCompanyInformation
 // @Router /agencies/{username} [put]
 func UpdateAgencyByUsername(c *gin.Context) {
-	//this function updates user, agency and company information
 	tx := database.MainDB.Begin()
+
 	username := c.Param("username")
 	var payload models.AgencyWithCompanyInformation
 	if err := c.ShouldBindJSON(&payload); err != nil {
@@ -76,6 +76,7 @@ func UpdateAgencyByUsername(c *gin.Context) {
 
 	agency := models.ToAgency(payload)
 	agency.Username = username
+
 	//get agency by username
 	agencyByUsername, err := database.GetAgencyByUsername(username, tx)
 	if err != nil {
@@ -90,7 +91,6 @@ func UpdateAgencyByUsername(c *gin.Context) {
 
 	image := payload.CompanyInformation
 
-	// Now you can access agencyWithUser.User and agencyWithUser.Agency
 	err = database.UpdateUserByUsername(username, user, tx)
 	if err != nil {
 		tx.Rollback()
@@ -110,5 +110,4 @@ func UpdateAgencyByUsername(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithCompanyInformation})
 	tx.Commit()
-
 }

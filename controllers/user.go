@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"DebTour/database"
-	"DebTour/models"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -49,37 +47,6 @@ func GetUserByUsername(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 }
 
-// CreateUser godoc
-// @summary Create a user
-// @description Create a user
-// @tags users
-// @id CreateUser
-// @accept json
-// @produce json
-// @param user body models.User true "User"
-// @success 200 {object} models.User
-// @router /users [post]
-type CreateUserInput struct {
-	Username string `json:"username"`
-}
-
-func CreateUser(c *gin.Context) {
-	var user models.User
-	var username CreateUserInput
-	c.ShouldBindJSON(&username)
-	fmt.Println(">>>>>>>>>>>>>>>> User: ", username.Username)
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	err := database.CreateUser(&user, database.MainDB)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": user})
-}
-
 // DeleteUserByUsername godoc
 // @summary Delete user by username
 // @description Delete user by username
@@ -93,8 +60,10 @@ func CreateUser(c *gin.Context) {
 // @router /users/{username} [delete]
 func DeleteUserByUsername(c *gin.Context) {
 	tx := database.MainDB.Begin()
+
 	// Extract the username from the URL path parameters
 	username := c.Param("username")
+
 	//check if user exist
 	_, err := database.GetUserByUsername(username, tx)
 	if err != nil {
@@ -102,15 +71,14 @@ func DeleteUserByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Invalid username"})
 		return
 	}
+
 	// Delete the user by username in Tourist table
-	fmt.Println("Before delete tourist")
 	err = database.DeleteTouristByUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	fmt.Println("After delete tourist")
 
 	// Delete company information by username in CompanyInformation table
 	err = database.DeleteCompanyInformationByAgencyUsername(username, tx)
@@ -121,15 +89,12 @@ func DeleteUserByUsername(c *gin.Context) {
 	}
 
 	// Delete the user by username in Agency table
-	fmt.Println("Before delete Agency")
-
 	err = database.DeleteAgencyByUsername(username, tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	fmt.Println("After delete Agency")
 
 	// Delete the user by username in User table
 	err = database.DeleteUserByUsername(username, tx)
@@ -138,6 +103,7 @@ func DeleteUserByUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+
 	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": "User deleted successfully"})
 }

@@ -63,8 +63,8 @@ func CreateIssueReport(c *gin.Context) {
 	reporterUsername := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
 	issue.ReporterUsername = reporterUsername
 
-	if err := database.MainDB.Create(&issue).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if err := database.CreateIssue(database.MainDB, &issue); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 

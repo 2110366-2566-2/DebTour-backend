@@ -4,6 +4,7 @@ import (
 	"DebTour/database"
 	"DebTour/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -81,4 +82,42 @@ func GetAllJoinings(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": joinings})
+}
+
+// GetTouristByTourId godoc
+// @summary Get a tourist by tourId
+// @description Get a tourist by tourId
+// @description Role allowed: "Admin" and "AgencyOwner"
+// @tags joinings
+// @id GetTouristByTourId
+// @produce json
+// @param id path int true "Tour ID"
+// @Security ApiKeyAuth
+// @success 200 {array} models.JoinedMembers
+// @router /tours/tourists/{id} [get]
+func GetTouristByTourId(c *gin.Context) {
+
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	id := uint(id64)
+
+	// check if tour exists
+	if _, err := database.GetTourByTourId(int(id), database.MainDB); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid tour id"})
+		return
+	}
+
+	joinedMembers, err := database.GetJoinedMembersByTourId(id, database.MainDB)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(joinedMembers), "data": joinedMembers})
 }
