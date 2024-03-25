@@ -245,14 +245,6 @@ func main() {
 		v1.GET("/suggestions",
 			middleware.AuthorizeJWT([]string{"Admin"}),
 			controllers.GetAllSuggestions)
-		// Get all suggestions with location (admin, agency)
-		v1.GET("/suggestions/location",
-			middleware.AuthorizeJWT([]string{"Admin", "Agency"}),
-			controllers.GetAllSuggestionsWithLocation)
-		// Get suggestion with location by suggestion id (admin, agency)
-		v1.GET("/suggestions/location/:suggestion_id",
-			middleware.AuthorizeJWT([]string{"Admin", "Agency"}),
-			controllers.GetSuggestionWithLocationBySuggestionId)
 		// Get suggestion by suggestion id (admin)
 		v1.GET("/suggestions/:suggestion_id",
 			middleware.AuthorizeJWT([]string{"Admin"}),
@@ -261,9 +253,26 @@ func main() {
 		v1.POST("/suggestions",
 			middleware.AuthorizeJWT([]string{"Tourist"}),
 			controllers.CreateSuggestion)
+		// Get all suggestions with location (admin, agency)
+		v1.GET("/suggestions/location",
+			middleware.AuthorizeJWT([]string{"Admin", "Agency"}),
+			controllers.GetAllSuggestionsWithLocation)
+		// Get suggestion with location by suggestion id (admin, agency)
+		v1.GET("/suggestions/location/:suggestion_id",
+			middleware.AuthorizeJWT([]string{"Admin", "Agency"}),
+			controllers.GetSuggestionWithLocationBySuggestionId)
+		// Delete suggestion by suggestion id (admin)
 		v1.DELETE("/suggestions/:suggestion_id",
 			middleware.AuthorizeJWT([]string{"Admin"}),
 			controllers.DeleteSuggestionBySuggestionId)
+		// Get all suggestions by tourist username (admin, tourist themselves)
+		v1.GET("/suggestions/tourist/:tourist_username",
+			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
+			controllers.GetAllSuggestionsWithLocationByTouristUsername)
+		// Delete suggestions by tourist username (admin, tourist themselves)
+		v1.DELETE("/suggestions/tourist/:tourist_username",
+			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
+			controllers.DeleteSuggestionsByTouristUsername)
 
 	}
 
