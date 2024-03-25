@@ -83,7 +83,7 @@ func CreateTransactionPayment(tranactionPaymentCreateForm models.TransactionPaym
 
 func DeleteTransactionPayment(transactionId string, db *gorm.DB) (err error) {
 	// Check if transaction exists
-	if err := GetTransactionPaymentByTransactionId(&models.TransactionPayment{}, transactionId, db); err != nil {
+	if _, err := GetTransactionPaymentByTransactionId(transactionId, db); err != nil {
 		return err
 	}
 
@@ -101,7 +101,7 @@ func DeleteTransactionPayment(transactionId string, db *gorm.DB) (err error) {
 
 func DeleteTransactionPaymentByTourId(tourId string, db *gorm.DB) (err error) {
 	// Check if transaction exists
-	if err := GetTransactionPaymentByTourId(&[]models.TransactionPayment{}, tourId, db); err != nil {
+	if _, err := GetTransactionPaymentByTourId(tourId, db); err != nil {
 		return err
 	}
 
@@ -119,7 +119,7 @@ func DeleteTransactionPaymentByTourId(tourId string, db *gorm.DB) (err error) {
 
 func DeleteTransactionPaymentByTouristUsername(username string, db *gorm.DB) (err error) {
 	// Check if transaction exists
-	if err := GetTransactionPaymentByTouristUsername(&[]models.TransactionPayment{}, username, db); err != nil {
+	if _, err := GetTransactionPaymentByTouristUsername(username, db); err != nil {
 		return err
 	}
 
