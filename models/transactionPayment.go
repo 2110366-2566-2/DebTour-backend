@@ -35,3 +35,15 @@ type FullTransactionPayment struct {
 	Method          string    `json:"method"`
 	Status          string    `json:"status"`
 }
+
+func ToFullTransactionPayment(transaction Transaction, transactionPayment TransactionPayment) FullTransactionPayment {
+	return FullTransactionPayment{
+		TransactionId:   transactionPayment.TransactionId,
+		TourId:          transactionPayment.TourId,
+		TouristUsername: transactionPayment.TouristUsername,
+		Timestamp:       transactionPayment.Timestamp,
+		Amount:          transaction.Amount,
+		Method:          transaction.Method,
+		Status:          transaction.Status,
+	}
+}
