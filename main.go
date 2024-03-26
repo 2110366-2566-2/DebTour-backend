@@ -186,33 +186,33 @@ func main() {
 		// Get all reviews (admin)
 		v1.GET("/reviews",
 			middleware.AuthorizeJWT([]string{"Admin"}),
-			controllers.GetAllReviews)                                                     // admin
+			controllers.GetAllReviews) // admin
 		// Get review by id (all)
-		v1.GET("/reviews/:id", controllers.GetReviewById)                                                                                             // all
+		v1.GET("/reviews/:id", controllers.GetReviewById) // all
 		// Get reviews by tour id (all)
-		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId)                                                                                   // all
+		v1.GET("/reviews/tour/:id", controllers.GetReviewsByTourId) // all
 		// Create review (tourist)
 		v1.POST("/reviews/tour/:id",
 			middleware.AuthorizeJWT([]string{"Tourist"}),
-			controllers.CreateReview)                                          // tourist
+			controllers.CreateReview) // tourist
 		// Get reviews by tourist username (admin, tourist themselves)
 		v1.GET("/reviews/tourist/:username",
 			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
-			controllers.GetReviewsByTouristUsername)       // admin, tourist themselves
+			controllers.GetReviewsByTouristUsername) // admin, tourist themselves
 		// Delete review by id (admin)
 		v1.DELETE("/reviews/:id",
 			middleware.AuthorizeJWT([]string{"Admin"}),
-			controllers.DeleteReview)                                               // admin
+			controllers.DeleteReview) // admin
 		// Delete reviews by tour id (admin, agency themselves)
 		v1.DELETE("/reviews/tour/:id",
 			middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2),
-			controllers.DeleteReviewsByTourId)                    // admin, agency themselves
+			controllers.DeleteReviewsByTourId) // admin, agency themselves
 		// Delete reviews by tourist username (admin, tourist themselves)
 		v1.DELETE("/reviews/tourist/:username",
 			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
 			controllers.DeleteReviewsByTouristUsername) // admin, tourist themselves
 		// Get average rating by tour id (all)
-		v1.GET("/reviews/averageRating/:id", controllers.GetAverageRatingByTourId)                                                                    // all
+		v1.GET("/reviews/averageRating/:id", controllers.GetAverageRatingByTourId) // all
 
 		// Auth
 		// Register tourist (all)
@@ -239,6 +239,40 @@ func main() {
 		v1.PUT("/issues/:issue_id",
 			middleware.AuthorizeJWT([]string{"Admin"}),
 			controllers.UpdateIssueReport)
+
+		// Suggestion
+		// Get all suggestions (admin)
+		v1.GET("/suggestions",
+			middleware.AuthorizeJWT([]string{"Admin"}),
+			controllers.GetAllSuggestions)
+		// Get suggestion by suggestion id (admin)
+		v1.GET("/suggestions/:suggestion_id",
+			middleware.AuthorizeJWT([]string{"Admin"}),
+			controllers.GetSuggestionBySuggestionId)
+		// Create suggestion (tourist)
+		v1.POST("/suggestions",
+			middleware.AuthorizeJWT([]string{"Tourist"}),
+			controllers.CreateSuggestion)
+		// Get all suggestions with location (admin, agency)
+		v1.GET("/suggestions/location",
+			middleware.AuthorizeJWT([]string{"Admin", "Agency"}),
+			controllers.GetAllSuggestionsWithLocation)
+		// Get suggestion with location by suggestion id (admin, agency)
+		v1.GET("/suggestions/location/:suggestion_id",
+			middleware.AuthorizeJWT([]string{"Admin", "Agency"}),
+			controllers.GetSuggestionWithLocationBySuggestionId)
+		// Delete suggestion by suggestion id (admin)
+		v1.DELETE("/suggestions/:suggestion_id",
+			middleware.AuthorizeJWT([]string{"Admin"}),
+			controllers.DeleteSuggestionBySuggestionId)
+		// Get all suggestions by tourist username (admin, tourist themselves)
+		v1.GET("/suggestions/tourist/:tourist_username",
+			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
+			controllers.GetAllSuggestionsWithLocationByTouristUsername)
+		// Delete suggestions by tourist username (admin, tourist themselves)
+		v1.DELETE("/suggestions/tourist/:tourist_username",
+			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
+			controllers.DeleteSuggestionsByTouristUsername)
 
 	}
 
