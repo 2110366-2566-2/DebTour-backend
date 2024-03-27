@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func GetAllTransactionPayments(db *gorm.DB) (fullTransactionPayment models.FullTransactionPayment, err error) {
+func GetAllTransactionPayments(db *gorm.DB) (fullTransactionPayment []models.FullTransactionPayment, err error) {
 	var transactionPayments []models.TransactionPayment
 	result := db.Model(&models.TransactionPayment{}).Find(&transactionPayments)
 
@@ -14,14 +14,14 @@ func GetAllTransactionPayments(db *gorm.DB) (fullTransactionPayment models.FullT
 		transaction := models.Transaction{}
 		err := GetTransactionByTransactionId(&transaction, strconv.Itoa(int(transactionPayment.TransactionId)), db)
 		if err != nil {
-			return models.FullTransactionPayment{}, err
+			return []models.FullTransactionPayment{}, err
 		}
-		fullTransactionPayment = models.ToFullTransactionPayment(transaction, transactionPayment)
+		fullTransactionPayment = append(fullTransactionPayment, models.ToFullTransactionPayment(transaction, transactionPayment))
 	}
 	return fullTransactionPayment, result.Error
 }
 
-func GetTransactionPaymentByTourId(tourId string, db *gorm.DB) (fullTransactionPayment models.FullTransactionPayment, err error) {
+func GetTransactionPaymentByTourId(tourId string, db *gorm.DB) (fullTransactionPayment []models.FullTransactionPayment, err error) {
 	var transactionPayments []models.TransactionPayment
 	result := db.Model(&models.TransactionPayment{}).Where("tour_id = ?", tourId).Find(&transactionPayments)
 
@@ -29,14 +29,14 @@ func GetTransactionPaymentByTourId(tourId string, db *gorm.DB) (fullTransactionP
 		transaction := models.Transaction{}
 		err := GetTransactionByTransactionId(&transaction, strconv.Itoa(int(transactionPayment.TransactionId)), db)
 		if err != nil {
-			return models.FullTransactionPayment{}, err
+			return []models.FullTransactionPayment{}, err
 		}
-		fullTransactionPayment = models.ToFullTransactionPayment(transaction, transactionPayment)
+		fullTransactionPayment = append(fullTransactionPayment, models.ToFullTransactionPayment(transaction, transactionPayment))
 	}
 	return fullTransactionPayment, result.Error
 }
 
-func GetTransactionPaymentByTouristUsername(username string, db *gorm.DB) (fullTransactionPayment models.FullTransactionPayment, err error) {
+func GetTransactionPaymentByTouristUsername(username string, db *gorm.DB) (fullTransactionPayment []models.FullTransactionPayment, err error) {
 	var transactionPayments []models.TransactionPayment
 	result := db.Model(&models.TransactionPayment{}).Where("tourist_username = ?", username).Find(&transactionPayments)
 
@@ -44,9 +44,9 @@ func GetTransactionPaymentByTouristUsername(username string, db *gorm.DB) (fullT
 		transaction := models.Transaction{}
 		err := GetTransactionByTransactionId(&transaction, strconv.Itoa(int(transactionPayment.TransactionId)), db)
 		if err != nil {
-			return models.FullTransactionPayment{}, err
+			return []models.FullTransactionPayment{}, err
 		}
-		fullTransactionPayment = models.ToFullTransactionPayment(transaction, transactionPayment)
+		fullTransactionPayment = append(fullTransactionPayment, models.ToFullTransactionPayment(transaction, transactionPayment))
 	}
 	return fullTransactionPayment, result.Error
 
