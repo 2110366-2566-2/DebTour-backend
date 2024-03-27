@@ -267,11 +267,11 @@ func main() {
 			controllers.DeleteSuggestionBySuggestionId)
 		// Get all suggestions by tourist username (admin, tourist themselves)
 		v1.GET("/suggestions/tourist/:tourist_username",
-			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
+			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}),
 			controllers.GetAllSuggestionsWithLocationByTouristUsername)
 		// Delete suggestions by tourist username (admin, tourist themselves)
 		v1.DELETE("/suggestions/tourist/:tourist_username",
-			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
+			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}),
 			controllers.DeleteSuggestionsByTouristUsername)
 
 	}
