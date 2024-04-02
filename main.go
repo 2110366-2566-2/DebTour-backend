@@ -21,7 +21,7 @@ func SetUpSwagger() {
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = os.Getenv("HOST")
 	docs.SwaggerInfo.BasePath = "/api/v1"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	docs.SwaggerInfo.Schemes = []string{"https"}
 }
 
 func SetupRouter() *gin.Engine {
@@ -276,9 +276,13 @@ func main() {
 
 	}
 
-	err := router.Run(":9000")
+	var err error
+	if os.Getenv("PORT") == "9000" {
+		err = router.Run(":9000")
+	} else {
+		err = router.RunTLS(":443", os.Getenv("CERT_PATH"), os.Getenv("KEY_PATH"))
+	}
 	if err != nil {
 		panic(err)
 	}
-
 }
