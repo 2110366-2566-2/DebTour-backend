@@ -4,6 +4,9 @@ import (
 	"DebTour/models"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"strconv"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -146,4 +149,62 @@ func GetAgencyWithCompanyInformationByUsername(username string, db *gorm.DB) (ag
 
 	agencyWithCompanyInformation = models.ToAgencyWithCompanyInformation(agency, user, companyInformation.Image)
 	return agencyWithCompanyInformation, nil
+}
+
+// create function name "GetRemainingRevenue"
+// Briefly, this function is used to get the remaining revenue of an agency by username.
+// Fitst, Get all tour of this agency by username.
+// Then, get all transaction of each tour.
+
+func GetRemainingRevenue(agencyUsername string, lastWithdrawTime *time.Time, db *gorm.DB) (remainingTransactions []models.FullTransactionPayment, remainingRevenue float64, err error) {
+	// Get agency pointer
+	db.SavePoint("BeforeStartFunctionGetRemainingRevenue")
+	agency, err := GetAgencyByUsername(agencyUsername, db)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	tours, err := GetToursByAgencyUsername(agencyUsername, db)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var transactionPayments []models.FullTransactionPayment
+
+	var totalRevenue float64
+	var maxTransactionTime time.Time // Initialize maxTransactionTime
+	fmt.Println("Before loop tours")
+	for _, tour := range tours {
+		tempTransactionPayments, err := GetTransactionPaymentByTourId(strconv.Itoa(int(tour.TourId)), db)
+		if err != nil {
+			db.RollbackTo("BeforeStartFunctionGetRemainingRevenue")
+			return nil, 0, err
+		}
+		fmt.Println(">>>>>>>>", strconv.Itoa(int(tour.TourId)))
+		for _, transaction := range tempTransactionPayments {
+			fmt.Println(transaction.Timestamp)
+			if transaction.Status == "Success" && (transaction.Timestamp.After(*lastWithdrawTime)) {
+				fmt.Println("I'm in")
+				totalRevenue += transaction.Amount
+				transactionPayments = append(transactionPayments, transaction)
+				// Update maxTransactionTime if the current transaction time is greater
+				if transaction.Timestamp.After(maxTransactionTime) {
+					maxTransactionTime = transaction.Timestamp
+				}
+			}
+		}
+	}
+
+	// Update last withdraw time to the maximum transaction time
+	agency.LastWithdrawTime = &maxTransactionTime
+
+	// Update agency information in the database
+	err = UpdateAgencyByUsername(agencyUsername, agency, db)
+	if err != nil {
+		db.RollbackTo("BeforeStartFunctionGetRemainingRevenue")
+		return nil, 0, err
+	}
+
+	remainingRevenue = totalRevenue
+	return transactionPayments, remainingRevenue, nil
 }

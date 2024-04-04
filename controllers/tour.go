@@ -441,3 +441,24 @@ func CreateTourActivities(c *gin.Context) {
 	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourWithActivitiesWithLocationWithImages})
 }
+
+// GetToursByAgencyUsername godoc
+// @Summary Get tours by agency username
+// @Description Get tours by agency username
+// @description Role allowed: "AgencyOwner"
+// @Tags tours
+// @ID GetToursByAgencyUsername
+// @Produce json
+// @Param username path string true "Username"
+// @Security ApiKeyAuth
+// @Success 200 {array} models.Tour
+// @Router /tours/agency/{username} [get]
+func GetToursByAgencyUsername(c *gin.Context) {
+	username := c.Param("username")
+	tours, err := database.GetToursByAgencyUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tours), "data": tours})
+}

@@ -103,6 +103,8 @@ func main() {
 		v1.POST("/tours/activities/:id",
 			middleware.AuthorizeJWT([]string{"Agency"}),
 			controllers.CreateTourActivities)
+		// Get all tours by agency username (admin, agency owner)
+		v1.GET("/tours/agency/:username", controllers.GetToursByAgencyUsername)
 
 		// Tour images
 		// Get tour images (all)
@@ -147,6 +149,12 @@ func main() {
 		v1.PUT("agencies/verify",
 			middleware.AuthorizeJWT([]string{"Admin"}),
 			controllers.VerifyAgency)
+
+		// Agency Revenue
+		// Get remaining revenue (agency owner)
+		v1.GET("/agencies/getRevenue",
+			middleware.AuthorizeJWT([]string{"Agency"}),
+			controllers.GetRemainingRevenue)
 
 		// Tourists
 		// Get all tourists (admin)
@@ -239,6 +247,46 @@ func main() {
 		v1.PUT("/issues/:issue_id",
 			middleware.AuthorizeJWT([]string{"Admin"}),
 			controllers.UpdateIssueReport)
+
+		// TransactionPayments
+		// Get all transaction payments (admin)
+		v1.GET("/transactionPayments",
+			middleware.AuthorizeJWT([]string{"Admin"}),
+			controllers.GetAllTransactionPayments)
+		// Get transaction payment by transaction id (all)
+		v1.GET("/transactionPayments/:transactionId",
+			middleware.AuthorizeJWT([]string{"Admin", "Agency", "Tourist"}),
+			controllers.GetTransactionPaymentByTransactionId)
+		// Get transaction payment by tour id (Admin, Agency Owner)
+		v1.GET("/transactionPayments/tours/:tourId",
+			middleware.AuthorizeJWT([]string{"Admin", "Agency"}, 2),
+			controllers.GetTransactionPaymentByTourId)
+		// Get transaction payment by tourist username (Admin, Tourist Owner)
+		v1.GET("/transactionPayments/tourists/:username",
+			middleware.AuthorizeJWT([]string{"Admin", "Tourist"}, 1),
+			controllers.GetTransactionPaymentByTouristUsername)
+		// Get Stripe public key (all)
+		v1.GET("/stripePublicKey", controllers.GetStripePublicKey)
+		// Start payment (tourist)
+		v1.POST("/transactionPayments",
+			middleware.AuthorizeJWT([]string{"Tourist"}),
+			controllers.StartTransactionPayment)
+		// Update transaction status (tourist and admin)
+		v1.PUT("/transactionPayments/:transactionId",
+			middleware.AuthorizeJWT([]string{"Tourist", "Admin"}),
+			controllers.UpdateTransactionStatus)
+		// Delete transaction payment by transaction id (admin)
+		v1.DELETE("/transactionPayments/:transactionId",
+			middleware.AuthorizeJWT([]string{"Admin"}),
+			controllers.DeleteTransactionPayment)
+		// Delete transaction payment by tour id (admin)
+		v1.DELETE("/transactionPayments/tours/:tourId",
+			middleware.AuthorizeJWT([]string{"Admin"}),
+			controllers.DeleteTransactionPaymentByTourId)
+		// Delete transaction payment by tourist username (admin)
+		v1.DELETE("/transactionPayments/tourists/:username",
+			middleware.AuthorizeJWT([]string{"Admin"}),
+			controllers.DeleteTransactionPaymentByTouristUsername)
 
 		// Suggestion
 		// Get all suggestions (admin)

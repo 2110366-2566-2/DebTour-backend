@@ -11,6 +11,7 @@ type Agency struct {
 	AuthorizeAdminUsername string     `json:"authorizeAdminUsername"`
 	AuthorizeStatus        string     `gorm:"not null" json:"authorizeStatus"`
 	ApproveTime            *time.Time `json:"approveTime"`
+	LastWithdrawTime       *time.Time `json:"lastWithdrawTime"`
 }
 
 type AgencyWithUser struct {

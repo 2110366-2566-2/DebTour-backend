@@ -111,3 +111,29 @@ func UpdateAgencyByUsername(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": agencyWithCompanyInformation})
 	tx.Commit()
 }
+
+// GetRemainingRevenue godoc
+// @Summary Get remaining revenue
+// @Description Get remaining revenue of an agency by username
+// @description Role allowed: "Agency Owner"
+// @Tags agencies
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.FullTransactionPayment
+// @Router /agencies/getRevenue [get]
+func GetRemainingRevenue(c *gin.Context) {
+	tx := database.MainDB.Begin()
+	authHeader := c.GetHeader("Authorization")
+	agencyUsername := GetUsernameByTokenWithBearer(authHeader)
+	//get agency by username
+	agency, _ := database.GetAgencyByUsername(agencyUsername, database.MainDB)
+	lastTime := agency.LastWithdrawTime
+	remainingTransactions, remainingRevenue, err := database.GetRemainingRevenue(agencyUsername, lastTime, tx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"success": true, "revenue": remainingRevenue, "data": remainingTransactions})
+
+}
