@@ -28,7 +28,25 @@ func GetAllTours(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tours), "data": tours})
+	type TourResponse struct {
+		models.Tour
+		FirstTourImage string
+	}
+
+	var toursResponse []TourResponse
+	for _, tour := range tours {
+		tourImage, err := database.GetTourImages(tour.TourId, database.MainDB)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		if len(tourImage) == 0 {
+			tourImage = append(tourImage, "No image")
+		}
+		toursResponse = append(toursResponse, TourResponse{tour, tourImage[0]})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(tours), "data": toursResponse})
 }
 
 // GetTourByID godoc
@@ -54,7 +72,22 @@ func GetTourByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": tourActivityLocation})
+	agency, err := database.GetAgencyByUsername(tourActivityLocation.AgencyUsername, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	type response struct {
+		models.TourWithActivitiesWithLocationWithImages
+		AgencyName string
+	}
+	responseData := response{
+		TourWithActivitiesWithLocationWithImages: tourActivityLocation,
+		AgencyName: agency.AgencyName,
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": responseData})
 }
 
 // CreateTour godoc
