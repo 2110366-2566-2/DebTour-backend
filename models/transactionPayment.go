@@ -4,6 +4,7 @@ import "time"
 
 type TransactionPayment struct {
 	TransactionId   uint      `gorm:"foreignKey;not null" json:"transactionId"`
+	StripeID        string    `gorm:"not null" json:"stripeID"`
 	TourId          uint      `gorm:"foreignKey;not null" json:"tourId"`
 	TouristUsername string    `gorm:"foreignKey;not null" json:"touristUsername"`
 	Timestamp       time.Time `gorm:"autoCreateTime" json:"timestamp"`
@@ -20,6 +21,7 @@ type TransactionPaymentCreateForm struct {
 func ToTransactionPayment(transaction Transaction, form TransactionPaymentCreateForm) TransactionPayment {
 	return TransactionPayment{
 		TransactionId:   transaction.TransactionId,
+		StripeID:        transaction.StripeID,
 		TourId:          form.TourId,
 		TouristUsername: form.TouristUsername,
 		Timestamp:       time.Now(),
@@ -28,6 +30,7 @@ func ToTransactionPayment(transaction Transaction, form TransactionPaymentCreate
 
 type FullTransactionPayment struct {
 	TransactionId   uint      `gorm:"foreignKey;not null" json:"transactionId"`
+	StripeID        string    `gorm:"not null" json:"stripeID"`
 	TourId          uint      `gorm:"foreignKey;not null" json:"tourId"`
 	TouristUsername string    `gorm:"foreignKey;not null" json:"touristUsername"`
 	Timestamp       time.Time `gorm:"autoCreateTime" json:"timestamp"`
@@ -39,6 +42,7 @@ type FullTransactionPayment struct {
 func ToFullTransactionPayment(transaction Transaction, transactionPayment TransactionPayment) FullTransactionPayment {
 	return FullTransactionPayment{
 		TransactionId:   transactionPayment.TransactionId,
+		StripeID:        transaction.StripeID,
 		TourId:          transactionPayment.TourId,
 		TouristUsername: transactionPayment.TouristUsername,
 		Timestamp:       transactionPayment.Timestamp,

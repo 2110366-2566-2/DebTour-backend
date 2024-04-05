@@ -3,11 +3,14 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
+	"fmt"
+	"net/http"
+	"os"
+	// "strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/paymentintent"
-	"net/http"
-	"os"
 )
 
 // GetAllTransactionPayments godoc
@@ -173,7 +176,7 @@ func StartTransactionPayment(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 
 	params := &stripe.PaymentIntentParams{
-		Amount: stripe.Int64(int64(transactionPaymentCreateForm.Amount * 100)),
+		Amount:   stripe.Int64(int64(transactionPaymentCreateForm.Amount * 100)),
 		Currency: stripe.String(string(stripe.CurrencyTHB)),
 		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
 			Enabled: stripe.Bool(true),
@@ -188,13 +191,14 @@ func StartTransactionPayment(c *gin.Context) {
 
 	// Create transaction payment
 	tx := database.MainDB.Begin()
-	err = database.CreateTransactionPayment(transactionPaymentCreateForm, tx)
+	err = database.CreateTransactionPayment(transactionPaymentCreateForm, pi.ID, tx)
 	if err != nil {
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FUCK, CREATE FAIL!!!!!")
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YIPPE, CREATE SUCCESS @_@")
 	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": pi.ClientSecret})
 }
@@ -266,6 +270,64 @@ func UpdateTransactionStatus(c *gin.Context) {
 
 	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": `"` + transactionId + `" updated to ` + status})
+}
+
+// RefundTransaction godoc
+// @Summary Refund transaction
+// @Description Refund transaction
+// @description Role allowed: "Tourist"
+// @tags transactionPayments
+// @ID RefundTransaction
+// @Produce json
+// @Security ApiKeyAuth
+// @Param transactionId path string true "Transaction ID"
+// @Success 200 {string} string "transactionId"
+// @Router /transactionPayments/refund/{transactionId} [put]
+func RefundTransaction(c *gin.Context) {
+	transactionId := c.Param("transactionId")
+
+	// Check if transaction exists
+	transactionPayment, err := database.GetTransactionPaymentByTransactionId(transactionId, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	// Check if user is authorized
+	username := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
+	user, err := database.GetUserByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Unauthorized"})
+		return
+	}
+	if user.Role != "Admin" && user.Role != "sudo" {
+		if user.Role == "Tourist" {
+			// Tourist Owner?
+			if user.Username != transactionPayment.TouristUsername {
+				// Unauthorized
+				c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "Unauthorized"})
+				return
+			}
+		}
+	}
+
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+	thisTransaction, _ := database.GetTransactionPaymentByTransactionId(transactionId, database.MainDB)
+	_, err = paymentintent.Cancel(thisTransaction.StripeID, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	tx := database.MainDB.Begin()
+	if err := database.UpdateTransactionStatus(transactionId, "Refunded", tx); err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": `"` + transactionId + `" refunded`})
 }
 
 // DeleteTransactionPayment godoc

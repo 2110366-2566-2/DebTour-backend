@@ -66,9 +66,9 @@ func GetTransactionPaymentByTransactionId(transactionId string, db *gorm.DB) (fu
 	return fullTransactionPayment, result.Error
 }
 
-func CreateTransactionPayment(tranactionPaymentCreateForm models.TransactionPaymentCreateForm, db *gorm.DB) (err error) {
+func CreateTransactionPayment(transactionPaymentCreateForm models.TransactionPaymentCreateForm, StripeID string, db *gorm.DB) (err error) {
 	db.SavePoint("BeforeCreateTransactionPayment")
-	transactionCreateForm := models.ToTransactionCreateForm(tranactionPaymentCreateForm)
+	transactionCreateForm := models.ToTransactionCreateForm(transactionPaymentCreateForm, StripeID)
 	transaction := models.ToTransaction(transactionCreateForm)
 	err = CreateTransaction(&transaction, db)
 	if err != nil {
@@ -76,7 +76,7 @@ func CreateTransactionPayment(tranactionPaymentCreateForm models.TransactionPaym
 		return err
 	}
 
-	transactionPayment := models.ToTransactionPayment(transaction, tranactionPaymentCreateForm)
+	transactionPayment := models.ToTransactionPayment(transaction, transactionPaymentCreateForm)
 	result := db.Model(&models.TransactionPayment{}).Create(transactionPayment)
 
 	return result.Error
