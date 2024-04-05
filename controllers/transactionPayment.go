@@ -173,7 +173,7 @@ func StartTransactionPayment(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 
 	params := &stripe.PaymentIntentParams{
-		Amount:   stripe.Int64(int64(transactionPaymentCreateForm.Amount * 100)),
+		Amount: stripe.Int64(int64(transactionPaymentCreateForm.Amount * 100)),
 		Currency: stripe.String(string(stripe.CurrencyTHB)),
 		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
 			Enabled: stripe.Bool(true),
