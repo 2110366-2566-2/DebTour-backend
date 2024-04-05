@@ -88,6 +88,7 @@ func UpdateAgencyByUsername(c *gin.Context) {
 	agency.AuthorizeStatus = agencyByUsername.AuthorizeStatus
 	agency.AuthorizeAdminUsername = agencyByUsername.AuthorizeAdminUsername
 	agency.ApproveTime = agencyByUsername.ApproveTime
+	agency.LastWithdrawTime = agencyByUsername.LastWithdrawTime
 
 	image := payload.CompanyInformation
 
