@@ -2,8 +2,9 @@ package database
 
 import (
 	"DebTour/models"
-	"gorm.io/gorm"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 func GetAllTransactionPayments(db *gorm.DB) (fullTransactionPayment []models.FullTransactionPayment, err error) {

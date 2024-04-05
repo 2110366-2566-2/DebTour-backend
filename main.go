@@ -103,6 +103,8 @@ func main() {
 		v1.POST("/tours/activities/:id",
 			middleware.AuthorizeJWT([]string{"Agency"}),
 			controllers.CreateTourActivities)
+		// Get all tours by agency username (admin, agency owner)
+		v1.GET("/tours/agency/:username", controllers.GetToursByAgencyUsername)
 
 		// Tour images
 		// Get tour images (all)
@@ -147,6 +149,12 @@ func main() {
 		v1.PUT("agencies/verify",
 			middleware.AuthorizeJWT([]string{"Admin"}),
 			controllers.VerifyAgency)
+
+		// Agency Revenue
+		// Get remaining revenue (agency owner)
+		v1.GET("/agencies/getRevenue",
+			middleware.AuthorizeJWT([]string{"Agency"}),
+			controllers.GetRemainingRevenue)
 
 		// Tourists
 		// Get all tourists (admin)

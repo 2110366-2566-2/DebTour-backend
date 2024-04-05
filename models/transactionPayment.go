@@ -10,11 +10,11 @@ type TransactionPayment struct {
 }
 
 type TransactionPaymentCreateForm struct {
-	TourId          uint   `json:"tourId"`
-	TouristUsername string `json:"touristUsername"`
-	Amount          float64   `json:"amount"`
-	Method          string `json:"method"`
-	Status          string `json:"status"`
+	TourId          uint    `json:"tourId"`
+	TouristUsername string  `json:"touristUsername"`
+	Amount          float64 `json:"amount"`
+	Method          string  `json:"method"`
+	Status          string  `json:"status"`
 }
 
 func ToTransactionPayment(transaction Transaction, form TransactionPaymentCreateForm) TransactionPayment {
