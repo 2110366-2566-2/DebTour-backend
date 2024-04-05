@@ -359,9 +359,14 @@ func FilterTours(c *gin.Context) {
 		return
 	}
 
-	var filteredToursResponse []models.FilteredToursResponse
+	type FilteredTourWithImageResponse struct {
+		models.FilteredToursResponse
+		FirstTourImage string
+	}
+
+	var filteredToursResponse []FilteredTourWithImageResponse
 	for _, tour := range tours {
-		filteredToursResponse = append(filteredToursResponse, models.FilteredToursResponse{
+		filteredTour := models.FilteredToursResponse{
 			TourId:           int(tour.TourId),
 			TourName:         tour.Name,
 			StartDate:        tour.StartDate,
@@ -370,7 +375,19 @@ func FilterTours(c *gin.Context) {
 			MemberCount:      tour.MemberCount,
 			MaxMemberCount:   tour.MaxMemberCount,
 			Price:            tour.Price,
-		})
+		}
+
+		images, err := database.GetTourImages(tour.TourId, database.MainDB)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		image := "No image"
+		if len(images) > 0 {
+			image = images[0]
+		}
+
+		filteredToursResponse = append(filteredToursResponse, FilteredTourWithImageResponse{filteredTour, image})
 	}
 
 	if err != nil {
