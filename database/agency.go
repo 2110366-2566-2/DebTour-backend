@@ -156,7 +156,7 @@ func GetAgencyWithCompanyInformationByUsername(username string, db *gorm.DB) (ag
 // Fitst, Get all tour of this agency by username.
 // Then, get all transaction of each tour.
 
-func GetRemainingRevenue(agencyUsername string, lastWithdrawTime *time.Time, db *gorm.DB) (remainingTransactions []models.FullTransactionPayment, remainingRevenue float64, err error) {
+func GetRemainingRevenue(agencyUsername string, role string, lastWithdrawTime *time.Time, db *gorm.DB) (remainingTransactions []models.FullTransactionPayment, remainingRevenue float64, err error) {
 	// Get agency pointer
 	db.SavePoint("BeforeStartFunctionGetRemainingRevenue")
 	agency, err := GetAgencyByUsername(agencyUsername, db)
@@ -196,13 +196,13 @@ func GetRemainingRevenue(agencyUsername string, lastWithdrawTime *time.Time, db 
 	}
 
 	// Update last withdraw time to the maximum transaction time
-	agency.LastWithdrawTime = &maxTransactionTime
-
-	// Update agency information in the database
-	err = UpdateAgencyByUsername(agencyUsername, agency, db)
-	if err != nil {
-		db.RollbackTo("BeforeStartFunctionGetRemainingRevenue")
-		return nil, 0, err
+	if role == "Admin" {
+		agency.LastWithdrawTime = &maxTransactionTime
+		err = UpdateAgencyByUsername(agencyUsername, agency, db)
+		if err != nil {
+			db.RollbackTo("BeforeStartFunctionGetRemainingRevenue")
+			return nil, 0, err
+		}
 	}
 
 	remainingRevenue = totalRevenue
