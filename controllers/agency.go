@@ -122,7 +122,7 @@ func UpdateAgencyByUsername(c *gin.Context) {
 // @Param username path string true "Username"
 // @Security ApiKeyAuth
 // @Success 200 {object} models.FullTransactionPayment
-// @Router /agencies/getRevenue [get]
+// @Router /agencies/getRevenue/{username} [get]
 func GetRemainingRevenue(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	agencyUsername := c.GetString("username")
