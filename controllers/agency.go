@@ -119,6 +119,7 @@ func UpdateAgencyByUsername(c *gin.Context) {
 // @description Role allowed: "Admin"
 // @Tags agencies
 // @Produce json
+// @Param username path string true "Username"
 // @Security ApiKeyAuth
 // @Success 200 {object} models.FullTransactionPayment
 // @Router /agencies/getRevenue [get]
