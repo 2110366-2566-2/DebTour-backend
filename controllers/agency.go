@@ -3,9 +3,8 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 // GetAllAgencies godoc
@@ -116,7 +115,7 @@ func UpdateAgencyByUsername(c *gin.Context) {
 // GetRemainingRevenue godoc
 // @Summary Get remaining revenue
 // @Description Get remaining revenue of an agency by username
-// @description Role allowed: "Admin"
+// @description Role allowed: "Admin" and "Agency Owner"
 // @Tags agencies
 // @Produce json
 // @Param username path string true "Username"
@@ -126,10 +125,20 @@ func UpdateAgencyByUsername(c *gin.Context) {
 func GetRemainingRevenue(c *gin.Context) {
 	tx := database.MainDB.Begin()
 	agencyUsername := c.GetString("username")
-	//get agency by username
+	// check caller
+	authHeader := c.GetHeader("Authorization")
+	username := GetUsernameByTokenWithBearer(authHeader)
+	user, err := database.GetUserByUsername(username, database.MainDB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	role := user.Role
+
 	agency, _ := database.GetAgencyByUsername(agencyUsername, database.MainDB)
 	lastTime := agency.LastWithdrawTime
-	remainingTransactions, remainingRevenue, err := database.GetRemainingRevenue(agencyUsername, lastTime, tx)
+
+	remainingTransactions, remainingRevenue, err := database.GetRemainingRevenue(agencyUsername, role, lastTime, tx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

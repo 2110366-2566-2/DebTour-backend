@@ -151,9 +151,9 @@ func main() {
 			controllers.VerifyAgency)
 
 		// Agency Revenue
-		// Get remaining revenue (agency owner)
+		// Get remaining revenue (admin,agency owner)
 		v1.GET("/agencies/getRevenue/:username",
-			middleware.AuthorizeJWT([]string{"Admin"}),
+			middleware.AuthorizeJWT([]string{"Admin", "Agency"}),
 			controllers.GetRemainingRevenue)
 
 		// Tourists
