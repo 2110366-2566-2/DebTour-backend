@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
 	// "strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go/v72"
@@ -293,6 +295,26 @@ func RefundTransaction(c *gin.Context) {
 		return
 	}
 
+	// get tour from transactionPayment
+	tour, err := database.GetTourByTourId(int(transactionPayment.TourId), database.MainDB)
+	// check whether the refund due date has passed
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	refundDueDateTime, err := time.Parse(time.RFC3339, tour.RefundDueDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to parse RefundDueDate"})
+		return
+	}
+
+	// Check if RefundDueDate has passed
+	if time.Now().After(refundDueDateTime) {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "Refund due date has passed"})
+		return
+	}
+
 	// Check if user is authorized
 	username := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
 	user, err := database.GetUserByUsername(username, database.MainDB)
@@ -315,6 +337,7 @@ func RefundTransaction(c *gin.Context) {
 	thisTransaction, _ := database.GetTransactionPaymentByTransactionId(transactionId, database.MainDB)
 	_, err = paymentintent.Cancel(thisTransaction.StripeID, nil)
 	if err != nil {
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> error paymentintent.Cancel")
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}

@@ -116,16 +116,16 @@ func UpdateAgencyByUsername(c *gin.Context) {
 // GetRemainingRevenue godoc
 // @Summary Get remaining revenue
 // @Description Get remaining revenue of an agency by username
-// @description Role allowed: "Agency Owner"
+// @description Role allowed: "Admin"
 // @Tags agencies
 // @Produce json
+// @Param username path string true "Username"
 // @Security ApiKeyAuth
 // @Success 200 {object} models.FullTransactionPayment
-// @Router /agencies/getRevenue [get]
+// @Router /agencies/getRevenue/{username} [get]
 func GetRemainingRevenue(c *gin.Context) {
 	tx := database.MainDB.Begin()
-	authHeader := c.GetHeader("Authorization")
-	agencyUsername := GetUsernameByTokenWithBearer(authHeader)
+	agencyUsername := c.GetString("username")
 	//get agency by username
 	agency, _ := database.GetAgencyByUsername(agencyUsername, database.MainDB)
 	lastTime := agency.LastWithdrawTime
