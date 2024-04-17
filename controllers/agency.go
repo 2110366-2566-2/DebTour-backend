@@ -116,7 +116,7 @@ func UpdateAgencyByUsername(c *gin.Context) {
 // GetRemainingRevenue godoc
 // @Summary Get remaining revenue
 // @Description Get remaining revenue of an agency by username
-// @description Role allowed: "Admin"
+// @description Role allowed: "Admin" and "Agency Owner"
 // @Tags agencies
 // @Produce json
 // @Param username path string true "Username"
