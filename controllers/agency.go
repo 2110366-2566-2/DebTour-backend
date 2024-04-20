@@ -124,7 +124,7 @@ func UpdateAgencyByUsername(c *gin.Context) {
 // @Router /agencies/getRevenue/{username} [get]
 func GetRemainingRevenue(c *gin.Context) {
 	tx := database.MainDB.Begin()
-	agencyUsername := c.GetString("username")
+	agencyUsername := c.Param("username")
 	// check caller
 	authHeader := c.GetHeader("Authorization")
 	username := GetUsernameByTokenWithBearer(authHeader)

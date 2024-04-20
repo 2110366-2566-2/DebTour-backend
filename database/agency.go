@@ -166,6 +166,9 @@ func GetRemainingRevenue(agencyUsername string, role string, lastWithdrawTime *t
 
 	tours, err := GetToursByAgencyUsername(agencyUsername, db)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, 0, nil
+		}
 		return nil, 0, err
 	}
 
@@ -177,6 +180,9 @@ func GetRemainingRevenue(agencyUsername string, role string, lastWithdrawTime *t
 	for _, tour := range tours {
 		tempTransactionPayments, err := GetTransactionPaymentByTourId(strconv.Itoa(int(tour.TourId)), db)
 		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				continue
+			}
 			db.RollbackTo("BeforeStartFunctionGetRemainingRevenue")
 			return nil, 0, err
 		}
