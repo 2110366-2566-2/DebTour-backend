@@ -21,7 +21,7 @@ func SetUpSwagger() {
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = os.Getenv("HOST")
 	docs.SwaggerInfo.BasePath = "/api/v1"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	docs.SwaggerInfo.Schemes = []string{"https", "http"}
 }
 
 func SetupRouter() *gin.Engine {
