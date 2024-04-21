@@ -47,3 +47,9 @@ func DeleteAllJoiningsByTourId(tourId uint, db *gorm.DB) (err error) {
 
 	return result.Error
 }
+
+func DeleteJoiningByTourIdAndTouristUsername(tourId uint, touristUsername string, db *gorm.DB) (err error) {
+	result := db.Model(&models.Joining{}).Where("tour_id = ? AND tourist_username = ?", tourId, touristUsername).Delete(&models.Joining{})
+
+	return result.Error
+}
