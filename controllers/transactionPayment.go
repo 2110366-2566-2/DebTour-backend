@@ -4,15 +4,17 @@ import (
 	"DebTour/database"
 	"DebTour/models"
 	"fmt"
+	"github.com/stripe/stripe-go/v72/checkout/session"
+	"github.com/stripe/stripe-go/v72/paymentintent"
 	"net/http"
 	"os"
+	"strconv"
 
 	// "strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/paymentintent"
 )
 
 // GetAllTransactionPayments godoc
@@ -153,6 +155,8 @@ func GetStripePublicKey(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
+// @Param successURL query string true "Success URL"
+// @Param cancelURL query string true "Cancel URL"
 // @Param transactionPaymentCreateForm body models.TransactionPaymentCreateForm true "Transaction Payment Create Form"
 // @Success 200 {string} string "clientSecret"
 // @Router /transactionPayments [post]
@@ -177,15 +181,26 @@ func StartTransactionPayment(c *gin.Context) {
 
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 
-	params := &stripe.PaymentIntentParams{
-		Amount:   stripe.Int64(int64(transactionPaymentCreateForm.Amount * 100)),
-		Currency: stripe.String(string(stripe.CurrencyTHB)),
-		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
-			Enabled: stripe.Bool(true),
+	params := &stripe.CheckoutSessionParams{
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency: stripe.String("thb"),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name: stripe.String(strconv.Itoa(int(transactionPaymentCreateForm.TourId))),
+					},
+
+					UnitAmount:  stripe.Int64(int64(transactionPaymentCreateForm.Amount * 100)),
+				},
+				Quantity: stripe.Int64(1),
+			},
 		},
+		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL:	stripe.String(c.Query("successURL")),
+		CancelURL:	stripe.String(c.Query("cancelURL")),
 	}
 
-	pi, err := paymentintent.New(params)
+	s, err := session.New(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -193,16 +208,14 @@ func StartTransactionPayment(c *gin.Context) {
 
 	// Create transaction payment
 	tx := database.MainDB.Begin()
-	err = database.CreateTransactionPayment(transactionPaymentCreateForm, pi.ID, tx)
+	err = database.CreateTransactionPayment(transactionPaymentCreateForm, s.ID, tx)
 	if err != nil {
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FUCK, CREATE FAIL!!!!!")
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YIPPE, CREATE SUCCESS @_@")
 	tx.Commit()
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": pi.ClientSecret})
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": s.URL})
 }
 
 // UpdateTransactionStatus godoc
