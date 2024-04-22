@@ -377,7 +377,7 @@ func RefundTransaction(c *gin.Context) {
 	}
 
 	// update tour member count
-	tour, err = database.GetTourByTourId(int(transactionPayment.TourId), tx)
+	tour, err := database.GetTourByTourId(int(transactionPayment.TourId), tx)
 	if err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error on get tour": err.Error()})
