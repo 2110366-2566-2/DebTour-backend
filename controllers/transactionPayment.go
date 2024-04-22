@@ -3,15 +3,10 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
-	"fmt"
 	"github.com/stripe/stripe-go/v72/checkout/session"
-	"github.com/stripe/stripe-go/v72/paymentintent"
 	"net/http"
 	"os"
 	"strconv"
-
-	// "strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go/v72"
@@ -309,14 +304,14 @@ func RefundTransaction(c *gin.Context) {
 	}
 
 	// get tour from transactionPayment
-	tour, err := database.GetTourByTourId(int(transactionPayment.TourId), database.MainDB)
+	_, err = database.GetTourByTourId(int(transactionPayment.TourId), database.MainDB)
 	// check whether the refund due date has passed
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 
-	refundDueDateTime, err := time.Parse(time.RFC3339, tour.RefundDueDate)
+/*	refundDueDateTime, err := time.Parse(time.RFC3339, tour.RefundDueDate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to parse RefundDueDate"})
 		return
@@ -327,7 +322,7 @@ func RefundTransaction(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"success": false, "message": "Refund due date has passed"})
 		return
 	}
-
+*/
 	// Check if user is authorized
 	username := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
 	user, err := database.GetUserByUsername(username, database.MainDB)
@@ -345,7 +340,7 @@ func RefundTransaction(c *gin.Context) {
 			}
 		}
 	}
-
+/*
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	thisTransaction, _ := database.GetTransactionPaymentByTransactionId(transactionId, database.MainDB)
 	_, err = paymentintent.Cancel(thisTransaction.StripeID, nil)
@@ -354,7 +349,7 @@ func RefundTransaction(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-
+*/
 	tx := database.MainDB.Begin()
 	if err := database.UpdateTransactionStatus(transactionId, "Refunded", tx); err != nil {
 		tx.Rollback()
