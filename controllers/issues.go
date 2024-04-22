@@ -3,6 +3,7 @@ package controllers
 import (
 	"DebTour/database"
 	"DebTour/models"
+	"encoding/base64"
 	"net/http"
 	"strconv"
 
@@ -42,6 +43,19 @@ func GetIssues(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": issues})
 }
 
+func checkValidInput(issue models.Issue) bool {
+	// empty message, too long message, not base64 image
+	if issue.Message == "" || len(issue.Message) > 255 {
+		return false
+	}
+	// try to decode the image
+	_, err := base64.StdEncoding.DecodeString(issue.Image)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 // CreateIssueReport godoc
 // @Summary Create an issue report
 // @Description Create a new issue report
@@ -56,7 +70,12 @@ func GetIssues(c *gin.Context) {
 func CreateIssueReport(c *gin.Context) {
 	var issue models.Issue
 	if err := c.ShouldBindJSON(&issue); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	if !checkValidInput(issue) {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid input"})
 		return
 	}
 

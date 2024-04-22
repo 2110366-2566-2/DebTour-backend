@@ -9,6 +9,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func checkJoinTourRequest(joinTourRequest models.JoinTourRequest) bool {
+	if joinTourRequest.TourId == 0 || len(joinTourRequest.JoinedMembers) == 0 {
+		return false
+	}
+	for _, member := range joinTourRequest.JoinedMembers {
+		if member.FirstName == "" || member.LastName == "" || member.Age <= 0 {
+			return false
+		}
+		if len(member.FirstName) > 50 || len(member.LastName) > 50 {
+			return false
+
+		}
+
+		// name must contain only letters
+		for _, char := range member.FirstName {
+			if (char < 'A' || char > 'Z') && (char < 'a' || char > 'z') {
+				return false
+			}
+		}
+		for _, char := range member.LastName {
+			if (char < 'A' || char > 'Z') && (char < 'a' || char > 'z') {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 // JoinTour godoc
 // @Summary Join tour
 // @Description Join tour
@@ -25,6 +53,11 @@ func JoinTour(c *gin.Context) {
 	var joinTourRequest models.JoinTourRequest
 	if err := c.BindJSON(&joinTourRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	if checkJoinTourRequest(joinTourRequest) == false {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid join tour request"})
 		return
 	}
 

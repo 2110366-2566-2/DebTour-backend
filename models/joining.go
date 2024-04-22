@@ -11,11 +11,7 @@ type Joining struct {
 type JoinTourRequest struct {
 	TourId          uint   `json:"tourId"`
 	TouristUsername string `json:"touristUsername"`
-	JoinedMembers   []struct {
-		FirstName string `json:"firstName"`
-		LastName  string `json:"lastName"`
-		Age       uint   `json:"age"`
-	} `json:"joinedMembers"`
+	JoinedMembers   []JoinedMembers `json:"joinedMembers"`
 }
 
 type JoinedMembers struct {
