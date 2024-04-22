@@ -29,7 +29,7 @@ func JoinTour(c *gin.Context) {
 	}
 
 	touristUsername := GetUsernameByTokenWithBearer(c.GetHeader("Authorization"))
-	joinTourRequest.TouristUsername = touristUsername;
+	joinTourRequest.TouristUsername = touristUsername
 
 	tour, err := database.GetTourByTourId(int(joinTourRequest.TourId), database.MainDB)
 	if err != nil {

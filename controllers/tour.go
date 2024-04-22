@@ -84,7 +84,7 @@ func GetTourByID(c *gin.Context) {
 	}
 	responseData := response{
 		TourWithActivitiesWithLocationWithImages: tourActivityLocation,
-		AgencyName: agency.AgencyName,
+		AgencyName:                               agency.AgencyName,
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": responseData})

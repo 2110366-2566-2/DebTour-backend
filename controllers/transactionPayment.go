@@ -351,9 +351,42 @@ func RefundTransaction(c *gin.Context) {
 	}
 */
 	tx := database.MainDB.Begin()
+	// update transaction status
 	if err := database.UpdateTransactionStatus(transactionId, "Refunded", tx); err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	// remove this torist from joining
+	joinings, err := database.GetJoiningsByTourId(transactionPayment.TourId, tx)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error on get joing with ": err.Error()})
+		return
+	}
+
+	for _, joining := range joinings {
+		if joining.TouristUsername == transactionPayment.TouristUsername {
+			if err := database.DeleteJoiningByTourIdAndTouristUsername(joining.TourId, joining.TouristUsername, tx); err != nil {
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error on delete joining": err.Error()})
+				return
+			}
+		}
+	}
+
+	// update tour member count
+	tour, err = database.GetTourByTourId(int(transactionPayment.TourId), tx)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error on get tour": err.Error()})
+		return
+	}
+	tour.MemberCount = tour.MemberCount - 1
+	if err := database.UpdateTour(&tour, tx); err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error on update tour": err.Error()})
 		return
 	}
 
